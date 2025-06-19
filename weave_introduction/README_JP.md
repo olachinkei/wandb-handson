@@ -41,12 +41,21 @@
    `WANDB_API_KEY`は[こちら](https://docs.wandb.ai/support/find_api_key/)を参考にして取得してください。
    ```bash
    export WANDB_BASE_URL="https://api.wandb.ai"
-   export OPENAI_API_KEY="your_openai_api_key_here"
    export WANDB_API_KEY="your_wandb_api_key_here" 
-   export GOOGLE_API_KEY="your_google_api_key" # otional if you want to try video
+   export GOOGLE_API_KEY="your_google_api_key" # optional if you want to try video
+   export OPENAI_API_KEY="your_openai_api_key_here"
+   # AZURE OPENAIを利用される場合は、以下を設定してください
+   export USE_AZURE_OPENAI=true
+   export AZURE_OPENAI_API_KEY="your_azureopenai_api_key_here"
+   export AZURE_OPENAI_ENDPOINT="https://<your>.openai.azure.com/"
+   export AZURE_OPENAI_DEPLOYMENT="name of your model"
    ```
    
-   **注意:** dedicated cloudやオンプレミス環境をお使いの場合は、`WANDB_BASE_URL`を適切に変更してください。
+   **注意:** 
+   - dedicated cloudやオンプレミス環境をお使いの場合は、`WANDB_BASE_URL`を適切に変更してください。
+   - Azure OpenAIを使用する場合は、環境変数に`USE_AZURE_OPENAI=true`を設定してください。
+
+
 
 4. ** wandbにログイン *
    ```bash  

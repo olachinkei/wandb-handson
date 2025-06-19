@@ -38,15 +38,22 @@ This repository contains hands-on materials for learning W&B Weave, a framework 
    ```
 
 3. **Set up environment variables:**
-Please refer [this documentation](https://docs.wandb.ai/support/find_api_key/)to get `WANDB_API_KEY`.
+
    ```bash
    export WANDB_BASE_URL="https://api.wandb.ai"
+   export WANDB_API_KEY="your_wandb_api_key_here" 
+   export GOOGLE_API_KEY="your_google_api_key" # optional if you want to try video
    export OPENAI_API_KEY="your_openai_api_key_here"
-   export WANDB_API_KEY="your_wandb_api_key_here"
-   export GOOGLE_API_KEY="your_google_api_key" # otional if you want to try video
+   # If you want to use Azure OpenAI, set the following:
+   export AZURE_OPENAI_API_KEY="your_azureopenai_api_key_here"
+   export AZURE_OPENAI_ENDPOINT="https://<your>.openai.azure.com/"
+   export AZURE_OPENAI_DEPLOYMENT="name of your model"
    ```
    
-   **Note:** If you are using dedicated cloud or on-premises environments, please change the `WANDB_BASE_URL` accordingly.
+   **Note:** 
+   - WANDB_API_KEY can be obtained from [here](https://docs.wandb.ai/support/find_api_key/).
+   - If you are using dedicated cloud or on-premises environments, please change the `WANDB_BASE_URL` accordingly.
+   - To use Azure OpenAI, set `USE_AZURE_OPENAI=true` in your environment variables.
 
 4. ** wandb login *
    ```bash  
