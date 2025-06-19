@@ -1,0 +1,8 @@
+wandb==0.19.10
+weave==0.51.44
+openai==1.76.2
+nest_asyncio
+numpy
+jupyter
+moviepy==1.0.3
+google-genai
