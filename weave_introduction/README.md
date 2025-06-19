@@ -1,6 +1,6 @@
 # W&B Weave Hands-on
 
-[日本語版はこちら](README_JP.md)
+[Japese version](README_JP.md)
 
 This repository contains hands-on materials for learning W&B Weave, a framework for tracking, experimenting with, evaluating, deploying, and improving LLM-based applications.
 
