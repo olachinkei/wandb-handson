@@ -38,6 +38,7 @@ This repository contains hands-on materials for learning W&B Weave, a framework 
    ```
 
 3. **Set up environment variables:**
+Please refer [this documentation](https://docs.wandb.ai/support/find_api_key/)to get `WANDB_API_KEY`.
    ```bash
    export WANDB_BASE_URL="https://api.wandb.ai"
    export OPENAI_API_KEY="your_openai_api_key_here"

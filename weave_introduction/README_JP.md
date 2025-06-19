@@ -38,10 +38,11 @@
    ```
 
 3. **環境変数の設定:**
+   `WANDB_API_KEY`は[こちら](https://docs.wandb.ai/support/find_api_key/)を参考にして取得してください。
    ```bash
    export WANDB_BASE_URL="https://api.wandb.ai"
    export OPENAI_API_KEY="your_openai_api_key_here"
-   export WANDB_API_KEY="your_wandb_api_key_here"
+   export WANDB_API_KEY="your_wandb_api_key_here" 
    export GOOGLE_API_KEY="your_google_api_key" # otional if you want to try video
    ```
    
