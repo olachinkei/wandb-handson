@@ -42,6 +42,7 @@ This repository contains hands-on materials for learning W&B Weave, a framework 
    export WANDB_BASE_URL="https://api.wandb.ai"
    export OPENAI_API_KEY="your_openai_api_key_here"
    export WANDB_API_KEY="your_wandb_api_key_here"
+   export GOOGLE_API_KEY="your_google_api_key" # otional if you want to try video
    ```
    
    **Note:** If you are using dedicated cloud or on-premises environments, please change the `WANDB_BASE_URL` accordingly.
