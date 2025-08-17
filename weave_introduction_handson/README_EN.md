@@ -25,6 +25,10 @@ For those who want to understand the complete picture of Weave, please refer to 
    3.1 Using Google Colab
       - For Google Colab, please use the following link
 
+        <a href="https://colab.research.google.com/drive/1bdymP7p7d4z7izsS-PhMUxXcD38p9Hqr" target="_blank">
+         <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+         </a>
+
    3.2 Local Execution
    - Python 3.8 or higher / [uv](https://github.com/astral-sh/uv) (recommended) or pip
 
