@@ -1,6 +1,6 @@
 # W&B Weave ハンズオン
 
-[English version is here](README.md)
+[English version is here](README_EN.md)
 
 ## 概要（このスクリプトで実現すること）
 このリポジトリには、W&B Weaveを学ぶためのハンズオン教材が含まれています。LLMベースのアプリケーションの追跡、実験、評価、デプロイ、改善のためのフレームワークであるW&B Weaveと、W&Bが提供する推論サービスW&B Inferenceを体験していきます。
@@ -24,6 +24,10 @@ Weaveの全体像を理解されたい方は、[こちらのページ](https://w
 
    3.1 Google Colabを利用する場合
       - Google Colabの場合は、以下のリンクを利用してください
+
+         <a href="https://colab.research.google.com/drive/1bdymP7p7d4z7izsS-PhMUxXcD38p9Hqr" target="_blank">
+         <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+         </a>
 
    3.2 ローカル実行の場合
    - Python 3.8以上 / [uv](https://github.com/astral-sh/uv)（推奨）または pip
