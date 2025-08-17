@@ -1,6 +1,6 @@
 # W&B Weave Hands-on
 
-[日本語版はこちら](README_JP.md)
+[Japanese Version](README.md)
 
 ## Overview (What this script accomplishes)
 This repository contains hands-on materials for learning W&B Weave. You will experience W&B Weave, a framework for tracking, experimenting, evaluating, deploying, and improving LLM-based applications, as well as W&B Inference, the inference service provided by W&B.
