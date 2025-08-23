@@ -14,11 +14,32 @@ Weaveの全体像を理解されたい方は、[こちらのページ](https://w
    
    [こちらのページ](https://wandbai.notion.site/W-B-Models-Weave-22dad8882177429ba1e9f0f05e7ceac3?source=copy_link)にW&Bのアカウント発行方法・環境構築方法を記載しています。instructionに従いながら、W&Bのアカウントを発行、API keyの取得を行なってください。Enterpriseのお客様で発行方法やWANDB_BASE_URLがわからない方は、担当のW&Bエンジニアまでご連絡ください。
 
+   W&Bの無料アカウントでのteamの作り方。Projectの作り方は下記です。Enterpriseの環境の方は、Adminの方のみTeamを作成できます。Adminの方にTeamを聞いてください。
+
+   **1.0 Teamとは何か？**
+
+   W&BはTeam, Project, Run(W&B Models), Trace (W&B Weave)という単位で実験を管理します。同じTeamに所属しているチームメートには自動的に実験結果が共有されます。ProjectはTeamの下の階層のフォルダのような管理単位です。Enterpriseの方は、Adminの方が複数のTeamを作れ、Free planの場合は1つしか作ることができません（複数のTeamに所属することはできます）。
+
+   ![teamとは](img/whatisteam.png)
+
+
+
+   **1.1 Team(entity)の作成と招待** 
+
+   Top pageの"Create a team to collaborate"をクリックし、teamを作成します。なお、Freeプランの場合、teamは一つしか作れません
+   ![team作成](img/howtocreateteam.png)
+
+   作成したteamのadminであれば、team memberを招待することができます
+   ![team invite](img/howtoinviteteammember.png)
+
+   **1.2 Projectの作成**
+
+   プロジェクトはTeamの中の"+New project"のボタンを押すか、wandb.init("entity name"/"project name")をpythonで実行すると作成することができます
+   ![project作成](img/howtocreateproject.png)。プロジェクトがひとつもない場合、UIが異なって見えるかと思いますが、スクロールダウンして"Start Exploring"を押し、まず一つ目のprojectを作ってからhomeに戻り、projectのtabを押してみてください。
+
 2. **W&B Inferencの準備**
 
-   LLMのAPIの推論には、W&B Inference (β機能)を利用します。2025年より、W&Bが推論のエンドポイントを提供しています。$5までは無料で利用できるので、ハンズオンではこちらを利用していきます。W&B Inferenceのドキュメントは[こちら](https://docs.wandb.ai/guides/inference/)です。W&B Inferenceで利用できるモデルの一覧は[こちら](https://wandb.ai/inference)です。W&B Inferenceを利用するために、個人のentity以外のentityの中に、projectを作成してください。推論でそのprojectを利用します。projectは以下の画像の"New project"から作成できます。entityは以下の画像の場合、wandb-japanになります。個人のentity(keisuke-kamataなどのアカウントの名前がついたentity)ではinferenceは使えないので、ご注意ください。
-
-   ![W&B Inferenceのプロジェクト作成例](img/Screenshot1.png)
+   LLMのAPIの推論には、W&B Inference (β機能)を利用します。2025年より、W&Bが推論のエンドポイントを提供しており、$5までは無料で利用できるので、ハンズオンではこちらを利用していきます。W&B Inferenceのドキュメントは[こちら](https://docs.wandb.ai/guides/inference/)です。W&B Inferenceで利用できるモデルの一覧は[こちら](https://wandb.ai/inference)です。W&B Inferenceを利用するためには、個人のteam(entity)以外のteam(entity)が必要です。teamの作り方は上記を参考にされてください。
 
 3. **環境構築**
 

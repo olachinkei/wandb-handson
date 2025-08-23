@@ -14,11 +14,34 @@ For those who want to understand the complete picture of Weave, please refer to 
    
    [This page](https://wandbai.notion.site/W-B-Models-Weave-22dad8882177429ba1e9f0f05e7ceac3?source=copy_link) contains instructions for W&B account creation and environment setup. Please follow the instructions to create a W&B account and obtain an API key. Enterprise customers who are unsure about the issuance method or WANDB_BASE_URL should contact their assigned W&B engineer.
 
+   How to create teams and projects for W&B free accounts is described below. For Enterprise environment users, only Admins can create Teams. Please ask your Admin about Teams.
+
+   **1.0 What is a Team?**
+
+   W&B manages experiments in units of Team, Project, Run (W&B Models), and Trace (W&B Weave). Experiment results are automatically shared with teammates belonging to the same Team. Projects are folder-like management units under Teams. For Enterprise users, Admins can create multiple Teams, while Free plan users can only create one (though they can belong to multiple Teams).
+
+   ![What is a team](img/whatisteam.png)
+
+
+
+   **1.1 Team (entity) Creation and Invitation** 
+
+   Click "Create a team to collaborate" on the top page to create a team. Note that Free plan users can only create one team.
+   ![Team creation](img/howtocreateteam.png)
+
+   If you are an admin of the created team, you can invite team members.
+   ![Team invite](img/howtoinviteteammember.png)
+
+   **1.2 Project Creation**
+
+   Projects can be created by pressing the "+New project" button within a Team, or by executing wandb.init("entity name"/"project name") in Python.
+   ![Project creation](img/howtocreateproject.png). If you don't have any projects, the UI may look different as shown below. Please scroll down and press "Start Exploring" to create your first project, then return to home and click the projects tab.
+   
+   ![Initial project view](img/initialproject.png)
+
 2. **W&B Inference Preparation**
 
-   For LLM API inference, we use W&B Inference (β feature). Starting from 2025, W&B provides inference endpoints. Up to $5 is free to use, so we'll use this for the hands-on. W&B Inference documentation is [here](https://docs.wandb.ai/guides/inference/). A list of models available with W&B Inference is [here](https://wandb.ai/inference). To use W&B Inference, please create a project within an entity other than your personal entity. You will use that project for inference. Projects can be created from "New project" shown in the image below. In the case of the image below, the entity would be wandb-japan. Please note that inference cannot be used with personal entities (entities with account names like keisuke-kamata).
-
-   ![W&B Inference Project Creation Example](img/Screenshot1.png)
+   For LLM API inference, we use W&B Inference (β feature). Starting from 2025, W&B provides inference endpoints. Up to $5 is free to use, so we'll use this for the hands-on. W&B Inference documentation is [here](https://docs.wandb.ai/guides/inference/). A list of models available with W&B Inference is [here](https://wandb.ai/inference). To use W&B Inference, you need a team (entity) other than your personal team (entity). Please refer to the above instructions for team creation.
 
 3. **Environment Setup**
 
@@ -36,7 +59,7 @@ For those who want to understand the complete picture of Weave, please refer to 
    - **Clone the repository:**
       ```bash
       git clone https://github.com/olachinkei/wandb-handson.git
-      cd wandb-handson/weave_introduction
+      cd wandb-handson/weave_introduction_handson
       ```
 
    - **Environment setup using uv (recommended):**
@@ -61,7 +84,7 @@ For those who want to understand the complete picture of Weave, please refer to 
       
       **Launch Jupyter Lab and open the notebook:**
       ```bash
-      jupyter lab weave_intro_notebook.ipynb
+      jupyter lab weave_intro_notebook_with_wandb_inference.ipynb
       ```
 
 4. **Environment Variable Setup**
