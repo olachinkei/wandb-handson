@@ -91,8 +91,7 @@ Weaveの全体像を理解されたい方は、[こちらのページ](https://w
    Google Colabを利用の方は、最初のセルに入力をしてください。
 
    export WANDB_BASE_URL="https://api.wandb.ai" # dedicated cloudやオンプレミスを利用の方のみ
-   export WANDB_API_KEY="your_wandb_api_key_here" 
-   export WANDB_API_KEY_PUBLIC_CLOUD= "your_public_cloud_wandb_api_key_here"  # Public cloudユーザーはWANDB_API_KEYと同じ値を使用
+   export WANDB_API_KEY="your_wandb_api_key_here"
    export GOOGLE_API_KEY="your_google_api_key" # optional if you want to try video
    ```
    **注意:** 
