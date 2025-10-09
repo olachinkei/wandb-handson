@@ -1,0 +1,17 @@
+[project]
+name = "weave-introduction-handson"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "azure-identity>=1.25.1",
+    "google-genai>=1.42.0",
+    "jupyter>=1.1.1",
+    "moviepy==1.0.3",
+    "nest-asyncio>=1.6.0",
+    "numpy>=2.3.3",
+    "openai==1.76.2",
+    "wandb==0.19.10",
+    "weave==0.51.44",
+]
