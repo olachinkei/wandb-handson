@@ -1,0 +1,553 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "currency": "USD",
+    "last_updated": "2025-10-13",
+    "description": "eSIM pricing database with local, regional, and global plans"
+  },
+  "local": {
+    "Afghanistan": {
+      "country_code": "AF",
+      "region": "Asia",
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 5.50},
+        {"days": 3, "data_gb": 3, "price": 12.00},
+        {"days": 7, "data_gb": 5, "price": 18.50},
+        {"days": 15, "data_gb": 10, "price": 32.00},
+        {"days": 30, "data_gb": 20, "price": 55.00}
+      ]
+    },
+    "Albania": {
+      "country_code": "AL",
+      "region": "Europe",
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 4.50},
+        {"days": 3, "data_gb": 3, "price": 9.00},
+        {"days": 7, "data_gb": 5, "price": 15.00},
+        {"days": 15, "data_gb": 10, "price": 26.00},
+        {"days": 30, "data_gb": 20, "price": 45.00}
+      ]
+    },
+    "Argentina": {
+      "country_code": "AR",
+      "region": "Latin America",
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 8.25},
+        {"days": 3, "data_gb": 3, "price": 16.50},
+        {"days": 7, "data_gb": 5, "price": 28.00},
+        {"days": 15, "data_gb": 10, "price": 48.00},
+        {"days": 30, "data_gb": 20, "price": 82.50}
+      ]
+    },
+    "Australia": {
+      "country_code": "AU",
+      "region": "Oceania",
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 4.50},
+        {"days": 3, "data_gb": 3, "price": 9.50},
+        {"days": 7, "data_gb": 5, "price": 16.00},
+        {"days": 15, "data_gb": 10, "price": 28.00},
+        {"days": 30, "data_gb": 20, "price": 48.00}
+      ]
+    },
+    "Austria": {
+      "country_code": "AT",
+      "region": "Europe",
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 4.50},
+        {"days": 3, "data_gb": 3, "price": 9.00},
+        {"days": 7, "data_gb": 5, "price": 15.00},
+        {"days": 15, "data_gb": 10, "price": 26.00},
+        {"days": 30, "data_gb": 20, "price": 45.00}
+      ]
+    },
+    "Brazil": {
+      "country_code": "BR",
+      "region": "Latin America",
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 4.50},
+        {"days": 3, "data_gb": 3, "price": 10.00},
+        {"days": 7, "data_gb": 5, "price": 17.50},
+        {"days": 15, "data_gb": 10, "price": 30.00},
+        {"days": 30, "data_gb": 20, "price": 52.00}
+      ]
+    },
+    "Canada": {
+      "country_code": "CA",
+      "region": "North America",
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 7.15},
+        {"days": 3, "data_gb": 3, "price": 15.00},
+        {"days": 7, "data_gb": 5, "price": 26.00},
+        {"days": 15, "data_gb": 10, "price": 45.00},
+        {"days": 30, "data_gb": 20, "price": 78.00}
+      ]
+    },
+    "China": {
+      "country_code": "CN",
+      "region": "Asia",
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 4.50},
+        {"days": 3, "data_gb": 3, "price": 9.50},
+        {"days": 7, "data_gb": 5, "price": 16.50},
+        {"days": 15, "data_gb": 10, "price": 29.00},
+        {"days": 30, "data_gb": 20, "price": 50.00}
+      ]
+    },
+    "Colombia": {
+      "country_code": "CO",
+      "region": "Latin America",
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 4.50},
+        {"days": 3, "data_gb": 3, "price": 10.00},
+        {"days": 7, "data_gb": 5, "price": 17.00},
+        {"days": 15, "data_gb": 10, "price": 29.50},
+        {"days": 30, "data_gb": 20, "price": 51.00}
+      ]
+    },
+    "France": {
+      "country_code": "FR",
+      "region": "Europe",
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 4.50},
+        {"days": 3, "data_gb": 3, "price": 9.00},
+        {"days": 7, "data_gb": 5, "price": 15.00},
+        {"days": 15, "data_gb": 10, "price": 26.00},
+        {"days": 30, "data_gb": 20, "price": 45.00}
+      ]
+    },
+    "Germany": {
+      "country_code": "DE",
+      "region": "Europe",
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 4.50},
+        {"days": 3, "data_gb": 3, "price": 9.00},
+        {"days": 7, "data_gb": 5, "price": 15.00},
+        {"days": 15, "data_gb": 10, "price": 26.00},
+        {"days": 30, "data_gb": 20, "price": 45.00}
+      ]
+    },
+    "Hong Kong": {
+      "country_code": "HK",
+      "region": "Asia",
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 4.50},
+        {"days": 3, "data_gb": 3, "price": 9.50},
+        {"days": 7, "data_gb": 5, "price": 16.00},
+        {"days": 15, "data_gb": 10, "price": 28.00},
+        {"days": 30, "data_gb": 20, "price": 48.00}
+      ]
+    },
+    "India": {
+      "country_code": "IN",
+      "region": "Asia",
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 4.50},
+        {"days": 3, "data_gb": 3, "price": 9.00},
+        {"days": 7, "data_gb": 5, "price": 15.50},
+        {"days": 15, "data_gb": 10, "price": 27.00},
+        {"days": 30, "data_gb": 20, "price": 46.50}
+      ]
+    },
+    "Indonesia": {
+      "country_code": "ID",
+      "region": "Asia",
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 4.50},
+        {"days": 3, "data_gb": 3, "price": 9.00},
+        {"days": 7, "data_gb": 5, "price": 15.50},
+        {"days": 15, "data_gb": 10, "price": 27.00},
+        {"days": 30, "data_gb": 20, "price": 46.50}
+      ]
+    },
+    "Ireland": {
+      "country_code": "IE",
+      "region": "Europe",
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 4.50},
+        {"days": 3, "data_gb": 3, "price": 9.00},
+        {"days": 7, "data_gb": 5, "price": 15.00},
+        {"days": 15, "data_gb": 10, "price": 26.00},
+        {"days": 30, "data_gb": 20, "price": 45.00}
+      ]
+    },
+    "Italy": {
+      "country_code": "IT",
+      "region": "Europe",
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 4.50},
+        {"days": 3, "data_gb": 3, "price": 9.00},
+        {"days": 7, "data_gb": 5, "price": 15.00},
+        {"days": 15, "data_gb": 10, "price": 26.00},
+        {"days": 30, "data_gb": 20, "price": 45.00}
+      ]
+    },
+    "Japan": {
+      "country_code": "JP",
+      "region": "Asia",
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 4.50},
+        {"days": 3, "data_gb": 3, "price": 9.50},
+        {"days": 7, "data_gb": 5, "price": 16.50},
+        {"days": 15, "data_gb": 10, "price": 29.00},
+        {"days": 30, "data_gb": 20, "price": 50.00}
+      ]
+    },
+    "Malaysia": {
+      "country_code": "MY",
+      "region": "Asia",
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 4.50},
+        {"days": 3, "data_gb": 3, "price": 9.00},
+        {"days": 7, "data_gb": 5, "price": 15.50},
+        {"days": 15, "data_gb": 10, "price": 27.00},
+        {"days": 30, "data_gb": 20, "price": 46.50}
+      ]
+    },
+    "Mexico": {
+      "country_code": "MX",
+      "region": "North America",
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 4.50},
+        {"days": 3, "data_gb": 3, "price": 10.00},
+        {"days": 7, "data_gb": 5, "price": 17.00},
+        {"days": 15, "data_gb": 10, "price": 29.50},
+        {"days": 30, "data_gb": 20, "price": 51.00}
+      ]
+    },
+    "Netherlands": {
+      "country_code": "NL",
+      "region": "Europe",
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 4.50},
+        {"days": 3, "data_gb": 3, "price": 9.00},
+        {"days": 7, "data_gb": 5, "price": 15.00},
+        {"days": 15, "data_gb": 10, "price": 26.00},
+        {"days": 30, "data_gb": 20, "price": 45.00}
+      ]
+    },
+    "New Zealand": {
+      "country_code": "NZ",
+      "region": "Oceania",
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 4.50},
+        {"days": 3, "data_gb": 3, "price": 9.50},
+        {"days": 7, "data_gb": 5, "price": 16.50},
+        {"days": 15, "data_gb": 10, "price": 29.00},
+        {"days": 30, "data_gb": 20, "price": 50.00}
+      ]
+    },
+    "Philippines": {
+      "country_code": "PH",
+      "region": "Asia",
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 4.50},
+        {"days": 3, "data_gb": 3, "price": 9.00},
+        {"days": 7, "data_gb": 5, "price": 15.50},
+        {"days": 15, "data_gb": 10, "price": 27.00},
+        {"days": 30, "data_gb": 20, "price": 46.50}
+      ]
+    },
+    "Portugal": {
+      "country_code": "PT",
+      "region": "Europe",
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 4.50},
+        {"days": 3, "data_gb": 3, "price": 9.00},
+        {"days": 7, "data_gb": 5, "price": 15.00},
+        {"days": 15, "data_gb": 10, "price": 26.00},
+        {"days": 30, "data_gb": 20, "price": 45.00}
+      ]
+    },
+    "Singapore": {
+      "country_code": "SG",
+      "region": "Asia",
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 4.50},
+        {"days": 3, "data_gb": 3, "price": 9.50},
+        {"days": 7, "data_gb": 5, "price": 16.50},
+        {"days": 15, "data_gb": 10, "price": 29.00},
+        {"days": 30, "data_gb": 20, "price": 50.00}
+      ]
+    },
+    "South Korea": {
+      "country_code": "KR",
+      "region": "Asia",
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 4.50},
+        {"days": 3, "data_gb": 3, "price": 9.50},
+        {"days": 7, "data_gb": 5, "price": 16.50},
+        {"days": 15, "data_gb": 10, "price": 29.00},
+        {"days": 30, "data_gb": 20, "price": 50.00}
+      ]
+    },
+    "Spain": {
+      "country_code": "ES",
+      "region": "Europe",
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 4.50},
+        {"days": 3, "data_gb": 3, "price": 9.00},
+        {"days": 7, "data_gb": 5, "price": 15.00},
+        {"days": 15, "data_gb": 10, "price": 26.00},
+        {"days": 30, "data_gb": 20, "price": 45.00}
+      ]
+    },
+    "Sweden": {
+      "country_code": "SE",
+      "region": "Europe",
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 4.50},
+        {"days": 3, "data_gb": 3, "price": 9.00},
+        {"days": 7, "data_gb": 5, "price": 15.00},
+        {"days": 15, "data_gb": 10, "price": 26.00},
+        {"days": 30, "data_gb": 20, "price": 45.00}
+      ]
+    },
+    "Switzerland": {
+      "country_code": "CH",
+      "region": "Europe",
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 4.50},
+        {"days": 3, "data_gb": 3, "price": 9.50},
+        {"days": 7, "data_gb": 5, "price": 16.00},
+        {"days": 15, "data_gb": 10, "price": 28.00},
+        {"days": 30, "data_gb": 20, "price": 48.00}
+      ]
+    },
+    "Taiwan": {
+      "country_code": "TW",
+      "region": "Asia",
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 4.50},
+        {"days": 3, "data_gb": 3, "price": 9.50},
+        {"days": 7, "data_gb": 5, "price": 16.50},
+        {"days": 15, "data_gb": 10, "price": 29.00},
+        {"days": 30, "data_gb": 20, "price": 50.00}
+      ]
+    },
+    "Thailand": {
+      "country_code": "TH",
+      "region": "Asia",
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 4.50},
+        {"days": 3, "data_gb": 3, "price": 9.00},
+        {"days": 7, "data_gb": 5, "price": 15.50},
+        {"days": 15, "data_gb": 10, "price": 27.00},
+        {"days": 30, "data_gb": 20, "price": 46.50}
+      ]
+    },
+    "Turkey": {
+      "country_code": "TR",
+      "region": "Europe",
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 4.50},
+        {"days": 3, "data_gb": 3, "price": 9.50},
+        {"days": 7, "data_gb": 5, "price": 16.00},
+        {"days": 15, "data_gb": 10, "price": 28.00},
+        {"days": 30, "data_gb": 20, "price": 48.00}
+      ]
+    },
+    "United Arab Emirates": {
+      "country_code": "AE",
+      "region": "Middle East",
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 4.50},
+        {"days": 3, "data_gb": 3, "price": 9.50},
+        {"days": 7, "data_gb": 5, "price": 16.50},
+        {"days": 15, "data_gb": 10, "price": 29.00},
+        {"days": 30, "data_gb": 20, "price": 50.00}
+      ]
+    },
+    "United Kingdom": {
+      "country_code": "GB",
+      "region": "Europe",
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 4.50},
+        {"days": 3, "data_gb": 3, "price": 9.00},
+        {"days": 7, "data_gb": 5, "price": 15.00},
+        {"days": 15, "data_gb": 10, "price": 26.00},
+        {"days": 30, "data_gb": 20, "price": 45.00}
+      ]
+    },
+    "United States": {
+      "country_code": "US",
+      "region": "North America",
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 4.50},
+        {"days": 3, "data_gb": 3, "price": 10.00},
+        {"days": 7, "data_gb": 5, "price": 17.50},
+        {"days": 15, "data_gb": 10, "price": 30.50},
+        {"days": 30, "data_gb": 20, "price": 53.00}
+      ]
+    },
+    "Vietnam": {
+      "country_code": "VN",
+      "region": "Asia",
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 4.50},
+        {"days": 3, "data_gb": 3, "price": 9.00},
+        {"days": 7, "data_gb": 5, "price": 15.50},
+        {"days": 15, "data_gb": 10, "price": 27.00},
+        {"days": 30, "data_gb": 20, "price": 46.50}
+      ]
+    }
+  },
+  "regional": {
+    "Africa": {
+      "countries": [
+        "Algeria", "Angola", "Benin", "Botswana", "Burkina Faso", "Cameroon",
+        "Cape Verde", "Chad", "Congo", "Egypt", "Ethiopia", "Gabon", "Gambia",
+        "Ghana", "Guinea", "Kenya", "Lesotho", "Liberia", "Madagascar", "Malawi",
+        "Mali", "Mauritius", "Morocco", "Mozambique", "Namibia", "Niger", "Nigeria",
+        "Rwanda", "Senegal", "Seychelles", "Sierra Leone", "South Africa", "Tanzania",
+        "Togo", "Tunisia", "Uganda", "Zambia", "Zimbabwe"
+      ],
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 26.50},
+        {"days": 3, "data_gb": 3, "price": 52.00},
+        {"days": 7, "data_gb": 5, "price": 88.00},
+        {"days": 15, "data_gb": 10, "price": 155.00},
+        {"days": 30, "data_gb": 20, "price": 270.00}
+      ]
+    },
+    "Asia": {
+      "countries": [
+        "Afghanistan", "Bangladesh", "Bhutan", "Brunei", "Cambodia", "China",
+        "Hong Kong", "India", "Indonesia", "Japan", "Kazakhstan", "Kyrgyzstan",
+        "Laos", "Macao", "Malaysia", "Maldives", "Mongolia", "Myanmar", "Nepal",
+        "Pakistan", "Philippines", "Singapore", "South Korea", "Sri Lanka", "Taiwan",
+        "Tajikistan", "Thailand", "Uzbekistan", "Vietnam"
+      ],
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 5.00},
+        {"days": 3, "data_gb": 3, "price": 11.00},
+        {"days": 7, "data_gb": 5, "price": 19.50},
+        {"days": 15, "data_gb": 10, "price": 34.00},
+        {"days": 30, "data_gb": 20, "price": 59.00}
+      ]
+    },
+    "Caribbean": {
+      "countries": [
+        "Anguilla", "Antigua and Barbuda", "Aruba", "Bahamas", "Barbados",
+        "Bermuda", "British Virgin Islands", "Cayman Islands", "Curacao",
+        "Dominica", "Dominican Republic", "Grenada", "Guadeloupe", "Haiti",
+        "Jamaica", "Martinique", "Montserrat", "Puerto Rico", "Saint Kitts and Nevis",
+        "Saint Lucia", "Saint Vincent and the Grenadines", "Sint Maarten",
+        "Trinidad and Tobago", "Turks and Caicos", "US Virgin Islands"
+      ],
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 8.25},
+        {"days": 3, "data_gb": 3, "price": 18.00},
+        {"days": 7, "data_gb": 5, "price": 32.00},
+        {"days": 15, "data_gb": 10, "price": 56.00},
+        {"days": 30, "data_gb": 20, "price": 98.00}
+      ]
+    },
+    "Europe": {
+      "countries": [
+        "Albania", "Andorra", "Austria", "Belgium", "Bosnia and Herzegovina",
+        "Bulgaria", "Croatia", "Cyprus", "Czech Republic", "Denmark", "Estonia",
+        "Faroe Islands", "Finland", "France", "Germany", "Gibraltar", "Greece",
+        "Guernsey", "Hungary", "Iceland", "Ireland", "Isle of Man", "Italy",
+        "Jersey", "Kosovo", "Latvia", "Liechtenstein", "Lithuania", "Luxembourg",
+        "Malta", "Moldova", "Monaco", "Montenegro", "Netherlands", "North Macedonia",
+        "Norway", "Poland", "Portugal", "Romania", "San Marino", "Serbia", "Slovakia",
+        "Slovenia", "Spain", "Sweden", "Switzerland", "Turkey", "Ukraine", "United Kingdom",
+        "Vatican City"
+      ],
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 5.00},
+        {"days": 3, "data_gb": 3, "price": 11.00},
+        {"days": 7, "data_gb": 5, "price": 19.00},
+        {"days": 15, "data_gb": 10, "price": 33.00},
+        {"days": 30, "data_gb": 20, "price": 57.00}
+      ]
+    },
+    "European Union": {
+      "countries": [
+        "Austria", "Belgium", "Bulgaria", "Croatia", "Cyprus", "Czech Republic",
+        "Denmark", "Estonia", "Finland", "France", "Germany", "Greece", "Hungary",
+        "Ireland", "Italy", "Latvia", "Lithuania", "Luxembourg", "Malta", "Netherlands",
+        "Poland", "Portugal", "Romania", "Slovakia", "Slovenia", "Spain", "Sweden",
+        "United Kingdom"
+      ],
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 4.50},
+        {"days": 3, "data_gb": 3, "price": 10.00},
+        {"days": 7, "data_gb": 5, "price": 17.50},
+        {"days": 15, "data_gb": 10, "price": 30.50},
+        {"days": 30, "data_gb": 20, "price": 53.00}
+      ]
+    },
+    "Latin America": {
+      "countries": [
+        "Argentina", "Belize", "Bolivia", "Brazil", "Chile", "Colombia",
+        "Costa Rica", "Ecuador", "El Salvador", "French Guiana", "Guatemala",
+        "Guyana", "Honduras", "Nicaragua", "Panama", "Paraguay", "Peru",
+        "Suriname", "Uruguay", "Venezuela"
+      ],
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 8.80},
+        {"days": 3, "data_gb": 3, "price": 19.50},
+        {"days": 7, "data_gb": 5, "price": 34.00},
+        {"days": 15, "data_gb": 10, "price": 59.50},
+        {"days": 30, "data_gb": 20, "price": 103.00}
+      ]
+    },
+    "Middle East": {
+      "countries": [
+        "Bahrain", "Egypt", "Iran", "Iraq", "Israel", "Jordan", "Kuwait",
+        "Lebanon", "Oman", "Palestine", "Qatar", "Saudi Arabia", "United Arab Emirates", "Yemen"
+      ],
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 7.70},
+        {"days": 3, "data_gb": 3, "price": 17.00},
+        {"days": 7, "data_gb": 5, "price": 30.00},
+        {"days": 15, "data_gb": 10, "price": 52.50},
+        {"days": 30, "data_gb": 20, "price": 91.00}
+      ]
+    },
+    "North America": {
+      "countries": [
+        "Canada", "Mexico", "United States"
+      ],
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 6.60},
+        {"days": 3, "data_gb": 3, "price": 14.50},
+        {"days": 7, "data_gb": 5, "price": 25.50},
+        {"days": 15, "data_gb": 10, "price": 44.50},
+        {"days": 30, "data_gb": 20, "price": 77.00}
+      ]
+    },
+    "Oceania": {
+      "countries": [
+        "Australia", "Fiji", "New Zealand", "Papua New Guinea", "Samoa",
+        "Tonga", "Vanuatu"
+      ],
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 4.50},
+        {"days": 3, "data_gb": 3, "price": 10.50},
+        {"days": 7, "data_gb": 5, "price": 18.50},
+        {"days": 15, "data_gb": 10, "price": 32.50},
+        {"days": 30, "data_gb": 20, "price": 56.00}
+      ]
+    }
+  },
+  "global": {
+    "Discover Global": {
+      "coverage": "130+ countries worldwide",
+      "regions": [
+        "Africa", "Asia", "Caribbean", "Europe", "Latin America",
+        "Middle East", "North America", "Oceania"
+      ],
+      "plans": [
+        {"days": 1, "data_gb": 1, "price": 8.80},
+        {"days": 3, "data_gb": 3, "price": 20.00},
+        {"days": 7, "data_gb": 5, "price": 35.50},
+        {"days": 15, "data_gb": 10, "price": 62.00},
+        {"days": 30, "data_gb": 20, "price": 108.00}
+      ]
+    }
+  }
+}
+

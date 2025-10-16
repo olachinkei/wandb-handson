@@ -1,0 +1,73 @@
+[
+  {
+    "id": "book_001",
+    "input": "I want to purchase the Japan 7-day plan for $19.99.",
+    "user_id": "user_001",
+    "plan_price": 19.99,
+    "quantity": 1,
+    "expected_tool_calls": ["status_check", "cost_calculator"],
+    "expected_ready_to_book": true,
+    "expected_total": 21.59,
+    "is_ambiguous": false,
+    "description": "Simple booking with logged-in user with payment"
+  },
+  {
+    "id": "book_002",
+    "input": "I'd like to buy this plan.",
+    "user_id": "user_002",
+    "plan_price": 29.99,
+    "quantity": 1,
+    "expected_tool_calls": ["status_check"],
+    "expected_ready_to_book": false,
+    "expected_prompt_payment": true,
+    "is_ambiguous": false,
+    "description": "User without payment method (plan price provided in context)"
+  },
+  {
+    "id": "book_003",
+    "input": "I want to purchase 2 plans for $15 each.",
+    "user_id": "user_001",
+    "plan_price": 15.00,
+    "quantity": 2,
+    "expected_tool_calls": ["status_check", "cost_calculator"],
+    "expected_ready_to_book": true,
+    "expected_total": 32.40,
+    "is_ambiguous": false,
+    "description": "Multiple quantity purchase"
+  },
+  {
+    "id": "book_004",
+    "input": "Book this plan for me.",
+    "user_id": "user_003",
+    "plan_price": 25.00,
+    "quantity": 1,
+    "expected_tool_calls": ["status_check"],
+    "expected_ready_to_book": false,
+    "expected_prompt_login": true,
+    "is_ambiguous": false,
+    "description": "User not logged in (plan price provided in context)"
+  },
+  {
+    "id": "book_005",
+    "input": "I want to buy the regional plan for $49.99.",
+    "user_id": "user_005",
+    "plan_price": 49.99,
+    "quantity": 1,
+    "expected_tool_calls": ["status_check", "cost_calculator"],
+    "expected_ready_to_book": true,
+    "expected_total": 53.99,
+    "is_ambiguous": false,
+    "description": "Higher priced plan booking"
+  },
+  {
+    "id": "book_006",
+    "input": "I want to book a plan.",
+    "user_id": "user_001",
+    "plan_price": null,
+    "quantity": null,
+    "expected_tool_calls": [],
+    "expected_ready_to_book": false,
+    "is_ambiguous": true,
+    "description": "Ambiguous booking request - missing plan details and price"
+  }
+]

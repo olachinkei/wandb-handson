@@ -1,0 +1,79 @@
+[
+  {
+    "id": "rag_001",
+    "input": "What is an eSIM?",
+    "expected_tool_calls": ["search_knowledge_base"],
+    "expected_topics": ["eSIM", "digital SIM", "embedded SIM"],
+    "expected_out_of_scope": false,
+    "is_ambiguous": false,
+    "description": "Basic eSIM definition question"
+  },
+  {
+    "id": "rag_002",
+    "input": "Is my iPhone 13 compatible with eSIM?",
+    "expected_tool_calls": ["search_knowledge_base"],
+    "expected_topics": ["iPhone 13", "compatibility", "support"],
+    "expected_answer_relevance": "high",
+    "expected_out_of_scope": false,
+    "is_ambiguous": false,
+    "description": "Device compatibility question"
+  },
+  {
+    "id": "rag_003",
+    "input": "How do I activate an eSIM on my Android phone?",
+    "expected_tool_calls": ["search_knowledge_base"],
+    "expected_topics": ["activation", "Android", "setup"],
+    "expected_answer_relevance": "high",
+    "expected_out_of_scope": false,
+    "is_ambiguous": false,
+    "description": "Activation instructions question"
+  },
+  {
+    "id": "rag_004",
+    "input": "My eSIM is not working. What should I do?",
+    "expected_tool_calls": ["search_knowledge_base"],
+    "expected_topics": ["troubleshooting", "not working", "issues"],
+    "expected_answer_relevance": "high",
+    "expected_out_of_scope": false,
+    "is_ambiguous": false,
+    "description": "Troubleshooting question"
+  },
+  {
+    "id": "rag_005",
+    "input": "What is the stock price of telecommunications companies?",
+    "expected_tool_calls": [],
+    "expected_out_of_scope": true,
+    "expected_redirect": null,
+    "is_ambiguous": false,
+    "description": "Completely out of scope - stock market question"
+  },
+  {
+    "id": "rag_006",
+    "input": "Can you recommend a good Italian restaurant in Tokyo?",
+    "expected_tool_calls": [],
+    "expected_out_of_scope": true,
+    "expected_redirect": null,
+    "is_ambiguous": false,
+    "description": "Completely out of scope - restaurant recommendation"
+  },
+  {
+    "id": "rag_007",
+    "input": "Can I use eSIM for international travel?",
+    "expected_tool_calls": ["search_knowledge_base"],
+    "expected_topics": ["travel", "international", "roaming"],
+    "expected_answer_relevance": "high",
+    "expected_out_of_scope": false,
+    "is_ambiguous": false,
+    "description": "Travel-related question"
+  },
+  {
+    "id": "rag_008",
+    "input": "Is eSIM secure?",
+    "expected_tool_calls": ["search_knowledge_base"],
+    "expected_topics": ["security", "privacy", "safe"],
+    "expected_answer_relevance": "high",
+    "expected_out_of_scope": false,
+    "is_ambiguous": false,
+    "description": "Security and privacy question"
+  }
+]
