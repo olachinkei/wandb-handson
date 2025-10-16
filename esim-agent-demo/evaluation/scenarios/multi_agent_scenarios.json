@@ -1,0 +1,441 @@
+[
+  {
+    "id": "multi_001",
+    "input": "I want to find a plan for Japan for 7 days and purchase it.",
+    "user_id": "user_001",
+    "description": "End-to-end flow: Plan search \u2192 Booking (logged in with payment)",
+    "expected_agent_sequence": [
+      "eSIM Agent",
+      "Plan Search Agent"
+    ],
+    "expected_tools": [
+      "ask_country_period",
+      "plan_search",
+      "status_check",
+      "cost_calculator"
+    ],
+    "intermediate_checks": {
+      "plan_search_result": {
+        "country": "Japan",
+        "days": 7,
+        "plan_type": "local"
+      }
+    },
+    "final_checks": {
+      "booking_completed": true,
+      "total_shown": true,
+      "expected_plan_price": 16.5
+    },
+    "expected_step_range": [
+      5,
+      15
+    ],
+    "is_ambiguous": false,
+    "expected_final_output_description": "The agent should present a local eSIM plan for Japan for 7 days at $16.5. It should then complete the booking, show the total cost including 8% tax, and confirm the purchase."
+  },
+  {
+    "id": "multi_002",
+    "input": "Find me a plan for France for 14 days and book it.",
+    "user_id": "user_001",
+    "description": "End-to-end flow with longer duration plan",
+    "expected_agent_sequence": [
+      "eSIM Agent",
+      "Plan Search Agent"
+    ],
+    "expected_tools": [
+      "ask_country_period",
+      "plan_search",
+      "status_check",
+      "cost_calculator"
+    ],
+    "intermediate_checks": {
+      "plan_search_result": {
+        "country": "France",
+        "days": 14,
+        "plan_type": "local"
+      }
+    },
+    "final_checks": {
+      "booking_completed": true,
+      "total_shown": true,
+      "expected_plan_price": 26.0
+    },
+    "expected_step_range": [
+      5,
+      15
+    ],
+    "is_ambiguous": false,
+    "expected_final_output_description": "The agent should present a local eSIM plan for France for 14 days at $26.0. It should then complete the booking, show the total cost including 8% tax, and confirm the purchase."
+  },
+  {
+    "id": "multi_003",
+    "input": "I need a plan for USA for 30 days. Can you help me book it?",
+    "user_id": "user_001",
+    "description": "End-to-end flow with 30-day plan",
+    "expected_agent_sequence": [
+      "eSIM Agent",
+      "Plan Search Agent"
+    ],
+    "expected_tools": [
+      "ask_country_period",
+      "plan_search",
+      "status_check",
+      "cost_calculator"
+    ],
+    "intermediate_checks": {
+      "plan_search_result": {
+        "country": "USA",
+        "days": 30,
+        "plan_type": "local"
+      }
+    },
+    "final_checks": {
+      "booking_completed": true,
+      "total_shown": true,
+      "expected_plan_price": 53.0
+    },
+    "expected_step_range": [
+      5,
+      15
+    ],
+    "is_ambiguous": false,
+    "expected_final_output_description": "The agent should present a local eSIM plan for USA for 30 days at $53.0. It should then complete the booking, show the total cost including 8% tax, and confirm the purchase."
+  },
+  {
+    "id": "multi_004",
+    "input": "Search for a plan for Germany for 10 days and I want to purchase it.",
+    "user_id": "user_002",
+    "description": "End-to-end flow with user without payment method",
+    "expected_agent_sequence": [
+      "eSIM Agent",
+      "Plan Search Agent"
+    ],
+    "expected_tools": [
+      "ask_country_period",
+      "plan_search",
+      "status_check"
+    ],
+    "intermediate_checks": {
+      "plan_search_result": {
+        "country": "Germany",
+        "days": 10,
+        "plan_type": "local"
+      }
+    },
+    "final_checks": {
+      "booking_completed": false,
+      "payment_prompt_shown": true,
+      "plan_found": true
+    },
+    "expected_step_range": [
+      5,
+      12
+    ],
+    "is_ambiguous": false,
+    "expected_final_output_description": "The agent should present a local eSIM plan for Germany for 10 days at $N/A and offer to help with booking."
+  },
+  {
+    "id": "multi_005",
+    "input": "Find a plan for Brazil for 5 days and book it for me.",
+    "user_id": "user_003",
+    "description": "End-to-end flow with user not logged in",
+    "expected_agent_sequence": [
+      "eSIM Agent",
+      "Plan Search Agent"
+    ],
+    "expected_tools": [
+      "ask_country_period",
+      "plan_search",
+      "status_check"
+    ],
+    "intermediate_checks": {
+      "plan_search_result": {
+        "country": "Brazil",
+        "days": 5,
+        "plan_type": "local"
+      }
+    },
+    "final_checks": {
+      "booking_completed": false,
+      "login_prompt_shown": true,
+      "plan_found": true
+    },
+    "expected_step_range": [
+      5,
+      12
+    ],
+    "is_ambiguous": false,
+    "expected_final_output_description": "The agent should present a local eSIM plan for Brazil for 5 days at $N/A and offer to help with booking."
+  },
+  {
+    "id": "multi_006",
+    "input": "I want to search for a plan in Antarctica and buy it.",
+    "user_id": "user_001",
+    "description": "Negative case: Unsupported country, should not proceed to booking",
+    "expected_agent_sequence": [
+      "eSIM Agent",
+      "Plan Search Agent"
+    ],
+    "expected_tools": [
+      "ask_country_period",
+      "plan_search"
+    ],
+    "intermediate_checks": {
+      "plan_search_result": {
+        "service_available": false
+      }
+    },
+    "final_checks": {
+      "booking_completed": false,
+      "service_unavailable_shown": true,
+      "no_booking_attempted": true
+    },
+    "expected_step_range": [
+      3,
+      8
+    ],
+    "is_ambiguous": false,
+    "expected_final_output_description": "The agent should present a N/A eSIM plan for N/A for N/A days at $N/A and offer to help with booking."
+  },
+  {
+    "id": "multi_007",
+    "input": "Find me a regional plan for Europe for 14 days and I want to purchase it.",
+    "user_id": "user_005",
+    "description": "End-to-end flow with regional plan",
+    "expected_agent_sequence": [
+      "eSIM Agent",
+      "Plan Search Agent"
+    ],
+    "expected_tools": [
+      "ask_country_period",
+      "plan_search",
+      "status_check",
+      "cost_calculator"
+    ],
+    "intermediate_checks": {
+      "plan_search_result": {
+        "region": "Europe",
+        "days": 14,
+        "plan_type": "regional"
+      }
+    },
+    "final_checks": {
+      "booking_completed": true,
+      "total_shown": true,
+      "expected_plan_price": 33.0
+    },
+    "expected_step_range": [
+      5,
+      15
+    ],
+    "is_ambiguous": false,
+    "expected_final_output_description": "The agent should present a regional eSIM plan for N/A for 14 days at $33.0. It should then complete the booking, show the total cost including 8% tax, and confirm the purchase."
+  },
+  {
+    "id": "multi_008",
+    "input": "Get me a plan for Thailand for 20 days and complete the booking.",
+    "user_id": "user_001",
+    "description": "End-to-end flow with longer duration",
+    "expected_agent_sequence": [
+      "eSIM Agent",
+      "Plan Search Agent"
+    ],
+    "expected_tools": [
+      "ask_country_period",
+      "plan_search",
+      "status_check",
+      "cost_calculator"
+    ],
+    "intermediate_checks": {
+      "plan_search_result": {
+        "country": "Thailand",
+        "days": 20,
+        "plan_type": "local"
+      }
+    },
+    "final_checks": {
+      "booking_completed": true,
+      "total_shown": true,
+      "expected_plan_price": 46.5
+    },
+    "expected_step_range": [
+      5,
+      15
+    ],
+    "is_ambiguous": false,
+    "expected_final_output_description": "The agent should present a local eSIM plan for Thailand for 20 days at $46.5. It should then complete the booking, show the total cost including 8% tax, and confirm the purchase."
+  },
+  {
+    "id": "multi_009",
+    "input": "What is an eSIM and how does it work?",
+    "user_id": "user_001",
+    "description": "RAG Agent: Basic eSIM knowledge question",
+    "expected_agent_sequence": [
+      "eSIM Agent",
+      "RAG Agent"
+    ],
+    "expected_tools": [
+      "search_knowledge_base"
+    ],
+    "intermediate_checks": {},
+    "final_checks": {
+      "plan_found": false,
+      "knowledge_provided": true
+    },
+    "expected_step_range": [
+      3,
+      10
+    ],
+    "is_ambiguous": false,
+    "expected_final_output_description": "The agent should provide helpful, accurate information about Basic eSIM knowledge question. The response should be based on the knowledge base, be relevant to the question, and ideally cite sources or provide specific details."
+  },
+  {
+    "id": "multi_010",
+    "input": "Is my iPhone 13 compatible with eSIM? How do I check?",
+    "user_id": "user_001",
+    "description": "RAG Agent: Device compatibility question",
+    "expected_agent_sequence": [
+      "eSIM Agent",
+      "RAG Agent"
+    ],
+    "expected_tools": [
+      "search_knowledge_base"
+    ],
+    "intermediate_checks": {},
+    "final_checks": {
+      "plan_found": false,
+      "knowledge_provided": true
+    },
+    "expected_step_range": [
+      3,
+      10
+    ],
+    "is_ambiguous": false,
+    "expected_final_output_description": "The agent should provide helpful, accurate information about Device compatibility question. The response should be based on the knowledge base, be relevant to the question, and ideally cite sources or provide specific details."
+  },
+  {
+    "id": "multi_011",
+    "input": "How do I activate an eSIM on my phone?",
+    "user_id": "user_001",
+    "description": "RAG Agent: Activation instructions question",
+    "expected_agent_sequence": [
+      "eSIM Agent",
+      "RAG Agent"
+    ],
+    "expected_tools": [
+      "search_knowledge_base"
+    ],
+    "intermediate_checks": {},
+    "final_checks": {
+      "plan_found": false,
+      "knowledge_provided": true
+    },
+    "expected_step_range": [
+      3,
+      10
+    ],
+    "is_ambiguous": false,
+    "expected_final_output_description": "The agent should provide helpful, accurate information about Activation instructions question. The response should be based on the knowledge base, be relevant to the question, and ideally cite sources or provide specific details."
+  },
+  {
+    "id": "multi_012",
+    "input": "My eSIM is not connecting to the network. What should I do?",
+    "user_id": "user_001",
+    "description": "RAG Agent: Troubleshooting question",
+    "expected_agent_sequence": [
+      "eSIM Agent",
+      "RAG Agent"
+    ],
+    "expected_tools": [
+      "search_knowledge_base"
+    ],
+    "intermediate_checks": {},
+    "final_checks": {
+      "plan_found": false,
+      "knowledge_provided": true
+    },
+    "expected_step_range": [
+      3,
+      10
+    ],
+    "is_ambiguous": false,
+    "expected_final_output_description": "The agent should provide helpful, accurate information about Troubleshooting question. The response should be based on the knowledge base, be relevant to the question, and ideally cite sources or provide specific details."
+  },
+  {
+    "id": "multi_013",
+    "input": "I want to purchase the Japan 7-day plan for $19.99 that I found.",
+    "user_id": "user_001",
+    "description": "Direct booking: eSIM Agent \u2192 Booking Agent (user already knows what to buy)",
+    "expected_agent_sequence": [
+      "eSIM Agent",
+      "Booking Agent"
+    ],
+    "expected_tools": [
+      "status_check",
+      "cost_calculator"
+    ],
+    "intermediate_checks": {},
+    "final_checks": {
+      "booking_completed": true,
+      "total_shown": true,
+      "plan_found": false
+    },
+    "expected_step_range": [
+      3,
+      10
+    ],
+    "is_ambiguous": false,
+    "expected_final_output_description": "The agent should complete the booking, calculate and show the total cost including 8% tax, and confirm the purchase with the user."
+  },
+  {
+    "id": "multi_014",
+    "input": "I'd like to buy the Europe regional plan for $45.99.",
+    "user_id": "user_001",
+    "description": "Direct booking: eSIM Agent \u2192 Booking Agent (regional plan)",
+    "expected_agent_sequence": [
+      "eSIM Agent",
+      "Booking Agent"
+    ],
+    "expected_tools": [
+      "status_check",
+      "cost_calculator"
+    ],
+    "intermediate_checks": {},
+    "final_checks": {
+      "booking_completed": true,
+      "total_shown": true,
+      "plan_found": false
+    },
+    "expected_step_range": [
+      3,
+      10
+    ],
+    "is_ambiguous": false,
+    "expected_final_output_description": "The agent should complete the booking, calculate and show the total cost including 8% tax, and confirm the purchase with the user."
+  },
+  {
+    "id": "multi_015",
+    "input": "I want to book this plan for $29.99 but I need to add my payment method first.",
+    "user_id": "user_002",
+    "description": "Direct booking: eSIM Agent \u2192 Booking Agent (no payment method)",
+    "expected_agent_sequence": [
+      "eSIM Agent",
+      "Booking Agent"
+    ],
+    "expected_tools": [
+      "status_check"
+    ],
+    "intermediate_checks": {},
+    "final_checks": {
+      "booking_completed": false,
+      "payment_prompt_shown": true,
+      "plan_found": false
+    },
+    "expected_step_range": [
+      3,
+      8
+    ],
+    "is_ambiguous": false,
+    "expected_final_output_description": "The agent should check the user's status, detect that no payment method is available, and prompt the user to add a payment method before proceeding."
+  }
+]

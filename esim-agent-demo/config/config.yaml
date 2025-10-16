@@ -1,0 +1,161 @@
+# eSIM Agent Demo Configuration
+# Last updated: 2025-10-13
+
+# ==========================================
+# Weave Configuration
+# ==========================================
+weave:
+  entity: "wandb-smle"
+  project: "esim-agent-demo"
+  enabled: true
+
+# ==========================================
+# Agent Model Configuration
+# ==========================================
+# Model options from https://platform.openai.com/docs/models
+# Latest models (2025):
+# - gpt-5-2025-08-07: Most advanced reasoning and capabilities
+# - gpt-5-mini-2025-08-07: Fast, cost-effective, excellent for structured tasks
+# Previous generation:
+# - gpt-4o: Previous flagship model
+# - gpt-4o-mini: Previous mini model
+
+agents:
+  # Main orchestrator agent
+  esim_agent:
+    model: "gpt-5-2025-08-07"
+    temperature: 0.3
+    max_tokens: 10000
+    description: "Main coordinator handling overall communication and routing"
+  
+  # Plan search and pricing agent
+  plan_search_agent:
+    model: "gpt-5-mini-2025-08-07"
+    temperature: 0.1  # Lower temperature for consistent pricing
+    max_tokens: 1500
+    description: "Handles pricing queries and plan recommendations"
+  
+  # RAG-powered Q&A agent
+  rag_agent:
+    model: "gpt-5-2025-08-07"
+    temperature: 0.2
+    max_tokens: 2000
+    description: "Answers questions using knowledge base retrieval"
+  
+  # Booking and reservation agent
+  booking_agent:
+    model: "gpt-5-mini-2025-08-07"
+    temperature: 0.1
+    max_tokens: 1000
+    description: "Handles booking flow and payment processing"
+
+# ==========================================
+# RAG / Vector Store Configuration
+# ==========================================
+rag:
+  # Embeddings model
+  embeddings:
+    model: "text-embedding-3-small"  # or "text-embedding-3-large" for higher quality
+    dimensions: 1536
+  
+  # Vector store settings
+  vector_store:
+    name: "esim-knowledge-base"
+    chunk_size: 1000
+    chunk_overlap: 200
+    
+  # Retrieval settings
+  retrieval:
+    top_k: 5  # Number of chunks to retrieve
+    similarity_threshold: 0.7  # Minimum similarity score
+    max_context_length: 4000  # Maximum context to pass to LLM
+  
+  # File store settings
+  file_store:
+    directory: "database/RAG_docs"
+    file_extensions: [".md", ".txt"]
+    excluded_files: ["reference_page_list_delete_later.md"]
+
+# ==========================================
+# Tool Configuration
+# ==========================================
+tools:
+  # Plan search tools
+  plan_search:
+    database_path: "database/price_list.json"
+    currency: "USD"
+    default_plan_duration: 7  # days
+  
+  # User cache tools
+  user_cache:
+    cache_path: "cache/user_cache.json"
+    default_user: "user_001"
+    session_timeout: 30  # minutes
+  
+  # Booking tools
+  booking:
+    confirmation_required: true
+    payment_processing_delay: 2  # seconds (simulated)
+
+# ==========================================
+# Application Settings
+# ==========================================
+app:
+  # Demo interface
+  demo:
+    max_conversation_history: 20
+    welcome_message: "Welcome to eSIM Agent! How can I help you today?"
+    show_agent_thoughts: true  # Show which agent is being used
+  
+  # Logging
+  logging:
+    level: "INFO"
+    format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    file: "logs/app.log"
+    max_file_size: 10485760  # 10MB
+    backup_count: 5
+
+# ==========================================
+# Evaluation Configuration
+# ==========================================
+evaluation:
+  scenarios_dir: "evaluation/scenarios"
+  results_dir: "evaluation/results"
+  
+  # Evaluation metrics
+  metrics:
+    plan_search:
+      - "tool_accuracy"
+      - "accuracy"
+      - "booking_prompt_present"
+    
+    rag:
+      - "faithfulness"
+      - "answer_relevancy"
+      - "source_citation"
+      - "out_of_scope_handling"
+      - "accuracy"
+    
+    booking:
+      - "tool_accuracy"
+      - "booking_flow_completion"
+      - "accuracy"
+  
+  # Test execution
+  test_execution:
+    parallel: false
+    timeout: 30  # seconds per test
+    retry_on_failure: 1
+
+# ==========================================
+# Development Settings
+# ==========================================
+development:
+  debug_mode: true
+  mock_external_apis: false
+  cache_responses: false
+  
+  # Testing
+  testing:
+    test_user: "user_001"
+    test_scenarios_limit: null  # null = run all

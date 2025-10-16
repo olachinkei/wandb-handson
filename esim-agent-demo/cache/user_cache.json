@@ -1,0 +1,141 @@
+{
+  "metadata": {
+    "description": "Mock user session data for development and testing",
+    "version": "1.0",
+    "last_updated": "2025-10-13"
+  },
+  "users": {
+    "user_001": {
+      "user_id": "user_001",
+      "email": "john.doe@example.com",
+      "name": "John Doe",
+      "is_logged_in": true,
+      "login_timestamp": "2025-10-13T10:30:00Z",
+      "has_payment_method": true,
+      "payment_methods": [
+        {
+          "type": "credit_card",
+          "last_four": "4242",
+          "brand": "Visa",
+          "expiry": "12/2027"
+        }
+      ],
+      "purchase_history": [
+        {
+          "order_id": "ORD-2025-001",
+          "date": "2025-09-15",
+          "destination": "Japan",
+          "plan": "7 days, 5GB",
+          "amount": 16.50
+        }
+      ],
+      "preferences": {
+        "currency": "USD",
+        "language": "en"
+      }
+    },
+    "user_002": {
+      "user_id": "user_002",
+      "email": "jane.smith@example.com",
+      "name": "Jane Smith",
+      "is_logged_in": true,
+      "login_timestamp": "2025-10-13T09:15:00Z",
+      "has_payment_method": false,
+      "payment_methods": [],
+      "purchase_history": [],
+      "preferences": {
+        "currency": "USD",
+        "language": "en"
+      }
+    },
+    "user_003": {
+      "user_id": "user_003",
+      "email": "guest@example.com",
+      "name": "Guest User",
+      "is_logged_in": false,
+      "login_timestamp": null,
+      "has_payment_method": false,
+      "payment_methods": [],
+      "purchase_history": [],
+      "preferences": {
+        "currency": "USD",
+        "language": "en"
+      }
+    },
+    "user_004": {
+      "user_id": "user_004",
+      "email": "maria.garcia@example.com",
+      "name": "Maria Garcia",
+      "is_logged_in": true,
+      "login_timestamp": "2025-10-13T08:00:00Z",
+      "has_payment_method": true,
+      "payment_methods": [
+        {
+          "type": "credit_card",
+          "last_four": "5555",
+          "brand": "Mastercard",
+          "expiry": "06/2026"
+        },
+        {
+          "type": "paypal",
+          "email": "maria.garcia@example.com"
+        }
+      ],
+      "purchase_history": [
+        {
+          "order_id": "ORD-2025-002",
+          "date": "2025-08-20",
+          "destination": "Europe",
+          "plan": "15 days, 10GB",
+          "amount": 30.50
+        },
+        {
+          "order_id": "ORD-2025-003",
+          "date": "2025-07-10",
+          "destination": "Asia",
+          "plan": "7 days, 5GB",
+          "amount": 19.50
+        }
+      ],
+      "preferences": {
+        "currency": "EUR",
+        "language": "es"
+      }
+    },
+    "user_005": {
+      "user_id": "user_005",
+      "email": "alex.kim@example.com",
+      "name": "Alex Kim",
+      "is_logged_in": true,
+      "login_timestamp": "2025-10-13T11:45:00Z",
+      "has_payment_method": true,
+      "payment_methods": [
+        {
+          "type": "credit_card",
+          "last_four": "1234",
+          "brand": "American Express",
+          "expiry": "03/2028"
+        }
+      ],
+      "purchase_history": [
+        {
+          "order_id": "ORD-2025-004",
+          "date": "2025-10-01",
+          "destination": "United States",
+          "plan": "30 days, 20GB",
+          "amount": 53.00
+        }
+      ],
+      "preferences": {
+        "currency": "USD",
+        "language": "en"
+      }
+    }
+  },
+  "session_management": {
+    "default_user": "user_001",
+    "session_timeout_minutes": 30,
+    "require_2fa": false
+  }
+}
+
