@@ -165,11 +165,11 @@ This project includes comprehensive evaluation using Weights & Biases Weave:
 # Run all evaluations
 uv run python evaluation/eval.py
 
-# Run single agent evaluation
-uv run python evaluation/eval.py plan_search
-uv run python evaluation/eval.py rag
-uv run python evaluation/eval.py booking
-uv run python evaluation/eval.py multi_agent
+# Run individual evaluations
+uv run python evaluation/eval.py plan_search  # Plan Search Agent only
+uv run python evaluation/eval.py rag          # RAG Agent only
+uv run python evaluation/eval.py booking      # Booking Agent only
+uv run python evaluation/eval.py end_to_end   # Full system workflow
 ```
 
 ### Evaluation Metrics
@@ -192,7 +192,7 @@ uv run python evaluation/eval.py multi_agent
 - ✓ **booking_flow_completion**: Proper flow with login/payment prompts
 - ✓ **accuracy**: Accurate total cost calculation (LLM judge)
 
-#### **Multi-Agent System** (7 scorers, 15 scenarios)
+#### **End-to-End System** (7 scorers, 15 scenarios)
 - ✓ **agent_sequence_correct**: Correct agent handoff sequence
 - ✓ **tool_usage_correct**: All expected tools used
 - ✓ **final_accuracy**: End result validation via LLM-as-a-judge
@@ -205,7 +205,7 @@ uv run python evaluation/eval.py multi_agent
 - **Plan Search**: 8 scenarios (5 standard + 2 negative/unavailable + 1 ambiguous)
 - **RAG**: 8 scenarios (6 eSIM questions + 2 out-of-scope)
 - **Booking**: 6 scenarios (5 standard + 1 ambiguous)
-- **Multi-Agent**: 15 scenarios (8 plan search + 4 RAG + 3 direct booking)
+- **End-to-End**: 15 scenarios (8 plan search flows + 4 RAG flows + 3 direct booking flows)
 
 View evaluation results in Weave: `https://wandb.ai/{entity}/{project}/weave`
 
@@ -236,12 +236,12 @@ esim-agent-demo/
 │   ├── scorers_plan_search.py   # Plan Search scorers (6 scorers)
 │   ├── scorers_rag.py           # RAG scorers (7 scorers)
 │   ├── scorers_booking.py       # Booking scorers (5 scorers)
-│   ├── scorers_multi_agent.py   # Multi-Agent scorers (8 scorers)
+│   ├── scorers_end_to_end.py    # End-to-End scorers (8 scorers)
 │   ├── scenarios/               # Test scenarios (37 total)
 │   │   ├── plan_search_scenarios.json    # 8 scenarios
 │   │   ├── rag_scenarios.json            # 8 scenarios
 │   │   ├── booking_scenarios.json        # 6 scenarios
-│   │   └── multi_agent_scenarios.json    # 15 scenarios
+│   │   └── end_to_end_scenarios.json     # 15 scenarios
 │   └── README.md                # Evaluation guide
 ├── tests/
 │   ├── test_utils.py            # Utils tests (20 tests)

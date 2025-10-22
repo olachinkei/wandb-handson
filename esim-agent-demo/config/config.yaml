@@ -5,8 +5,8 @@
 # Weave Configuration
 # ==========================================
 weave:
-  entity: "wandb-smle"
-  project: "esim-agent-demo"
+  entity: "agent-lab"
+  project: "esim-agent-test"
   enabled: true
 
 # ==========================================

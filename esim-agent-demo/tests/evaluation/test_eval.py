@@ -11,12 +11,12 @@ from evaluation.eval import (
     prepare_plan_search_dataset,
     prepare_rag_dataset,
     prepare_booking_dataset,
-    prepare_multi_agent_dataset,
+    prepare_end_to_end_dataset,
 )
 from evaluation.scorers_plan_search import PLAN_SEARCH_SCORERS
 from evaluation.scorers_rag import RAG_SCORERS
 from evaluation.scorers_booking import BOOKING_SCORERS
-from evaluation.scorers_multi_agent import MULTI_AGENT_SCORERS
+from evaluation.scorers_end_to_end import END_TO_END_SCORERS
 
 
 class TestScenarioLoading:
@@ -107,9 +107,9 @@ class TestDatasetPreparation:
         assert "expected_tool_calls" in item
         assert "id" in item
     
-    def test_load_multi_agent_scenarios(self):
-        """Test loading multi-agent scenarios."""
-        scenarios = load_scenarios("multi_agent_scenarios.json")
+    def test_load_end_to_end_scenarios(self):
+        """Test loading end-to-end scenarios."""
+        scenarios = load_scenarios("end_to_end_scenarios.json")
         
         assert len(scenarios) > 0
         assert isinstance(scenarios, list)
@@ -123,9 +123,9 @@ class TestDatasetPreparation:
         assert "intermediate_checks" in scenario
         assert "final_checks" in scenario
     
-    def test_prepare_multi_agent_dataset(self):
-        """Test Multi-Agent dataset preparation."""
-        dataset = prepare_multi_agent_dataset()
+    def test_prepare_end_to_end_dataset(self):
+        """Test End-to-End dataset preparation."""
+        dataset = prepare_end_to_end_dataset()
         
         assert len(dataset) > 0
         assert isinstance(dataset, list)
@@ -174,18 +174,18 @@ class TestScorerConfiguration:
         assert "BookingFlowCompletionScorer" in scorer_names
         assert "BookingAccuracyScorer" in scorer_names
     
-    def test_multi_agent_scorers_exist(self):
-        """Test Multi-Agent scorers are configured."""
-        assert len(MULTI_AGENT_SCORERS) > 0
+    def test_end_to_end_scorers_exist(self):
+        """Test End-to-End scorers are configured."""
+        assert len(END_TO_END_SCORERS) > 0
         
         # Check scorer types
-        scorer_names = [type(scorer).__name__ for scorer in MULTI_AGENT_SCORERS]
-        assert "MultiAgentSequenceScorer" in scorer_names
-        assert "MultiAgentToolUsageScorer" in scorer_names
-        assert "MultiAgentFinalAccuracyScorer" in scorer_names
-        assert "MultiAgentStepCountScorer" in scorer_names
-        assert "MultiAgentReflectionDetectionScorer" in scorer_names
-        assert "MultiAgentOverallSuccessScorer" in scorer_names
+        scorer_names = [type(scorer).__name__ for scorer in END_TO_END_SCORERS]
+        assert "EndToEndSequenceScorer" in scorer_names
+        assert "EndToEndToolUsageScorer" in scorer_names
+        assert "EndToEndFinalAccuracyScorer" in scorer_names
+        assert "EndToEndStepCountScorer" in scorer_names
+        assert "EndToEndReflectionDetectionScorer" in scorer_names
+        assert "EndToEndOverallSuccessScorer" in scorer_names
 
 
 class TestScenarioValidity:
@@ -227,9 +227,9 @@ class TestScenarioValidity:
             for field in required_fields:
                 assert field in scenario, f"Scenario {scenario['id']} missing field: {field}"
     
-    def test_multi_agent_scenarios_have_expected_fields(self):
-        """Test all multi-agent scenarios have required fields."""
-        scenarios = load_scenarios("multi_agent_scenarios.json")
+    def test_end_to_end_scenarios_have_expected_fields(self):
+        """Test all end-to-end scenarios have required fields."""
+        scenarios = load_scenarios("end_to_end_scenarios.json")
         
         required_fields = [
             "id", "input", "user_id", "expected_agent_sequence",
@@ -260,19 +260,19 @@ class TestScenarioCounts:
         scenarios = load_scenarios("booking_scenarios.json")
         assert len(scenarios) == 6, f"Expected 6 scenarios, got {len(scenarios)}"
     
-    def test_multi_agent_scenario_count(self):
-        """Test Multi-Agent has 15 scenarios (8 plan_search + 4 rag + 3 booking)."""
-        scenarios = load_scenarios("multi_agent_scenarios.json")
+    def test_end_to_end_scenario_count(self):
+        """Test End-to-End has 15 scenarios (8 plan_search + 4 rag + 3 booking)."""
+        scenarios = load_scenarios("end_to_end_scenarios.json")
         assert len(scenarios) == 15, f"Expected 15 scenarios, got {len(scenarios)}"
     
     def test_total_scenario_count(self):
-        """Test total scenario count is 37 (8 plan_search + 8 rag + 6 booking + 15 multi_agent)."""
+        """Test total scenario count is 37 (8 plan_search + 8 rag + 6 booking + 15 end_to_end)."""
         plan_search = load_scenarios("plan_search_scenarios.json")
         rag = load_scenarios("rag_scenarios.json")
         booking = load_scenarios("booking_scenarios.json")
-        multi_agent = load_scenarios("multi_agent_scenarios.json")
+        end_to_end = load_scenarios("end_to_end_scenarios.json")
         
-        total = len(plan_search) + len(rag) + len(booking) + len(multi_agent)
+        total = len(plan_search) + len(rag) + len(booking) + len(end_to_end)
         assert total == 37, f"Expected 37 total scenarios, got {total}"
 
 

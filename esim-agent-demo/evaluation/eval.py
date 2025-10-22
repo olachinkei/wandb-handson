@@ -25,7 +25,7 @@ from src.agents import (
 from evaluation.scorers_plan_search import PLAN_SEARCH_SCORERS
 from evaluation.scorers_rag import RAG_SCORERS
 from evaluation.scorers_booking import BOOKING_SCORERS
-from evaluation.scorers_multi_agent import MULTI_AGENT_SCORERS
+from evaluation.scorers_end_to_end import END_TO_END_SCORERS
 
 # Load environment
 load_dotenv()
@@ -205,9 +205,9 @@ def prepare_booking_dataset() -> List[dict]:
     return dataset
 
 
-def prepare_multi_agent_dataset() -> List[dict]:
-    """Prepare Multi-Agent evaluation dataset."""
-    scenarios = load_scenarios("multi_agent_scenarios.json")
+def prepare_end_to_end_dataset() -> List[dict]:
+    """Prepare End-to-End evaluation dataset."""
+    scenarios = load_scenarios("end_to_end_scenarios.json")
     
     dataset = []
     for scenario in scenarios:
@@ -343,10 +343,10 @@ async def evaluate_booking_agent():
     return results
 
 
-async def evaluate_multi_agent_system():
-    """Evaluate Multi-Agent System (end-to-end)."""
+async def evaluate_end_to_end_system():
+    """Evaluate End-to-End System (complete workflow across multiple agents)."""
     print("\n" + "="*70)
-    print("🤝 Evaluating Multi-Agent System (End-to-End)")
+    print("🔗 Evaluating End-to-End System")
     print("="*70)
     
     # Create main eSIM agent (orchestrator)
@@ -354,21 +354,21 @@ async def evaluate_multi_agent_system():
     model = AgentModel(agent, name="eSIM_Agent_System")
     
     # Prepare dataset
-    dataset = prepare_multi_agent_dataset()
+    dataset = prepare_end_to_end_dataset()
     print(f"📊 Dataset: {len(dataset)} scenarios")
     
     # Create evaluation
     evaluation = weave.Evaluation(
-        name="multi_agent_evaluation",
+        name="end_to_end_evaluation",
         dataset=dataset,
-        scorers=MULTI_AGENT_SCORERS,
+        scorers=END_TO_END_SCORERS,
     )
     
     # Run evaluation
     print("🚀 Running evaluation...")
     results = await evaluation.evaluate(
         model,
-        __weave={"display_name": "Multi-Agent System Evaluation"}
+        __weave={"display_name": "End-to-End System Evaluation"}
     )
     
     # Print summary
@@ -424,11 +424,11 @@ async def run_all_evaluations():
         import traceback
         traceback.print_exc()
     
-    # Evaluate Multi-Agent System
+    # Evaluate End-to-End System
     try:
-        results["multi_agent"] = await evaluate_multi_agent_system()
+        results["end_to_end"] = await evaluate_end_to_end_system()
     except Exception as e:
-        print(f"\n❌ Multi-Agent evaluation failed: {e}")
+        print(f"\n❌ End-to-End evaluation failed: {e}")
         import traceback
         traceback.print_exc()
     
@@ -448,7 +448,7 @@ async def run_single_evaluation(agent_type: str):
     Run evaluation for a single agent type.
     
     Args:
-        agent_type: One of 'plan_search', 'rag', 'booking', or 'multi_agent'
+        agent_type: One of 'plan_search', 'rag', 'booking', or 'end_to_end'
     """
     if agent_type == "plan_search":
         return await evaluate_plan_search_agent()
@@ -456,10 +456,10 @@ async def run_single_evaluation(agent_type: str):
         return await evaluate_rag_agent()
     elif agent_type == "booking":
         return await evaluate_booking_agent()
-    elif agent_type == "multi_agent":
-        return await evaluate_multi_agent_system()
+    elif agent_type == "end_to_end":
+        return await evaluate_end_to_end_system()
     else:
-        raise ValueError(f"Unknown agent type: {agent_type}. Valid options: plan_search, rag, booking, multi_agent")
+        raise ValueError(f"Unknown agent type: {agent_type}. Valid options: plan_search, rag, booking, end_to_end")
 
 
 # =============================================================================

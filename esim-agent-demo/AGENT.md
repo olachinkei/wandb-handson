@@ -104,49 +104,6 @@ esim-agent-demo/
 - Python 3.10+
 - uv package manager
 
-
----
-
-## 📋 Development Process
-
-### Phase 1: Database Setup ✅ COMPLETED
-- [x] Create `plan_list` database with eSIM pricing data
-- [x] Generate knowledge base documents in `database/RAG_docs/`
-  - Created 9 comprehensive markdown files based on reference sources
-  - Files cover: device compatibility, activation, troubleshooting, FAQ, etc.
-  - Reference links: `database/reference_page_list_delete_later.md`
-- [x] Create mock user cache data
-
-### Phase 2: Configuration ✅ COMPLETED
-- [x] Set up `config.yaml` with configuration parameters
-  - **Model selection**: 
-  - **Weave settings**: entity and project configuration
-  - **RAG configuration**: Vector store and retrieval settings
-  - **Tool configuration**: Plan search, user cache, booking settings
-  - **Evaluation metrics**: Defined for each agent type
-- [x] Create `src/utils.py` with configuration loading utilities
-- [x] Create tests directory structure
-
-### Phase 3: RAG Preparation ✅ COMPLETED
-- [x] Implement `rag_prep.py` for knowledge base setup
-- [x] Initialize OpenAI Vector Store / Assistants API
-- [x] Create and upload knowledge base files
-- [x] Configure retrieval settings and test queries
-- [x] Add tests for RAG preparation (4 tests passing)
-
-### Phase 4: Agent Implementation ✅ COMPLETED
-- [x] Implement core agents in `src/agents/`
-  - **eSIM Agent**: Main orchestrator with handoffs ✅
-  - **Plan Search Agent**: Pricing and plan recommendations ✅
-  - **RAG Agent**: Q&A with knowledge base (Vector Store) ✅
-  - **Booking Agent**: Reservation handling ✅
-- [x] Implement agent tools in `src/tools.py` ✅
-  - `ask_country_period`, `plan_search` (Plan Search)
-  - `status_check`, `cost_calculator` (Booking)
-- [x] Build interactive demo in `demo.py` ✅
-- [x] Write tool tests in `tests/test_tools.py` (11 tests passing) ✅
-- [x] Create comprehensive `README.md` ✅
-
 **Implementation References:**
 OpenAI Agents SDK: https://openai.github.io/openai-agents-python/agents/
 
@@ -165,85 +122,14 @@ OpenAI Agents SDK: https://openai.github.io/openai-agents-python/agents/
 - `src/tools.py`: All agent tools
 - `demo.py`: Interactive demo application
 - `README.md`: Full documentation
-
-### Phase 5: Evaluation ✅ COMPLETED
-- [x] Create evaluation scenarios (38 test cases) ✅
-  - plan_search_scenarios.json (7 scenarios, including 2 negative cases)
-  - rag_scenarios.json (8 scenarios)
-  - booking_scenarios.json (5 scenarios)
-  - multi_agent_scenarios.json (18 scenarios: 8 plan_search + 4 rag + 3 booking + 3 full_flow) 🆕
-- [x] Implement evaluation scorers (19 scorer classes) ✅
-  - Base LLMJudgeScorer for LLM-as-a-judge evaluations
-  - Plan Search: Tool accuracy, accuracy, booking prompt, service availability (4 scorers)
-  - RAG: Faithfulness, relevancy, citations, out-of-scope, accuracy (5 scorers)
-  - Booking: Tool accuracy, flow completion, accuracy (3 scorers)
-  - Multi-Agent: Sequence, tool usage, intermediate, final, steps, reflection, success (7 scorers) 🆕
-- [x] Implement evaluation runner in `evaluation/eval.py` ✅
-  - AgentModel wrapper for Weave evaluations
-  - Enhanced predict method with agent sequence tracking 🆕
-  - Fixed tool name extraction (strip _impl suffix)
-  - Dataset preparation from JSON scenarios
-  - Support for single or all agent evaluations (including multi_agent) 🆕
-  - Full Weave integration with display names
-- [x] Write evaluation tests in `tests/evaluation/` ✅
-  - 21 tests for scenario loading and validation (+5 for multi-agent) 🆕
-  - All tests passing
-- [x] Run evaluations and analyze results with Weave ✅
-- [x] Implement end-to-end multi-agent workflow evaluation ✅ 🆕
-
-**Completed:**
-- ✅ 38 evaluation scenarios covering all agent types, workflows, and edge cases
-- ✅ 19 scorer classes based on Weave documentation
-- ✅ LLM-as-a-judge implementation for complex metrics
-- ✅ Full evaluation runner with CLI support (4 evaluation types)
-- ✅ 21 evaluation tests (100% passing)
-- ✅ Comprehensive evaluation documentation
-- ✅ All evaluations executed with strong performance
-- ✅ End-to-end multi-agent workflow evaluation with 3-agent flows 🆕
-  - eSIM Agent → Plan Search Agent
-  - eSIM Agent → RAG Agent
-  - eSIM Agent → Booking Agent
-  - eSIM Agent → Plan Search Agent → Booking Agent (Full Flow) 🌟
-
-**Files Created:**
 - `evaluation/eval.py`: Main evaluation runner (420+ lines)
 - `evaluation/scorers_plan_search.py`: Plan Search scorers (4 scorers)
 - `evaluation/scorers_rag.py`: RAG scorers (5 scorers)
 - `evaluation/scorers_booking.py`: Booking scorers (3 scorers)
-- `evaluation/scorers_multi_agent.py`: Multi-Agent scorers (7 scorers) 🆕
+- `evaluation/scorers_end_to_end.py`: End-to-End scorers (7 scorers) 
 - `evaluation/README.md`: Complete evaluation guide
 - `tests/evaluation/test_eval.py`: Evaluation tests (21 tests)
 
-**Evaluation Results:**
-- **Plan Search Agent (7 scenarios)**:
-  - tool_accuracy: 85.7%
-  - accuracy: 85.7%
-  - booking_prompt_correct: 85.7%
-  - service_availability_correct: 100% ✅ (perfect handling of negative cases)
-
-- **RAG Agent (8 scenarios)**:
-  - faithfulness: 75%
-  - answer_relevancy: 87.5%
-  - source_citation: 50%
-  - out_of_scope_handling: 62.5%
-  - accuracy: 75%
-
-- **Booking Agent (5 scenarios)**:
-  - tool_accuracy: 100% ✅
-  - booking_flow_completion: 80%
-  - accuracy: 100% ✅
-  - total_shown: 100% ✅
-
-- **Multi-Agent System (18 scenarios: 8 Plan Search + 4 RAG + 3 Booking + 3 Full Flow)** 🆕:
-  - overall_success: 100% ✅
-  - agent_sequence_correct: 83.3% (15/18) ✅ (3-agent flow tracking)
-  - tool_coverage: 68.5% (comprehensive tool validation)
-  - intermediate_accuracy: 88.9% (16/18) ✅
-  - final_accuracy: 22.2% (4/18)
-  - step_count_correct: 61.1% (11/18)
-  - step_efficiency: 91.2% ✅ (efficient execution)
-  - reflection_detected: 44.4% (8/18) (error correction when needed)
-  - Covers: Plan search flows, RAG knowledge queries, direct booking, full flow (eSIM → Plan Search → Booking), auth failures, unsupported countries
 
 **Usage:**
 ```bash
@@ -254,7 +140,7 @@ uv run python evaluation/eval.py
 uv run python evaluation/eval.py plan_search
 uv run python evaluation/eval.py rag
 uv run python evaluation/eval.py booking
-uv run python evaluation/eval.py multi_agent
+uv run python evaluation/eval.py end_to_end
 ```
 
 **Evaluation Criteria:**
@@ -277,7 +163,7 @@ uv run python evaluation/eval.py multi_agent
 - ✓ **booking_flow_completion**: Proper flow with login/payment prompts
 - ✓ **accuracy**: Accurate total cost calculation (price × quantity + 8% tax) (LLM judge)
 
-**Multi-Agent System (7 scorers)** 🆕:
+**End-to-End System (7 scorers)** 🆕:
 - ✓ **agent_sequence_correct**: Correct agent handoff sequence
 - ✓ **tool_coverage**: All expected tools used
 - ✓ **intermediate_accuracy**: Mid-workflow result validation
@@ -285,8 +171,6 @@ uv run python evaluation/eval.py multi_agent
 - ✓ **step_count_correct**: Workflow completed within expected step range
 - ✓ **reflection_detected**: Error correction and retry behavior
 - ✓ **overall_success**: Complete workflow success
-
-
 
 
 ---

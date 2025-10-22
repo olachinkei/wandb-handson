@@ -1,7 +1,7 @@
 """
-Multi-Agent System Scorers
+End-to-End System Scorers
 
-Scorers for evaluating end-to-end multi-agent workflows.
+Scorers for evaluating complete end-to-end workflows across multiple agents.
 Evaluates agent handoffs, tool usage, intermediate results, and final outcomes.
 """
 
@@ -51,7 +51,7 @@ class LLMJudgeScorer(weave.Scorer):
         return response.choices[0].message.content
 
 
-class MultiAgentSequenceScorer(weave.Scorer):
+class EndToEndSequenceScorer(weave.Scorer):
     """
     Evaluates if the correct sequence of agents was used.
     """
@@ -93,7 +93,7 @@ class MultiAgentSequenceScorer(weave.Scorer):
         }
 
 
-class MultiAgentToolUsageScorer(weave.Scorer):
+class EndToEndToolUsageScorer(weave.Scorer):
     """
     Evaluates if the expected tools were used during the workflow.
     """
@@ -127,7 +127,7 @@ class MultiAgentToolUsageScorer(weave.Scorer):
         }
 
 
-class MultiAgentFinalAccuracyScorer(LLMJudgeScorer):
+class EndToEndFinalAccuracyScorer(LLMJudgeScorer):
     """
     Evaluates final outcome accuracy using LLM as a judge.
     Compares actual output with expected output description.
@@ -202,7 +202,7 @@ Does the actual output meet the requirements? Respond with JSON only."""
         }
 
 
-class MultiAgentStepCountScorer(weave.Scorer):
+class EndToEndStepCountScorer(weave.Scorer):
     """
     Evaluates if the workflow completed within expected step range.
     """
@@ -245,7 +245,7 @@ class MultiAgentStepCountScorer(weave.Scorer):
         }
 
 
-class MultiAgentReflectionDetectionScorer(weave.Scorer):
+class EndToEndReflectionDetectionScorer(weave.Scorer):
     """
     Detects if the agent performed reflection or error correction.
     """
@@ -282,7 +282,7 @@ class MultiAgentReflectionDetectionScorer(weave.Scorer):
         }
 
 
-class MultiAgentOverallSuccessScorer(weave.Scorer):
+class EndToEndOverallSuccessScorer(weave.Scorer):
     """
     Overall success evaluation - checks if workflow completed without errors.
     """
@@ -304,14 +304,14 @@ class MultiAgentOverallSuccessScorer(weave.Scorer):
         }
 
 
-# Scorer list for Multi-Agent evaluation
-MULTI_AGENT_SCORERS = [
-    MultiAgentSequenceScorer(),
-    MultiAgentToolUsageScorer(),
-    MultiAgentFinalAccuracyScorer(),
-    MultiAgentStepCountScorer(),
-    MultiAgentReflectionDetectionScorer(),
-    MultiAgentOverallSuccessScorer(),
+# Scorer list for End-to-End evaluation
+END_TO_END_SCORERS = [
+    EndToEndSequenceScorer(),
+    EndToEndToolUsageScorer(),
+    EndToEndFinalAccuracyScorer(),
+    EndToEndStepCountScorer(),
+    EndToEndReflectionDetectionScorer(),
+    EndToEndOverallSuccessScorer(),
     ClarificationScorer(),
     ClarificationAppropriatenessScorer(),
 ]
