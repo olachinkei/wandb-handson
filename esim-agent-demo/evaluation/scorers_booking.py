@@ -85,16 +85,10 @@ class BookingToolAccuracyScorer(weave.Scorer):
         total_samples = len(valid_rows)
         
         if total_samples == 0:
-            return {"tool_accuracy": {"true_count": 0, "total_samples": 0, "success_rate": 0.0}}
+            return {"tool_accuracy": 0.0}
         
         true_count = sum(1 for row in valid_rows if row.get("tool_accuracy"))
-        return {
-            "tool_accuracy": {
-                "true_count": true_count,
-                "total_samples": total_samples,
-                "success_rate": true_count / total_samples
-            }
-        }
+        return {"tool_accuracy": true_count / total_samples}
 
 
 class BookingFlowCompletionScorer(weave.Scorer):
@@ -165,16 +159,10 @@ class BookingFlowCompletionScorer(weave.Scorer):
         total_samples = len(valid_rows)
         
         if total_samples == 0:
-            return {"booking_flow_completion": {"true_count": 0, "total_samples": 0, "success_rate": 0.0}}
+            return {"booking_flow_completion": 0.0}
         
         true_count = sum(1 for row in valid_rows if row.get("booking_flow_completion"))
-        return {
-            "booking_flow_completion": {
-                "true_count": true_count,
-                "total_samples": total_samples,
-                "success_rate": true_count / total_samples
-            }
-        }
+        return {"booking_flow_completion": true_count / total_samples}
 
 
 class BookingAccuracyScorer(LLMJudgeScorer):
@@ -273,16 +261,10 @@ Evaluate cost calculation accuracy:"""
         total_samples = len(valid_rows)
         
         if total_samples == 0:
-            return {"accuracy": {"true_count": 0, "total_samples": 0, "success_rate": 0.0}}
+            return {"accuracy": 0.0}
         
         true_count = sum(1 for row in valid_rows if row.get("accuracy"))
-        return {
-            "accuracy": {
-                "true_count": true_count,
-                "total_samples": total_samples,
-                "success_rate": true_count / total_samples
-            }
-        }
+        return {"accuracy": true_count / total_samples}
 
 
 # Scorer list for Booking Agent

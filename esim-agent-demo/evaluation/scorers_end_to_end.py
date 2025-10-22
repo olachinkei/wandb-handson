@@ -95,19 +95,12 @@ class EndToEndSequenceScorer(weave.Scorer):
     def summarize(self, score_rows: list) -> dict:
         """Summarize agent sequence scores."""
         valid_rows = [row for row in score_rows if row.get("agent_sequence_correct") is not None]
-        total_samples = len(valid_rows)
         
-        if total_samples == 0:
-            return {"agent_sequence_correct": {"true_count": 0, "total_samples": 0, "success_rate": 0.0}}
+        if not valid_rows:
+            return {"success_rate": 0.0}
         
         true_count = sum(1 for row in valid_rows if row.get("agent_sequence_correct"))
-        return {
-            "agent_sequence_correct": {
-                "true_count": true_count,
-                "total_samples": total_samples,
-                "success_rate": true_count / total_samples
-            }
-        }
+        return {"success_rate": true_count / len(valid_rows)}
 
 
 class EndToEndToolUsageScorer(weave.Scorer):
@@ -146,19 +139,12 @@ class EndToEndToolUsageScorer(weave.Scorer):
     def summarize(self, score_rows: list) -> dict:
         """Summarize tool usage scores."""
         valid_rows = [row for row in score_rows if row.get("tool_usage_correct") is not None]
-        total_samples = len(valid_rows)
         
-        if total_samples == 0:
-            return {"tool_usage_correct": {"true_count": 0, "total_samples": 0, "success_rate": 0.0}}
+        if not valid_rows:
+            return {"success_rate": 0.0}
         
         true_count = sum(1 for row in valid_rows if row.get("tool_usage_correct"))
-        return {
-            "tool_usage_correct": {
-                "true_count": true_count,
-                "total_samples": total_samples,
-                "success_rate": true_count / total_samples
-            }
-        }
+        return {"success_rate": true_count / len(valid_rows)}
 
 
 class EndToEndFinalAccuracyScorer(LLMJudgeScorer):
@@ -237,33 +223,12 @@ Does the actual output meet the requirements? Respond with JSON only."""
     
     def summarize(self, score_rows: list) -> dict:
         """Summarize final accuracy scores."""
-        # For final_score (numerical), calculate average
         valid_scores = [row.get("final_score") for row in score_rows if row.get("final_score") is not None]
         
-        # For meets_requirements (boolean), calculate success rate
-        valid_meets = [row for row in score_rows if row.get("meets_requirements") is not None]
+        if not valid_scores:
+            return {"final_score": 0.0}
         
-        result = {}
-        
-        if valid_scores:
-            result["final_score"] = {
-                "mean": sum(valid_scores) / len(valid_scores),
-                "total_samples": len(valid_scores)
-            }
-        else:
-            result["final_score"] = {"mean": 0.0, "total_samples": 0}
-        
-        if valid_meets:
-            true_count = sum(1 for row in valid_meets if row.get("meets_requirements"))
-            result["meets_requirements"] = {
-                "true_count": true_count,
-                "total_samples": len(valid_meets),
-                "success_rate": true_count / len(valid_meets)
-            }
-        else:
-            result["meets_requirements"] = {"true_count": 0, "total_samples": 0, "success_rate": 0.0}
-        
-        return result
+        return {"final_score": sum(valid_scores) / len(valid_scores)}
 
 
 class EndToEndStepCountScorer(weave.Scorer):
@@ -311,29 +276,12 @@ class EndToEndStepCountScorer(weave.Scorer):
     def summarize(self, score_rows: list) -> dict:
         """Summarize step count scores."""
         valid_correct = [row for row in score_rows if row.get("step_count_correct") is not None]
-        valid_efficiency = [row.get("step_efficiency") for row in score_rows if row.get("step_efficiency") is not None]
         
-        result = {}
+        if not valid_correct:
+            return {"success_rate": 0.0}
         
-        if valid_correct:
-            true_count = sum(1 for row in valid_correct if row.get("step_count_correct"))
-            result["step_count_correct"] = {
-                "true_count": true_count,
-                "total_samples": len(valid_correct),
-                "success_rate": true_count / len(valid_correct)
-            }
-        else:
-            result["step_count_correct"] = {"true_count": 0, "total_samples": 0, "success_rate": 0.0}
-        
-        if valid_efficiency:
-            result["step_efficiency"] = {
-                "mean": sum(valid_efficiency) / len(valid_efficiency),
-                "total_samples": len(valid_efficiency)
-            }
-        else:
-            result["step_efficiency"] = {"mean": 0.0, "total_samples": 0}
-        
-        return result
+        true_count = sum(1 for row in valid_correct if row.get("step_count_correct"))
+        return {"success_rate": true_count / len(valid_correct)}
 
 
 class EndToEndReflectionDetectionScorer(weave.Scorer):
@@ -375,19 +323,12 @@ class EndToEndReflectionDetectionScorer(weave.Scorer):
     def summarize(self, score_rows: list) -> dict:
         """Summarize reflection detection scores."""
         valid_rows = [row for row in score_rows if row.get("reflection_detected") is not None]
-        total_samples = len(valid_rows)
         
-        if total_samples == 0:
-            return {"reflection_detected": {"true_count": 0, "total_samples": 0, "success_rate": 0.0}}
+        if not valid_rows:
+            return {"reflection_rate": 0.0}
         
         true_count = sum(1 for row in valid_rows if row.get("reflection_detected"))
-        return {
-            "reflection_detected": {
-                "true_count": true_count,
-                "total_samples": total_samples,
-                "success_rate": true_count / total_samples
-            }
-        }
+        return {"reflection_rate": true_count / len(valid_rows)}
 
 
 class EndToEndOverallSuccessScorer(weave.Scorer):
@@ -414,19 +355,12 @@ class EndToEndOverallSuccessScorer(weave.Scorer):
     def summarize(self, score_rows: list) -> dict:
         """Summarize overall success scores."""
         valid_rows = [row for row in score_rows if row.get("overall_success") is not None]
-        total_samples = len(valid_rows)
         
-        if total_samples == 0:
-            return {"overall_success": {"true_count": 0, "total_samples": 0, "success_rate": 0.0}}
+        if not valid_rows:
+            return {"success_rate": 0.0}
         
         true_count = sum(1 for row in valid_rows if row.get("overall_success"))
-        return {
-            "overall_success": {
-                "true_count": true_count,
-                "total_samples": total_samples,
-                "success_rate": true_count / total_samples
-            }
-        }
+        return {"success_rate": true_count / len(valid_rows)}
 
 
 # Scorer list for End-to-End evaluation

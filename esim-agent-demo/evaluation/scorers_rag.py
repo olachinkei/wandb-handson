@@ -100,16 +100,10 @@ Is this response faithful (grounded in factual information about eSIMs)?"""
         total_samples = len(valid_rows)
         
         if total_samples == 0:
-            return {"faithfulness": {"true_count": 0, "total_samples": 0, "success_rate": 0.0}}
+            return {"faithfulness": 0.0}
         
         true_count = sum(1 for row in valid_rows if row.get("faithfulness"))
-        return {
-            "faithfulness": {
-                "true_count": true_count,
-                "total_samples": total_samples,
-                "success_rate": true_count / total_samples
-            }
-        }
+        return {"faithfulness": true_count / total_samples}
 
 
 class RAGAnswerRelevancyScorer(LLMJudgeScorer):
@@ -163,16 +157,10 @@ Is this response relevant to the question?"""
         total_samples = len(valid_rows)
         
         if total_samples == 0:
-            return {"answer_relevancy": {"true_count": 0, "total_samples": 0, "success_rate": 0.0}}
+            return {"answer_relevancy": 0.0}
         
         true_count = sum(1 for row in valid_rows if row.get("answer_relevancy"))
-        return {
-            "answer_relevancy": {
-                "true_count": true_count,
-                "total_samples": total_samples,
-                "success_rate": true_count / total_samples
-            }
-        }
+        return {"answer_relevancy": true_count / total_samples}
 
 
 class RAGSourceCitationScorer(weave.Scorer):
@@ -211,16 +199,10 @@ class RAGSourceCitationScorer(weave.Scorer):
         total_samples = len(valid_rows)
         
         if total_samples == 0:
-            return {"source_citation": {"true_count": 0, "total_samples": 0, "success_rate": 0.0}}
+            return {"source_citation": 0.0}
         
         true_count = sum(1 for row in valid_rows if row.get("source_citation"))
-        return {
-            "source_citation": {
-                "true_count": true_count,
-                "total_samples": total_samples,
-                "success_rate": true_count / total_samples
-            }
-        }
+        return {"source_citation": true_count / total_samples}
 
 
 class RAGOutOfScopeHandlingScorer(weave.Scorer):
@@ -280,16 +262,10 @@ class RAGOutOfScopeHandlingScorer(weave.Scorer):
         total_samples = len(valid_rows)
         
         if total_samples == 0:
-            return {"out_of_scope_handling": {"true_count": 0, "total_samples": 0, "success_rate": 0.0}}
+            return {"out_of_scope_handling": 0.0}
         
         true_count = sum(1 for row in valid_rows if row.get("out_of_scope_handling"))
-        return {
-            "out_of_scope_handling": {
-                "true_count": true_count,
-                "total_samples": total_samples,
-                "success_rate": true_count / total_samples
-            }
-        }
+        return {"out_of_scope_handling": true_count / total_samples}
 
 
 class RAGAccuracyScorer(LLMJudgeScorer):
@@ -353,16 +329,10 @@ Is this answer accurate?"""
         total_samples = len(valid_rows)
         
         if total_samples == 0:
-            return {"accuracy": {"true_count": 0, "total_samples": 0, "success_rate": 0.0}}
+            return {"accuracy": 0.0}
         
         true_count = sum(1 for row in valid_rows if row.get("accuracy"))
-        return {
-            "accuracy": {
-                "true_count": true_count,
-                "total_samples": total_samples,
-                "success_rate": true_count / total_samples
-            }
-        }
+        return {"accuracy": true_count / total_samples}
 
 
 # Scorer list for RAG Agent

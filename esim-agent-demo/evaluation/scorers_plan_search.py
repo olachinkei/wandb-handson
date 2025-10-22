@@ -46,16 +46,10 @@ class PlanSearchToolAccuracyScorer(weave.Scorer):
         total_samples = len(valid_rows)
         
         if total_samples == 0:
-            return {"tool_accuracy": {"true_count": 0, "total_samples": 0, "success_rate": 0.0}}
+            return {"tool_accuracy": 0.0}
         
         true_count = sum(1 for row in valid_rows if row.get("tool_accuracy"))
-        return {
-            "tool_accuracy": {
-                "true_count": true_count,
-                "total_samples": total_samples,
-                "success_rate": true_count / total_samples
-            }
-        }
+        return {"tool_accuracy": true_count / total_samples}
 
 
 class PlanSearchAccuracyScorer(weave.Scorer):
@@ -145,16 +139,10 @@ class PlanSearchAccuracyScorer(weave.Scorer):
         total_samples = len(valid_rows)
         
         if total_samples == 0:
-            return {"accuracy": {"true_count": 0, "total_samples": 0, "success_rate": 0.0}}
+            return {"accuracy": 0.0}
         
         true_count = sum(1 for row in valid_rows if row.get("accuracy"))
-        return {
-            "accuracy": {
-                "true_count": true_count,
-                "total_samples": total_samples,
-                "success_rate": true_count / total_samples
-            }
-        }
+        return {"accuracy": true_count / total_samples}
 
 
 class PlanSearchBookingPromptScorer(weave.Scorer):
@@ -197,16 +185,10 @@ class PlanSearchBookingPromptScorer(weave.Scorer):
         total_samples = len(valid_rows)
         
         if total_samples == 0:
-            return {"booking_prompt_correct": {"true_count": 0, "total_samples": 0, "success_rate": 0.0}}
+            return {"booking_prompt_correct": 0.0}
         
         true_count = sum(1 for row in valid_rows if row.get("booking_prompt_correct"))
-        return {
-            "booking_prompt_correct": {
-                "true_count": true_count,
-                "total_samples": total_samples,
-                "success_rate": true_count / total_samples
-            }
-        }
+        return {"booking_prompt_correct": true_count / total_samples}
 
 
 class PlanSearchServiceAvailabilityScorer(weave.Scorer):
@@ -255,16 +237,10 @@ class PlanSearchServiceAvailabilityScorer(weave.Scorer):
         total_samples = len(valid_rows)
         
         if total_samples == 0:
-            return {"service_availability_correct": {"true_count": 0, "total_samples": 0, "success_rate": 0.0}}
+            return {"service_availability_correct": 0.0}
         
         true_count = sum(1 for row in valid_rows if row.get("service_availability_correct"))
-        return {
-            "service_availability_correct": {
-                "true_count": true_count,
-                "total_samples": total_samples,
-                "success_rate": true_count / total_samples
-            }
-        }
+        return {"service_availability_correct": true_count / total_samples}
 
 
 # Scorer list for Plan Search Agent
