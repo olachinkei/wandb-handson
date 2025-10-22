@@ -42,6 +42,21 @@ citation_monitor = RAGSourceCitationScorer()
 
 
 @weave.op()
+async def _run_agent_core(prompt: str):
+    """
+    Core agent execution function (for Weave tracing).
+    
+    Args:
+        prompt: User input
+        
+    Returns:
+        Agent response
+    """
+    esim_agent = create_esim_agent()
+    response = await Runner.run(esim_agent, prompt)
+    return str(response.final_output)
+
+
 async def run_agent(prompt: str, apply_guardrails: bool = True):
     """
     Run the agent with a single prompt.
@@ -54,34 +69,33 @@ async def run_agent(prompt: str, apply_guardrails: bool = True):
     Returns:
         Agent response
     """
-    esim_agent = create_esim_agent()
-    response = await Runner.run(esim_agent, prompt)
-    output = response.final_output
+    # Use .call() to get both result and Call object for Weave
+    output, call = await _run_agent_core.call(prompt)
     
-    # Apply guardrails in the background (non-blocking for user)
+    # Apply guardrails as proper Weave scorers (recorded in Weave)
     if apply_guardrails:
-        asyncio.create_task(_apply_guardrails_async(str(output), prompt))
+        asyncio.create_task(_apply_guardrails_async(call, output, prompt))
     
     return output
 
 
-async def _apply_guardrails_async(output: str, prompt: str):
+async def _apply_guardrails_async(call, output: str, prompt: str):
     """
-    Apply guardrail scorers asynchronously in the background.
+    Apply guardrail scorers asynchronously using Weave's Scorer framework.
     This runs after the response is returned to the user.
     
     Args:
+        call: Weave Call object
         output: Agent response
         prompt: User input
     """
     try:
-        model_output_dict = {"output": output}
-        
-        # Run all scorers in parallel for efficiency
+        # Run all scorers in parallel using Weave's apply_scorer
+        # This properly records scorer results in Weave
         await asyncio.gather(
-            _check_faithfulness(model_output_dict, prompt),
-            _check_relevancy(model_output_dict, prompt),
-            _check_citation(model_output_dict),
+            _apply_faithfulness_scorer(call, output, prompt),
+            _apply_relevancy_scorer(call, output, prompt),
+            _apply_citation_scorer(call, output),
             return_exceptions=True  # Don't fail if one scorer fails
         )
     except Exception as e:
@@ -89,33 +103,51 @@ async def _apply_guardrails_async(output: str, prompt: str):
         print(f"⚠️ Guardrail scoring error: {e}")
 
 
-async def _check_faithfulness(model_output: dict, prompt: str):
-    """Check if response is faithful to knowledge base."""
+async def _apply_faithfulness_scorer(call, output: str, prompt: str):
+    """Apply faithfulness scorer using Weave's framework."""
     try:
-        result = faithfulness_guard.score(model_output=model_output, input=prompt)
-        if not result.get('faithfulness', True):
-            print(f"🚨 Guardrail Alert: Unfaithful response detected!")
-    except Exception:
+        # Provide model_output and input via additional_scorer_kwargs
+        model_output_dict = {"output": output}
+        await call.apply_scorer(
+            faithfulness_guard,
+            additional_scorer_kwargs={
+                "model_output": model_output_dict,
+                "input": prompt
+            }
+        )
+        # Scorer result is automatically recorded in Weave
+        # No alerts here - use demo_simple_guardrails.py for explicit alerts
+    except Exception as e:
+        # Silent failure - scorer errors won't interrupt user experience
+        pass
+
+
+async def _apply_relevancy_scorer(call, output: str, prompt: str):
+    """Apply relevancy scorer using Weave's framework."""
+    try:
+        model_output_dict = {"output": output}
+        await call.apply_scorer(
+            relevancy_guard,
+            additional_scorer_kwargs={
+                "model_output": model_output_dict,
+                "input": prompt
+            }
+        )
+        # Scorer result is automatically recorded in Weave
+    except Exception as e:
         pass  # Silent failure
 
 
-async def _check_relevancy(model_output: dict, prompt: str):
-    """Check if response is relevant to the question."""
+async def _apply_citation_scorer(call, output: str):
+    """Apply citation scorer using Weave's framework."""
     try:
-        result = relevancy_guard.score(model_output=model_output, input=prompt)
-        if not result.get('answer_relevancy', True):
-            print(f"🚨 Guardrail Alert: Irrelevant response detected!")
-    except Exception:
-        pass  # Silent failure
-
-
-async def _check_citation(model_output: dict):
-    """Monitor if response includes source citations."""
-    try:
-        result = citation_monitor.score(model_output=model_output)
-        if not result.get('source_citation', True):
-            print(f"ℹ️  Note: Response missing source citations")
-    except Exception:
+        model_output_dict = {"output": output}
+        await call.apply_scorer(
+            citation_monitor,
+            additional_scorer_kwargs={"model_output": model_output_dict}
+        )
+        # Scorer result is automatically recorded in Weave
+    except Exception as e:
         pass  # Silent failure
 
 
