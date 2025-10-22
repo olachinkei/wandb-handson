@@ -127,39 +127,60 @@ Run the interactive demo to chat with the eSIM agent system:
 uv run python demo.py
 ```
 
-**Note:** The `run_agent()` function automatically applies guardrail scorers in the background:
-- **Faithfulness Guard**: Detects hallucinations and unfaithful responses
-- **Relevancy Guard**: Detects irrelevant responses  
-- **Citation Monitor**: Monitors source attribution
+### Run with Guardrails (Programmatic)
 
-Alerts appear only if quality issues are detected. Guardrails run asynchronously with zero latency impact.
-
-### Guardrails Demo (Recommended)
-
-For the best demonstration of guardrails functionality, use the standalone demo:
-
-```bash
-uv run python demo_simple_guardrails.py
-```
-
-**Why use this demo?**
-- Shows real-time guardrail evaluation results with scores
-- Displays citation markers (📚 Sources: [1], [2], [3]) from the knowledge base
-- Demonstrates blocking vs non-blocking behavior
-- Better visibility into faithfulness, relevancy, and citation quality
-
-This demo uses the Assistants API directly, preserving source citations from the vector store.
-
-Example interactions:
-- "I'm traveling to Japan for 7 days" → Plan Search
-- "How do I activate an eSIM?" → RAG
-- "I want to buy this plan" → Booking
-
-### Single Query Test
-
-Edit `demo.py` to test specific queries:
+The `run_agent()` function applies quality guardrails synchronously:
 
 ```python
+from demo import run_agent
+import asyncio
+
+# Run with guardrails (default, silent mode)
+response = asyncio.run(run_agent("What devices support eSIM?"))
+
+# Run with verbose mode to see guardrail checks
+response = asyncio.run(run_agent("What devices support eSIM?", verbose=True))
+
+# Run without guardrails
+response = asyncio.run(run_agent("What devices support eSIM?", apply_guardrails=False))
+```
+
+**Guardrail Checks:**
+- **Faithfulness**: Response is grounded in knowledge base (blocking)
+- **Relevancy**: Response answers the question (blocking)
+- **Source Citation**: Response includes proper references (BLOCKING - critical for RAG)
+
+**Blocking Behavior:**
+- If citation check fails → Returns error message in Japanese
+- If faithfulness check fails → Returns error message
+- If relevancy check fails → Returns error message
+- All guardrail results are recorded in Weave for analysis
+
+**Error Messages:**
+```
+⚠️ 申し訳ございません。適切な参照情報を含む回答を作成できませんでした。質問を言い換えてお試しください。
+(Sorry, we couldn't create a response with appropriate references. Please rephrase your question.)
+```
+
+### Test with Sample Queries
+
+Run 10 predefined queries to test the system:
+
+```python
+# Run with verbose mode to see guardrails
+asyncio.run(run_sample_queries(verbose=True))
+
+# Run in silent mode (default)
+asyncio.run(run_sample_queries())
+```
+
+Or test a single query:
+
+```python
+# With verbose mode
+asyncio.run(single_query_demo("What devices support eSIM?", verbose=True))
+
+# Silent mode
 asyncio.run(single_query_demo("I'm traveling to Japan for 7 days"))
 ```
 

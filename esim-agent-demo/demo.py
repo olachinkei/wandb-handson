@@ -42,113 +42,152 @@ citation_monitor = RAGSourceCitationScorer()
 
 
 @weave.op()
-async def _run_agent_core(prompt: str):
+async def _generate_agent_response(prompt: str) -> str:
     """
-    Core agent execution function (for Weave tracing).
+    Generate agent response (for Weave tracing and scorer application).
     
     Args:
         prompt: User input
         
     Returns:
-        Agent response
+        Agent response as string
     """
     esim_agent = create_esim_agent()
     response = await Runner.run(esim_agent, prompt)
     return str(response.final_output)
 
 
-async def run_agent(prompt: str, apply_guardrails: bool = True):
+async def run_agent(prompt: str, apply_guardrails: bool = True, verbose: bool = False):
     """
-    Run the agent with a single prompt.
-    Automatically applies guardrail scorers in the background for quality assurance.
+    Run the agent with synchronous guardrail checking.
+    
+    If guardrails are enabled, checks:
+    - Faithfulness: Response is grounded in knowledge base
+    - Relevancy: Response answers the question
+    - Source Citation: Response includes proper references (BLOCKING)
     
     Args:
         prompt: User input
-        apply_guardrails: Whether to apply guardrail scorers (default: True)
+        apply_guardrails: Whether to apply guardrail checks (default: True)
+        verbose: Show guardrail checking progress (default: False)
         
     Returns:
-        Agent response
+        Agent response, or error message if guardrails fail
     """
-    # Use .call() to get both result and Call object for Weave
-    output, call = await _run_agent_core.call(prompt)
+    # Generate response and get Call object
+    output, call = await _generate_agent_response.call(prompt)
+    output_str = str(output)
     
-    # Apply guardrails as proper Weave scorers (recorded in Weave)
-    if apply_guardrails:
-        asyncio.create_task(_apply_guardrails_async(call, output, prompt))
+    # If guardrails disabled, return immediately
+    if not apply_guardrails:
+        return output_str
     
-    return output
+    # Apply guardrails synchronously (blocking)
+    if verbose:
+        print(f"\n{'='*80}")
+        print("🛡️ Applying Guardrails...")
+        print(f"{'='*80}\n")
+    
+    try:
+        model_output_dict = {"output": output_str}
+        
+        # Check faithfulness (is response grounded in knowledge base?)
+        if verbose:
+            print("  Checking faithfulness...")
+        faithfulness_result = faithfulness_guard.score(
+            model_output=model_output_dict,
+            input=prompt
+        )
+        faithfulness_ok = faithfulness_result.get('faithfulness', False)
+        if verbose:
+            print(f"  ✅ Faithfulness: {faithfulness_ok}")
+        
+        # Check answer relevancy (does it answer the question?)
+        if verbose:
+            print("  Checking relevancy...")
+        relevancy_result = relevancy_guard.score(
+            model_output=model_output_dict,
+            input=prompt
+        )
+        relevancy_ok = relevancy_result.get('answer_relevancy', False)
+        if verbose:
+            print(f"  ✅ Relevancy: {relevancy_ok}")
+        
+        # Check source citation (BLOCKING - critical for RAG)
+        if verbose:
+            print("  Checking source citation...")
+        citation_result = citation_monitor.score(
+            model_output=model_output_dict
+        )
+        has_citation = citation_result.get('source_citation', False)
+        if verbose:
+            print(f"  📚 Source Citation: {has_citation}")
+            print(f"\n{'='*80}\n")
+        
+        # Apply guardrail logic (blocking)
+        if not has_citation:
+            if verbose:
+                print("🚫 Response blocked: Missing source citations/references")
+            return "⚠️ 申し訳ございません。適切な参照情報を含む回答を作成できませんでした。質問を言い換えてお試しください。"
+        
+        if not faithfulness_ok:
+            if verbose:
+                print("🚫 Response blocked: Not faithful to retrieved content")
+            return "⚠️ 申し訳ございません。信頼できる回答を作成できませんでした。質問を言い換えてお試しください。"
+        
+        if not relevancy_ok:
+            if verbose:
+                print("🚫 Response blocked: Not relevant to your question")
+            return "⚠️ 申し訳ございません。ご質問に関連する回答を作成できませんでした。質問を言い換えてお試しください。"
+        
+        # All guardrails passed
+        if verbose:
+            print("✅ All guardrails passed! Response is safe to return.\n")
+        
+        # Record scores to Weave asynchronously (non-blocking)
+        asyncio.create_task(_record_scores_to_weave(call, output_str, prompt))
+        
+        return output_str
+        
+    except Exception as e:
+        if verbose:
+            print(f"⚠️ Guardrail error: {e}")
+        # On error, return safe message
+        return "⚠️ 申し訳ございません。回答の品質確認中にエラーが発生しました。もう一度お試しください。"
 
 
-async def _apply_guardrails_async(call, output: str, prompt: str):
+async def _record_scores_to_weave(call, output: str, prompt: str):
     """
-    Apply guardrail scorers asynchronously using Weave's Scorer framework.
-    This runs after the response is returned to the user.
-    
-    Args:
-        call: Weave Call object
-        output: Agent response
-        prompt: User input
+    Record scorer results to Weave asynchronously (non-blocking).
+    This runs in the background after the response is returned.
     """
     try:
-        # Run all scorers in parallel using Weave's apply_scorer
-        # This properly records scorer results in Weave
+        model_output_dict = {"output": output}
+        
+        # Record all scores to Weave in parallel
         await asyncio.gather(
-            _apply_faithfulness_scorer(call, output, prompt),
-            _apply_relevancy_scorer(call, output, prompt),
-            _apply_citation_scorer(call, output),
-            return_exceptions=True  # Don't fail if one scorer fails
+            call.apply_scorer(
+                faithfulness_guard,
+                additional_scorer_kwargs={
+                    "model_output": model_output_dict,
+                    "input": prompt
+                }
+            ),
+            call.apply_scorer(
+                relevancy_guard,
+                additional_scorer_kwargs={
+                    "model_output": model_output_dict,
+                    "input": prompt
+                }
+            ),
+            call.apply_scorer(
+                citation_monitor,
+                additional_scorer_kwargs={"model_output": model_output_dict}
+            ),
+            return_exceptions=True
         )
-    except Exception as e:
-        # Log error but don't interrupt the user experience
-        print(f"⚠️ Guardrail scoring error: {e}")
-
-
-async def _apply_faithfulness_scorer(call, output: str, prompt: str):
-    """Apply faithfulness scorer using Weave's framework."""
-    try:
-        # Provide model_output and input via additional_scorer_kwargs
-        model_output_dict = {"output": output}
-        await call.apply_scorer(
-            faithfulness_guard,
-            additional_scorer_kwargs={
-                "model_output": model_output_dict,
-                "input": prompt
-            }
-        )
-        # Scorer result is automatically recorded in Weave
-        # No alerts here - use demo_simple_guardrails.py for explicit alerts
-    except Exception as e:
-        # Silent failure - scorer errors won't interrupt user experience
-        pass
-
-
-async def _apply_relevancy_scorer(call, output: str, prompt: str):
-    """Apply relevancy scorer using Weave's framework."""
-    try:
-        model_output_dict = {"output": output}
-        await call.apply_scorer(
-            relevancy_guard,
-            additional_scorer_kwargs={
-                "model_output": model_output_dict,
-                "input": prompt
-            }
-        )
-        # Scorer result is automatically recorded in Weave
-    except Exception as e:
-        pass  # Silent failure
-
-
-async def _apply_citation_scorer(call, output: str):
-    """Apply citation scorer using Weave's framework."""
-    try:
-        model_output_dict = {"output": output}
-        await call.apply_scorer(
-            citation_monitor,
-            additional_scorer_kwargs={"model_output": model_output_dict}
-        )
-        # Scorer result is automatically recorded in Weave
-    except Exception as e:
-        pass  # Silent failure
+    except Exception:
+        pass  # Silent failure for background recording
 
 
 @weave.op()
@@ -211,21 +250,25 @@ async def interactive_demo():
             print("Please try again or type 'quit' to exit.\n")
 
 
-async def single_query_demo(query: str):
+async def single_query_demo(query: str, verbose: bool = True):
     """
     Run a single query demo (useful for testing).
     
     Args:
         query: User query to test
+        verbose: Show guardrail checking progress (default: True)
     """
     print(f"\n🧪 Testing query: {query}\n")
-    result = await run_agent(query)
+    result = await run_agent(query, verbose=verbose)
     print(f"\n📤 Response:\n{result}\n")
 
 
-async def run_sample_queries():
+async def run_sample_queries(verbose: bool = False):
     """
     Run 10 sample queries to demonstrate the eSIM agent system.
+    
+    Args:
+        verbose: Show guardrail checking progress for each query (default: False)
     """
     sample_queries = [
         # Plan Search queries (3)
@@ -248,7 +291,9 @@ async def run_sample_queries():
     ]
     
     print("=" * 80)
-    print("🧪 Running 10 Sample Queries")
+    print("🧪 Running 10 Sample Queries with Guardrails")
+    print("=" * 80)
+    print(f"Verbose mode: {'ON' if verbose else 'OFF'}")
     print("=" * 80)
     
     for i, query in enumerate(sample_queries, 1):
@@ -257,7 +302,7 @@ async def run_sample_queries():
         print(f"{'='*80}")
         
         try:
-            result = await run_agent(query)
+            result = await run_agent(query, verbose=verbose)
             print(f"\n✅ Response:\n{result}\n")
         except Exception as e:
             print(f"\n❌ Error: {e}\n")
