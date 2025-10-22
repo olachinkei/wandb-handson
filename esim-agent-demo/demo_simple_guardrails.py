@@ -142,11 +142,11 @@ async def demo():
     print("safe, accurate, and relevant responses from the RAG Agent.")
     print("\n" + "=" * 80 + "\n")
     
-    # Test queries
+    # Test queries - RAG-focused to demonstrate citations
     test_queries = [
-        "How do I activate my eSIM?",
-        "Is my iPhone 12 compatible with eSIM?",
-        "What should I do if my eSIM isn't working?",
+        "What devices support eSIM?",
+        "Can you explain eSIM security and privacy?",
+        "What should I know about eSIM troubleshooting?",
     ]
     
     for i, query in enumerate(test_queries, 1):
@@ -192,7 +192,7 @@ if __name__ == "__main__":
     asyncio.run(demo())
     
     # To run a single query, uncomment:
-    # asyncio.run(single_query("How do I activate my eSIM?"))
+    # asyncio.run(single_query("What devices support eSIM?"))
 
 
 # =============================================================================

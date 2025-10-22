@@ -134,18 +134,21 @@ uv run python demo.py
 
 Alerts appear only if quality issues are detected. Guardrails run asynchronously with zero latency impact.
 
-### Guardrails Demo
+### Guardrails Demo (Recommended)
 
-Run the standalone guardrails demo to see quality checks in action:
+For the best demonstration of guardrails functionality, use the standalone demo:
 
 ```bash
 uv run python demo_simple_guardrails.py
 ```
 
-This demo explicitly shows:
-- Real-time guardrail evaluation results
-- Faithfulness, relevancy, and citation scores
-- Blocking/non-blocking behavior
+**Why use this demo?**
+- Shows real-time guardrail evaluation results with scores
+- Displays citation markers (📚 Sources: [1], [2], [3]) from the knowledge base
+- Demonstrates blocking vs non-blocking behavior
+- Better visibility into faithfulness, relevancy, and citation quality
+
+This demo uses the Assistants API directly, preserving source citations from the vector store.
 
 Example interactions:
 - "I'm traveling to Japan for 7 days" → Plan Search
