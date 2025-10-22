@@ -58,8 +58,23 @@ def _create_rag_search_tool(vector_store_id: str):
             # Get response
             if run.status == "completed":
                 messages = client.beta.threads.messages.list(thread_id=thread.id)
-                response = messages.data[0].content[0].text.value
-                return response
+                message_content = messages.data[0].content[0].text
+                response_text = message_content.value
+                
+                # Extract citations from annotations
+                citations = []
+                if hasattr(message_content, 'annotations') and message_content.annotations:
+                    for annotation in message_content.annotations:
+                        if hasattr(annotation, 'file_citation'):
+                            citations.append(annotation.file_citation.file_id)
+                
+                # Append citations to response if present
+                if citations:
+                    unique_citations = list(set(citations))
+                    citation_text = "\n\n📚 Sources: " + ", ".join([f"[{i+1}]" for i in range(len(unique_citations))])
+                    response_text += citation_text
+                
+                return response_text
             else:
                 return f"Error: Run status is {run.status}"
         finally:
@@ -121,8 +136,13 @@ Your responsibilities:
 
 2. Use the search_knowledge_base tool to retrieve relevant information
 3. Provide accurate, helpful answers based on the knowledge base
-4. Cite sources when providing information
-5. If a question is about pricing or booking, redirect to the appropriate agent
+4. **ALWAYS mention that your answer is based on the knowledge base** using phrases like:
+   - "According to our knowledge base..."
+   - "Based on the documentation..."
+   - "Our resources indicate..."
+   - Or similar references to show the information source
+5. If the search_knowledge_base tool returns citations (📚 Sources: [1], [2], etc.), include them in your final response
+6. If a question is about pricing or booking, redirect to the appropriate agent
 
 Knowledge base coverage:
 - What is eSIM and how it works
@@ -139,7 +159,8 @@ Communication style:
 - Ask clarifying questions when needed to provide better answers
 - Use clear, non-technical language when possible
 - Provide step-by-step instructions when needed
-- Always cite your sources from the knowledge base
+- **Always reference the knowledge base/documentation** (e.g., "According to our documentation...", "Based on our knowledge base...")
+- **Include any citation markers** (📚 Sources: [1], [2]) from the search tool if provided
 
 Important:
 - Ask for clarification if the question is vague or ambiguous
@@ -148,7 +169,9 @@ Important:
 - If asked about booking: Say "Let me connect you with our Booking Agent"
 - If the question is COMPLETELY out of scope (not eSIM-related): Politely say "I can only help with eSIM-related questions"
 - If information is not in knowledge base: Be honest and say you don't have that information
-- Always use search_knowledge_base tool to find answers
+- **Always use search_knowledge_base tool to find answers**
+- **Always acknowledge the knowledge base source** in your response (e.g., "According to our documentation...")
+- **If the tool returns citation markers (📚 Sources), include them** in your response
 - Provide clear, helpful responses based on the search results
 
 Out of scope:
