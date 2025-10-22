@@ -174,31 +174,39 @@ uv run python evaluation/eval.py end_to_end   # Full system workflow
 
 ### Evaluation Metrics
 
-#### **Plan Search Agent** (4 scorers, 8 scenarios)
+#### **Plan Search Agent** (6 scorers, 8 scenarios)
 - ✓ **tool_accuracy**: Correct tool selection and execution
 - ✓ **accuracy**: Accurate pricing, plan type, country, and days
 - ✓ **booking_prompt_correct**: Appropriate booking confirmation prompts
 - ✓ **service_availability_correct**: Graceful handling of unavailable countries
+- ✓ **provides_complete_answer**: Complete response vs asking clarification vs incomplete
+- ✓ **clarification_appropriate**: Whether asking for clarification is appropriate
 
-#### **RAG Agent** (5 scorers - LLM-as-a-judge, 8 scenarios)
+#### **RAG Agent** (7 scorers - LLM-as-a-judge, 8 scenarios)
 - ✓ **faithfulness**: Response accuracy to retrieved context
 - ✓ **answer_relevancy**: Response relevance to user question
 - ✓ **source_citation**: Provides reference indicators
 - ✓ **out_of_scope_handling**: Correctly redirects non-eSIM questions
 - ✓ **accuracy**: Overall answer correctness with topic coverage
+- ✓ **provides_complete_answer**: Complete response vs asking clarification vs incomplete
+- ✓ **clarification_appropriate**: Whether asking for clarification is appropriate
 
-#### **Booking Agent** (3 scorers, 6 scenarios)
+#### **Booking Agent** (5 scorers, 6 scenarios)
 - ✓ **tool_accuracy**: Correct tool usage (status_check, cost_calculator)
 - ✓ **booking_flow_completion**: Proper flow with login/payment prompts
 - ✓ **accuracy**: Accurate total cost calculation (LLM judge)
+- ✓ **provides_complete_answer**: Complete response vs asking clarification vs incomplete
+- ✓ **clarification_appropriate**: Whether asking for clarification is appropriate
 
-#### **End-to-End System** (7 scorers, 15 scenarios)
+#### **End-to-End System** (8 scorers, 15 scenarios)
 - ✓ **agent_sequence_correct**: Correct agent handoff sequence
 - ✓ **tool_usage_correct**: All expected tools used
-- ✓ **final_accuracy**: End result validation via LLM-as-a-judge
-- ✓ **step_count_correct**: Workflow completed within expected step range
+- ✓ **final_score & meets_requirements**: End result validation via LLM-as-a-judge
+- ✓ **step_count_correct & step_efficiency**: Workflow completed within expected step range
 - ✓ **reflection_detected**: Error correction and retry behavior
 - ✓ **overall_success**: Complete workflow success
+- ✓ **provides_complete_answer**: Complete response vs asking clarification vs incomplete
+- ✓ **clarification_appropriate**: Whether asking for clarification is appropriate
 
 ### Test Scenarios
 
@@ -232,11 +240,11 @@ esim-agent-demo/
 │   └── utils.py                 # Utility functions
 ├── evaluation/
 │   ├── eval.py                  # Main evaluation runner (480+ lines)
-│   ├── scorers.py               # Base scorers
-│   ├── scorers_plan_search.py   # Plan Search scorers (6 scorers)
-│   ├── scorers_rag.py           # RAG scorers (7 scorers)
-│   ├── scorers_booking.py       # Booking scorers (5 scorers)
-│   ├── scorers_end_to_end.py    # End-to-End scorers (8 scorers)
+│   ├── scorers.py               # Base & common scorers (2 common scorers)
+│   ├── scorers_plan_search.py   # Plan Search scorers (4 + 2 common = 6)
+│   ├── scorers_rag.py           # RAG scorers (5 + 2 common = 7)
+│   ├── scorers_booking.py       # Booking scorers (3 + 2 common = 5)
+│   ├── scorers_end_to_end.py    # End-to-End scorers (6 + 2 common = 8)
 │   ├── scenarios/               # Test scenarios (37 total)
 │   │   ├── plan_search_scenarios.json    # 8 scenarios
 │   │   ├── rag_scenarios.json            # 8 scenarios
