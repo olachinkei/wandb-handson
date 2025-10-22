@@ -111,6 +111,48 @@ Categorize this response:"""
             "has_incomplete_answer": is_incomplete,
             "response_type": response_type
         }
+    
+    def summarize(self, score_rows: list) -> dict:
+        """Summarize clarification scores."""
+        result = {}
+        
+        # provides_complete_answer
+        valid_complete = [row for row in score_rows if row.get("provides_complete_answer") is not None]
+        if valid_complete:
+            true_count = sum(1 for row in valid_complete if row.get("provides_complete_answer"))
+            result["provides_complete_answer"] = {
+                "true_count": true_count,
+                "total_samples": len(valid_complete),
+                "success_rate": true_count / len(valid_complete)
+            }
+        else:
+            result["provides_complete_answer"] = {"true_count": 0, "total_samples": 0, "success_rate": 0.0}
+        
+        # is_asking_clarification
+        valid_asking = [row for row in score_rows if row.get("is_asking_clarification") is not None]
+        if valid_asking:
+            true_count = sum(1 for row in valid_asking if row.get("is_asking_clarification"))
+            result["is_asking_clarification"] = {
+                "true_count": true_count,
+                "total_samples": len(valid_asking),
+                "success_rate": true_count / len(valid_asking)
+            }
+        else:
+            result["is_asking_clarification"] = {"true_count": 0, "total_samples": 0, "success_rate": 0.0}
+        
+        # has_incomplete_answer
+        valid_incomplete = [row for row in score_rows if row.get("has_incomplete_answer") is not None]
+        if valid_incomplete:
+            true_count = sum(1 for row in valid_incomplete if row.get("has_incomplete_answer"))
+            result["has_incomplete_answer"] = {
+                "true_count": true_count,
+                "total_samples": len(valid_incomplete),
+                "success_rate": true_count / len(valid_incomplete)
+            }
+        else:
+            result["has_incomplete_answer"] = {"true_count": 0, "total_samples": 0, "success_rate": 0.0}
+        
+        return result
 
 
 class ClarificationAppropriatenessScorer(LLMJudgeScorer):
@@ -188,6 +230,23 @@ Categorize:"""
             "clarification_reason": reason,
             "is_ambiguous_input": is_ambiguous,
             "agent_asked_clarification": is_asking
+        }
+    
+    def summarize(self, score_rows: list) -> dict:
+        """Summarize clarification appropriateness scores."""
+        valid_rows = [row for row in score_rows if row.get("clarification_appropriate") is not None]
+        total_samples = len(valid_rows)
+        
+        if total_samples == 0:
+            return {"clarification_appropriate": {"true_count": 0, "total_samples": 0, "success_rate": 0.0}}
+        
+        true_count = sum(1 for row in valid_rows if row.get("clarification_appropriate"))
+        return {
+            "clarification_appropriate": {
+                "true_count": true_count,
+                "total_samples": total_samples,
+                "success_rate": true_count / total_samples
+            }
         }
 
 

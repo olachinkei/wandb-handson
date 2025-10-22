@@ -93,6 +93,23 @@ Is this response faithful (grounded in factual information about eSIMs)?"""
             "faithfulness": is_faithful,
             "judgment": judgment
         }
+    
+    def summarize(self, score_rows: list) -> dict:
+        """Summarize faithfulness scores."""
+        valid_rows = [row for row in score_rows if row.get("faithfulness") is not None]
+        total_samples = len(valid_rows)
+        
+        if total_samples == 0:
+            return {"faithfulness": {"true_count": 0, "total_samples": 0, "success_rate": 0.0}}
+        
+        true_count = sum(1 for row in valid_rows if row.get("faithfulness"))
+        return {
+            "faithfulness": {
+                "true_count": true_count,
+                "total_samples": total_samples,
+                "success_rate": true_count / total_samples
+            }
+        }
 
 
 class RAGAnswerRelevancyScorer(LLMJudgeScorer):
@@ -139,6 +156,23 @@ Is this response relevant to the question?"""
             "answer_relevancy": is_relevant,
             "judgment": judgment
         }
+    
+    def summarize(self, score_rows: list) -> dict:
+        """Summarize answer relevancy scores."""
+        valid_rows = [row for row in score_rows if row.get("answer_relevancy") is not None]
+        total_samples = len(valid_rows)
+        
+        if total_samples == 0:
+            return {"answer_relevancy": {"true_count": 0, "total_samples": 0, "success_rate": 0.0}}
+        
+        true_count = sum(1 for row in valid_rows if row.get("answer_relevancy"))
+        return {
+            "answer_relevancy": {
+                "true_count": true_count,
+                "total_samples": total_samples,
+                "success_rate": true_count / total_samples
+            }
+        }
 
 
 class RAGSourceCitationScorer(weave.Scorer):
@@ -169,6 +203,23 @@ class RAGSourceCitationScorer(weave.Scorer):
         
         return {
             "source_citation": has_citation
+        }
+    
+    def summarize(self, score_rows: list) -> dict:
+        """Summarize source citation scores."""
+        valid_rows = [row for row in score_rows if row.get("source_citation") is not None]
+        total_samples = len(valid_rows)
+        
+        if total_samples == 0:
+            return {"source_citation": {"true_count": 0, "total_samples": 0, "success_rate": 0.0}}
+        
+        true_count = sum(1 for row in valid_rows if row.get("source_citation"))
+        return {
+            "source_citation": {
+                "true_count": true_count,
+                "total_samples": total_samples,
+                "success_rate": true_count / total_samples
+            }
         }
 
 
@@ -222,6 +273,23 @@ class RAGOutOfScopeHandlingScorer(weave.Scorer):
                 "out_of_scope_handling": redirect_found,
                 "correct_behavior": "redirected" if redirect_found else "failed_to_redirect"
             }
+    
+    def summarize(self, score_rows: list) -> dict:
+        """Summarize out-of-scope handling scores."""
+        valid_rows = [row for row in score_rows if row.get("out_of_scope_handling") is not None]
+        total_samples = len(valid_rows)
+        
+        if total_samples == 0:
+            return {"out_of_scope_handling": {"true_count": 0, "total_samples": 0, "success_rate": 0.0}}
+        
+        true_count = sum(1 for row in valid_rows if row.get("out_of_scope_handling"))
+        return {
+            "out_of_scope_handling": {
+                "true_count": true_count,
+                "total_samples": total_samples,
+                "success_rate": true_count / total_samples
+            }
+        }
 
 
 class RAGAccuracyScorer(LLMJudgeScorer):
@@ -277,6 +345,23 @@ Is this answer accurate?"""
         return {
             "accuracy": is_accurate,
             "judgment": judgment
+        }
+    
+    def summarize(self, score_rows: list) -> dict:
+        """Summarize accuracy scores."""
+        valid_rows = [row for row in score_rows if row.get("accuracy") is not None]
+        total_samples = len(valid_rows)
+        
+        if total_samples == 0:
+            return {"accuracy": {"true_count": 0, "total_samples": 0, "success_rate": 0.0}}
+        
+        true_count = sum(1 for row in valid_rows if row.get("accuracy"))
+        return {
+            "accuracy": {
+                "true_count": true_count,
+                "total_samples": total_samples,
+                "success_rate": true_count / total_samples
+            }
         }
 
 

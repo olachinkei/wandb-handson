@@ -78,6 +78,23 @@ class BookingToolAccuracyScorer(weave.Scorer):
             "called_tools": called_tools,
             "missing_tools": missing_tools
         }
+    
+    def summarize(self, score_rows: list) -> dict:
+        """Summarize tool accuracy scores."""
+        valid_rows = [row for row in score_rows if row.get("tool_accuracy") is not None]
+        total_samples = len(valid_rows)
+        
+        if total_samples == 0:
+            return {"tool_accuracy": {"true_count": 0, "total_samples": 0, "success_rate": 0.0}}
+        
+        true_count = sum(1 for row in valid_rows if row.get("tool_accuracy"))
+        return {
+            "tool_accuracy": {
+                "true_count": true_count,
+                "total_samples": total_samples,
+                "success_rate": true_count / total_samples
+            }
+        }
 
 
 class BookingFlowCompletionScorer(weave.Scorer):
@@ -141,6 +158,23 @@ class BookingFlowCompletionScorer(weave.Scorer):
                 "booking_flow_completion": correct_prompt,
                 "status": "correctly_prompted" if correct_prompt else "missing_prompt"
             }
+    
+    def summarize(self, score_rows: list) -> dict:
+        """Summarize booking flow completion scores."""
+        valid_rows = [row for row in score_rows if row.get("booking_flow_completion") is not None]
+        total_samples = len(valid_rows)
+        
+        if total_samples == 0:
+            return {"booking_flow_completion": {"true_count": 0, "total_samples": 0, "success_rate": 0.0}}
+        
+        true_count = sum(1 for row in valid_rows if row.get("booking_flow_completion"))
+        return {
+            "booking_flow_completion": {
+                "true_count": true_count,
+                "total_samples": total_samples,
+                "success_rate": true_count / total_samples
+            }
+        }
 
 
 class BookingAccuracyScorer(LLMJudgeScorer):
@@ -232,6 +266,23 @@ Evaluate cost calculation accuracy:"""
                 "accuracy": total_appears,
                 "explanation": "JSON parse failed, checked for total in output"
             }
+    
+    def summarize(self, score_rows: list) -> dict:
+        """Summarize accuracy scores."""
+        valid_rows = [row for row in score_rows if row.get("accuracy") is not None]
+        total_samples = len(valid_rows)
+        
+        if total_samples == 0:
+            return {"accuracy": {"true_count": 0, "total_samples": 0, "success_rate": 0.0}}
+        
+        true_count = sum(1 for row in valid_rows if row.get("accuracy"))
+        return {
+            "accuracy": {
+                "true_count": true_count,
+                "total_samples": total_samples,
+                "success_rate": true_count / total_samples
+            }
+        }
 
 
 # Scorer list for Booking Agent

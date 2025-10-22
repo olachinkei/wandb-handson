@@ -39,6 +39,23 @@ class PlanSearchToolAccuracyScorer(weave.Scorer):
             "called_tools": called_tools,
             "missing_tools": missing_tools
         }
+    
+    def summarize(self, score_rows: list) -> dict:
+        """Summarize tool accuracy scores."""
+        valid_rows = [row for row in score_rows if row.get("tool_accuracy") is not None]
+        total_samples = len(valid_rows)
+        
+        if total_samples == 0:
+            return {"tool_accuracy": {"true_count": 0, "total_samples": 0, "success_rate": 0.0}}
+        
+        true_count = sum(1 for row in valid_rows if row.get("tool_accuracy"))
+        return {
+            "tool_accuracy": {
+                "true_count": true_count,
+                "total_samples": total_samples,
+                "success_rate": true_count / total_samples
+            }
+        }
 
 
 class PlanSearchAccuracyScorer(weave.Scorer):
@@ -121,6 +138,23 @@ class PlanSearchAccuracyScorer(weave.Scorer):
             "plan_type_correct": plan_type_found,
             "price_correct": price_found
         }
+    
+    def summarize(self, score_rows: list) -> dict:
+        """Summarize plan search accuracy scores."""
+        valid_rows = [row for row in score_rows if row.get("accuracy") is not None]
+        total_samples = len(valid_rows)
+        
+        if total_samples == 0:
+            return {"accuracy": {"true_count": 0, "total_samples": 0, "success_rate": 0.0}}
+        
+        true_count = sum(1 for row in valid_rows if row.get("accuracy"))
+        return {
+            "accuracy": {
+                "true_count": true_count,
+                "total_samples": total_samples,
+                "success_rate": true_count / total_samples
+            }
+        }
 
 
 class PlanSearchBookingPromptScorer(weave.Scorer):
@@ -155,6 +189,23 @@ class PlanSearchBookingPromptScorer(weave.Scorer):
         return {
             "booking_prompt_present": has_prompt,
             "booking_prompt_correct": is_correct
+        }
+    
+    def summarize(self, score_rows: list) -> dict:
+        """Summarize booking prompt scores."""
+        valid_rows = [row for row in score_rows if row.get("booking_prompt_correct") is not None]
+        total_samples = len(valid_rows)
+        
+        if total_samples == 0:
+            return {"booking_prompt_correct": {"true_count": 0, "total_samples": 0, "success_rate": 0.0}}
+        
+        true_count = sum(1 for row in valid_rows if row.get("booking_prompt_correct"))
+        return {
+            "booking_prompt_correct": {
+                "true_count": true_count,
+                "total_samples": total_samples,
+                "success_rate": true_count / total_samples
+            }
         }
 
 
@@ -196,6 +247,23 @@ class PlanSearchServiceAvailabilityScorer(weave.Scorer):
             "service_availability_correct": is_correct,
             "has_unavailable_message": has_unavailable_message,
             "expected_available": expected_service_available
+        }
+    
+    def summarize(self, score_rows: list) -> dict:
+        """Summarize service availability scores."""
+        valid_rows = [row for row in score_rows if row.get("service_availability_correct") is not None]
+        total_samples = len(valid_rows)
+        
+        if total_samples == 0:
+            return {"service_availability_correct": {"true_count": 0, "total_samples": 0, "success_rate": 0.0}}
+        
+        true_count = sum(1 for row in valid_rows if row.get("service_availability_correct"))
+        return {
+            "service_availability_correct": {
+                "true_count": true_count,
+                "total_samples": total_samples,
+                "success_rate": true_count / total_samples
+            }
         }
 
 
