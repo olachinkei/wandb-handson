@@ -30,6 +30,37 @@ eSIM Agent (Main Orchestrator)
       └── file_search (OpenAI Vector Store)
 ```
 
+### Agent Details
+
+#### 1. **eSIM Agent** (Main Orchestrator)
+- **Role:** Master coordinator that handles overall communication
+- Routes user requests to appropriate sub-agents
+- Manages conversation flow and context
+- Coordinates responses from multiple agents
+
+#### 2. **Plan Search Agent**
+- **Role:** Provides pricing information based on country and duration
+- **Tools:**
+  - `ask_country_period`: Collects travel destination and dates, converts date ranges to days
+  - `plan_search`: Searches database for plans (local/regional/global)
+- **Returns:** Plan details with pricing, coverage, and booking prompt
+
+#### 3. **RAG Agent**
+- **Role:** Handles Q&A using Retrieval-Augmented Generation
+- **Workflow:**
+  1. Determines if question is eSIM-related
+  2. If not related: Politely declines to answer
+  3. If related: Searches knowledge base using Vector Store
+  4. Provides response with source citations
+- **Knowledge Base:** 9 markdown documents covering device compatibility, activation, troubleshooting, etc.
+
+#### 4. **Booking Agent**
+- **Role:** Handles booking and payment processing
+- **Tools:**
+  - `status_check`: Verifies user login status and payment method
+  - `cost_calculator`: Calculates total cost (price × quantity + 8% tax)
+- **Flow:** Guides user through login → payment setup → booking confirmation
+
 ## 📋 Prerequisites
 
 - Python 3.10 or higher
@@ -124,46 +155,126 @@ uv run pytest tests/test_utils.py -v
 uv run pytest --cov=src --cov-report=html
 ```
 
+## 📊 Evaluation
+
+### Running Evaluations
+
+This project includes comprehensive evaluation using Weights & Biases Weave:
+
+```bash
+# Run all evaluations
+uv run python evaluation/eval.py
+
+# Run single agent evaluation
+uv run python evaluation/eval.py plan_search
+uv run python evaluation/eval.py rag
+uv run python evaluation/eval.py booking
+uv run python evaluation/eval.py multi_agent
+```
+
+### Evaluation Metrics
+
+#### **Plan Search Agent** (4 scorers, 8 scenarios)
+- ✓ **tool_accuracy**: Correct tool selection and execution
+- ✓ **accuracy**: Accurate pricing, plan type, country, and days
+- ✓ **booking_prompt_correct**: Appropriate booking confirmation prompts
+- ✓ **service_availability_correct**: Graceful handling of unavailable countries
+
+#### **RAG Agent** (5 scorers - LLM-as-a-judge, 8 scenarios)
+- ✓ **faithfulness**: Response accuracy to retrieved context
+- ✓ **answer_relevancy**: Response relevance to user question
+- ✓ **source_citation**: Provides reference indicators
+- ✓ **out_of_scope_handling**: Correctly redirects non-eSIM questions
+- ✓ **accuracy**: Overall answer correctness with topic coverage
+
+#### **Booking Agent** (3 scorers, 6 scenarios)
+- ✓ **tool_accuracy**: Correct tool usage (status_check, cost_calculator)
+- ✓ **booking_flow_completion**: Proper flow with login/payment prompts
+- ✓ **accuracy**: Accurate total cost calculation (LLM judge)
+
+#### **Multi-Agent System** (7 scorers, 15 scenarios)
+- ✓ **agent_sequence_correct**: Correct agent handoff sequence
+- ✓ **tool_usage_correct**: All expected tools used
+- ✓ **final_accuracy**: End result validation via LLM-as-a-judge
+- ✓ **step_count_correct**: Workflow completed within expected step range
+- ✓ **reflection_detected**: Error correction and retry behavior
+- ✓ **overall_success**: Complete workflow success
+
+### Test Scenarios
+
+- **Plan Search**: 8 scenarios (5 standard + 2 negative/unavailable + 1 ambiguous)
+- **RAG**: 8 scenarios (6 eSIM questions + 2 out-of-scope)
+- **Booking**: 6 scenarios (5 standard + 1 ambiguous)
+- **Multi-Agent**: 15 scenarios (8 plan search + 4 RAG + 3 direct booking)
+
+View evaluation results in Weave: `https://wandb.ai/{entity}/{project}/weave`
+
 ## 📁 Project Structure
 
 ```
 esim-agent-demo/
 ├── config/
-│   ├── config.yaml           # Main configuration
-│   └── README.md            # Config documentation
+│   ├── config.yaml              # Main configuration
+│   └── README.md                # Config documentation
 ├── database/
-│   ├── price_list.json      # eSIM pricing data
-│   ├── RAG_docs/            # Knowledge base documents
-│   └── vector_store_info.json  # Vector store metadata
+│   ├── price_list.json          # eSIM pricing data (35 countries, 9 regions)
+│   ├── RAG_docs/                # Knowledge base (9 markdown documents)
+│   └── vector_store_info.json   # Vector store metadata
 ├── cache/
-│   └── user_cache.json      # Mock user data
+│   └── user_cache.json          # Mock user data
 ├── src/
 │   ├── agents/
 │   │   ├── esim_agent.py        # Main orchestrator
 │   │   ├── plan_search_agent.py # Plan search specialist
 │   │   ├── booking_agent.py     # Booking specialist
 │   │   └── rag_agent.py         # Q&A specialist
-│   ├── tools.py             # Agent tools
-│   └── utils.py             # Utility functions
+│   ├── tools.py                 # Agent tools (4 tools)
+│   └── utils.py                 # Utility functions
+├── evaluation/
+│   ├── eval.py                  # Main evaluation runner (480+ lines)
+│   ├── scorers.py               # Base scorers
+│   ├── scorers_plan_search.py   # Plan Search scorers (6 scorers)
+│   ├── scorers_rag.py           # RAG scorers (7 scorers)
+│   ├── scorers_booking.py       # Booking scorers (5 scorers)
+│   ├── scorers_multi_agent.py   # Multi-Agent scorers (8 scorers)
+│   ├── scenarios/               # Test scenarios (37 total)
+│   │   ├── plan_search_scenarios.json    # 8 scenarios
+│   │   ├── rag_scenarios.json            # 8 scenarios
+│   │   ├── booking_scenarios.json        # 6 scenarios
+│   │   └── multi_agent_scenarios.json    # 15 scenarios
+│   └── README.md                # Evaluation guide
 ├── tests/
-│   ├── test_utils.py        # Utils tests
-│   └── test_tools.py        # Tools tests
-├── demo.py                  # Interactive demo
-├── rag_prep.py             # RAG setup script
-└── AGENT.md                # Detailed documentation
+│   ├── test_utils.py            # Utils tests (20 tests)
+│   ├── test_tools.py            # Tools tests (13 tests)
+│   ├── test_rag_prep.py         # RAG prep tests (4 tests)
+│   └── evaluation/
+│       └── test_eval.py         # Evaluation tests (21 tests)
+├── demo.py                      # Interactive demo
+├── rag_prep.py                  # RAG setup script
+├── pyproject.toml               # Dependencies
+├── uv.lock                      # Lock file
+├── README.md                    # This file
+└── AGENT.md                     # Detailed technical documentation
 ```
 
-## 🎯 Development Workflow
+### Key Implementation Files
 
-This project follows a phased development approach:
+**Agents (4 files):**
+- `src/agents/esim_agent.py`: Main orchestrator with handoffs
+- `src/agents/plan_search_agent.py`: Plan search with tools
+- `src/agents/booking_agent.py`: Booking with tools
+- `src/agents/rag_agent.py`: Q&A with Vector Store
 
-- ✅ **Phase 1**: Database Setup
-- ✅ **Phase 2**: Configuration
-- ✅ **Phase 3**: RAG Preparation
-- ✅ **Phase 4**: Agent Implementation
-- ⏳ **Phase 5**: Evaluation
+**Tools & Utils:**
+- `src/tools.py`: 4 custom tools with `_impl` versions for testing
+- `src/utils.py`: Configuration loading and utilities
 
-See `AGENT.md` for detailed documentation.
+**Evaluation Framework:**
+- `evaluation/eval.py`: Complete evaluation runner
+- `evaluation/scorers_*.py`: 26 total scorers (6+7+5+8)
+- `evaluation/scenarios/`: 37 test scenarios
+- Total: 58 evaluation tests across 4 agent types
+
 
 ## 📊 Observability
 
