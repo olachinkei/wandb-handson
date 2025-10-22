@@ -24,7 +24,7 @@ config = load_config()
 
 # Initialize Weave tracing
 weave_config = config["weave"]
-project_name = f"{weave_config['project_entity']}/{weave_config['project_name']}"
+project_name = f"{weave_config['entity']}/{weave_config['project']}"
 weave.init(project_name=project_name)
 
 # Set up OpenAI Agents tracing processor
@@ -119,6 +119,53 @@ async def single_query_demo(query: str):
     print(f"\n📤 Response:\n{result}\n")
 
 
+async def run_sample_queries():
+    """
+    Run 10 sample queries to demonstrate the eSIM agent system.
+    """
+    sample_queries = [
+        # Plan Search queries (3)
+        "I'm traveling to Japan for 7 days",
+        "Find me an eSIM plan for France and Italy, 14 days total",
+        "What plans do you have for Thailand?",
+        
+        # RAG queries (3)
+        "How do I activate my eSIM?",
+        "Is my iPhone 12 compatible with eSIM?",
+        "What should I do if my eSIM isn't working?",
+        
+        # Booking flow queries (2)
+        "I want to buy the 7-day Japan plan",
+        "Can I purchase the Europe regional plan now?",
+        
+        # Mixed/Complex queries (2)
+        "I need an eSIM for Spain, how does it work and can I buy it?",
+        "What's the best plan for a 10-day trip to Australia and how do I set it up?"
+    ]
+    
+    print("=" * 80)
+    print("🧪 Running 10 Sample Queries")
+    print("=" * 80)
+    
+    for i, query in enumerate(sample_queries, 1):
+        print(f"\n{'='*80}")
+        print(f"📋 Query {i}/10: {query}")
+        print(f"{'='*80}")
+        
+        try:
+            result = await run_agent(query)
+            print(f"\n✅ Response:\n{result}\n")
+        except Exception as e:
+            print(f"\n❌ Error: {e}\n")
+        
+        # Small delay between queries
+        await asyncio.sleep(1)
+    
+    print("=" * 80)
+    print("✨ Sample queries completed!")
+    print("=" * 80)
+
+
 if __name__ == "__main__":
     # Check if OPENAI_API_KEY is set
     if not os.getenv("OPENAI_API_KEY"):
@@ -126,9 +173,36 @@ if __name__ == "__main__":
         print("Please set it in your .env file or environment.")
         exit(1)
     
-    # Run interactive demo
-    asyncio.run(interactive_demo())
+    # Run sample queries demo
+    asyncio.run(run_sample_queries())
     
-    # Example: Run single query demo
+    # To run interactive demo instead, uncomment:
+    # asyncio.run(interactive_demo())
+    
+    # To run a single query, uncomment:
     # asyncio.run(single_query_demo("I'm traveling to Japan for 7 days"))
+
+
+# =============================================================================
+# Sample Queries for Testing
+# =============================================================================
+# 
+# Plan Search Queries:
+# 1. "I'm traveling to Japan for 7 days"
+# 2. "Find me an eSIM plan for France and Italy, 14 days total"
+# 3. "What plans do you have for Thailand?"
+# 
+# RAG Queries:
+# 4. "How do I activate my eSIM?"
+# 5. "Is my iPhone 12 compatible with eSIM?"
+# 6. "What should I do if my eSIM isn't working?"
+# 
+# Booking Flow Queries:
+# 7. "I want to buy the 7-day Japan plan"
+# 8. "Can I purchase the Europe regional plan now?"
+# 
+# Mixed/Complex Queries:
+# 9. "I need an eSIM for Spain, how does it work and can I buy it?"
+# 10. "What's the best plan for a 10-day trip to Australia and how do I set it up?"
+#
 
