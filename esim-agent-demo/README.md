@@ -257,25 +257,6 @@ esim-agent-demo/
 └── AGENT.md                     # Detailed technical documentation
 ```
 
-### Key Implementation Files
-
-**Agents (4 files):**
-- `src/agents/esim_agent.py`: Main orchestrator with handoffs
-- `src/agents/plan_search_agent.py`: Plan search with tools
-- `src/agents/booking_agent.py`: Booking with tools
-- `src/agents/rag_agent.py`: Q&A with Vector Store
-
-**Tools & Utils:**
-- `src/tools.py`: 4 custom tools with `_impl` versions for testing
-- `src/utils.py`: Configuration loading and utilities
-
-**Evaluation Framework:**
-- `evaluation/eval.py`: Complete evaluation runner
-- `evaluation/scorers_*.py`: 26 total scorers (6+7+5+8)
-- `evaluation/scenarios/`: 37 test scenarios
-- Total: 58 evaluation tests across 4 agent types
-
-
 ## 📊 Observability
 
 All agent interactions are automatically traced to Weights & Biases Weave:
@@ -289,45 +270,12 @@ Weave provides:
 - Agent handoff visualization
 - Performance metrics
 
-## 🔍 Key Components
-
-### Tools
-
-- **ask_country_period**: Process travel destinations and dates
-- **plan_search**: Search for eSIM plans (local/regional/global)
-- **status_check**: Verify user login and payment status
-- **cost_calculator**: Calculate booking costs with tax
-
-### Agents
-
-Each agent has:
-- Specific instructions and personality
-- Relevant tools or handoffs
-- Clear responsibilities
-- Configured model (GPT-5 or GPT-5-mini)
-
-### Configuration
-
-Centralized in `config/config.yaml`:
-- Agent models and settings
-- Weave tracking
-- RAG configuration
-- Tool parameters
-
 ## 📝 Development Notes
 
 - All tools have `_impl` versions for testing
 - Use `@function_tool` decorator for agent tools
 - Vector store is created once and reused
 - Mock data in `cache/` for testing without real auth
-
-## 🤝 Contributing
-
-1. Create a new branch
-2. Make changes
-3. Run tests: `uv run pytest`
-4. Commit with descriptive messages
-5. Push and create PR
 
 ## 📄 License
 
