@@ -174,9 +174,15 @@ class RAGSourceCitationScorer(weave.Scorer):
         Check if output cites sources.
         
         Args:
-            model_output: Agent output dictionary
+            model_output: Agent output dictionary or string
         """
-        output = model_output.get("output", model_output.get("final_output", ""))
+        # Handle different input types
+        if isinstance(model_output, dict):
+            output = model_output.get("output", model_output.get("final_output", ""))
+        else:
+            # If model_output is already a string (or BoxedStr)
+            output = str(model_output)
+        
         if isinstance(output, dict):
             output = str(output)
         

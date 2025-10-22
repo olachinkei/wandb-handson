@@ -6,7 +6,7 @@
 # ==========================================
 weave:
   entity: "agent-lab"
-  project: "esim-agent-test"
+  project: "esim-agent"
   enabled: true
 
 # ==========================================

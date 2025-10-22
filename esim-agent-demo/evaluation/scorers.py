@@ -125,6 +125,74 @@ Categorize this response:"""
         }
 
 
+class QueryCategorizationScorer(LLMJudgeScorer):
+    """
+    Categorizes user queries using LLM-as-a-judge.
+    Determines the type of query and intent.
+    """
+    
+    @weave.op
+    def score(self, output: str, input: str) -> dict:
+        """
+        Categorize the user query.
+        
+        Args:
+            output: Agent output (required by Weave, but not used for categorization)
+            input: User query to categorize
+            
+        Returns:
+            dict with category, sub_category, and reasoning
+        """
+        system_prompt = """You are an expert at analyzing and categorizing user queries for an eSIM service.
+
+Categorize the query into one of these main categories:
+- PLAN_SEARCH: User is looking for eSIM plans (pricing, availability, destinations)
+- RAG_QUESTION: User has questions about eSIM (how-to, compatibility, setup, troubleshooting)
+- BOOKING: User wants to purchase or book an eSIM plan
+- MIXED: Query contains multiple intents (e.g., plan search + how-to question)
+- OUT_OF_SCOPE: Query is not related to eSIM services
+
+For sub-categories:
+- PLAN_SEARCH: specific_country, regional, global, pricing_inquiry
+- RAG_QUESTION: activation, compatibility, troubleshooting, general_info, security
+- BOOKING: direct_purchase, booking_inquiry
+- MIXED: plan_and_howto, plan_and_booking, multiple_intents
+- OUT_OF_SCOPE: completely_unrelated, off_topic
+
+Respond with ONLY a JSON object:
+{
+  "category": "MAIN_CATEGORY",
+  "sub_category": "sub_category",
+  "reasoning": "Brief explanation"
+}"""
+
+        user_prompt = f"""Categorize this user query:
+
+"{input}"
+
+Respond with JSON only."""
+
+        try:
+            llm_response = self.call_llm_judge(system_prompt, user_prompt)
+            raw_judgment = llm_response.get("raw_judgment", "")
+            
+            # Parse JSON response
+            import json
+            result = json.loads(raw_judgment)
+            
+            return {
+                "category": result.get("category", "UNKNOWN"),
+                "sub_category": result.get("sub_category", "unknown"),
+                "reasoning": result.get("reasoning", "")
+            }
+        except Exception as e:
+            return {
+                "category": "ERROR",
+                "sub_category": "error",
+                "reasoning": f"Failed to categorize: {str(e)}"
+            }
+
+
 class ClarificationAppropriatenessScorer(LLMJudgeScorer):
     """
     Evaluates if asking for clarification is appropriate given the input.

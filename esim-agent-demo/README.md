@@ -119,55 +119,114 @@ This will:
 
 ## 💻 Usage
 
-### Interactive Demo
+### Demo Modes
 
-Run the interactive demo to chat with the eSIM agent system:
+The demo supports three modes to test the eSIM agent system:
 
 ```bash
-uv run python demo.py
+# 1. Comprehensive Scenarios (30 test cases - recommended for thorough testing)
+uv run python demo.py comprehensive
+
+# 2. Quick Sample Queries (10 test cases - fast overview)
+uv run python demo.py sample
+
+# 3. Interactive Chat Mode (manual testing)
+uv run python demo.py interactive
+
+# Show help
+uv run python demo.py help
 ```
 
-### Run with Guardrails (Programmatic)
+#### Comprehensive Mode (30 Scenarios)
 
-The `run_agent()` function applies quality guardrails synchronously:
+Tests all agent capabilities across 6 categories:
+
+- **📋 Plan Search (8)**: Basic queries, regional/global plans, unsupported countries, ambiguous requests
+- **📚 RAG Questions (8)**: Device compatibility, activation, setup, troubleshooting, security
+- **🛒 Booking (4)**: Direct purchase, quantity specification, post-search booking
+- **🔀 Mixed (5)**: Combined plan search + RAG + booking workflows
+- **❌ Out of Scope (3)**: Unrelated questions (weather, restaurants, stocks)
+- **🤔 Ambiguous (2)**: Unclear user intent requiring clarification
+
+```bash
+# Run with verbose output to see guardrail checks
+uv run python demo.py comprehensive --verbose
+```
+
+#### Sample Mode (10 Queries)
+
+Quick test with representative queries from each category:
+
+```bash
+uv run python demo.py sample
+```
+
+#### Interactive Mode
+
+Chat directly with the agent:
+
+```bash
+uv run python demo.py interactive
+```
+
+### Run with Intelligent Guardrails (Programmatic)
+
+The `run_agent_with_guardrails()` function applies intelligent, context-aware guardrails:
 
 ```python
-from demo import run_agent
+from demo import run_agent_with_guardrails
 import asyncio
 
 # Run with guardrails (default, silent mode)
-response = asyncio.run(run_agent("What devices support eSIM?"))
+response = asyncio.run(run_agent_with_guardrails("What devices support eSIM?"))
 
-# Run with verbose mode to see guardrail checks
-response = asyncio.run(run_agent("What devices support eSIM?", verbose=True))
-
-# Run without guardrails
-response = asyncio.run(run_agent("What devices support eSIM?", apply_guardrails=False))
+# Run with verbose mode to see categorization and guardrail checks
+response = asyncio.run(run_agent_with_guardrails("What devices support eSIM?", verbose=True))
 ```
 
-**Guardrail Checks:**
-- **Faithfulness**: Response is grounded in knowledge base (blocking)
-- **Relevancy**: Response answers the question (blocking)
-- **Source Citation**: Response includes proper references (BLOCKING - critical for RAG)
+**Intelligent Guardrail System:**
+
+1. **Query Categorization** (LLM-as-a-Judge):
+   - Automatically categorizes every query: `PLAN_SEARCH`, `RAG_QUESTION`, `BOOKING`, `MIXED`, `OUT_OF_SCOPE`
+   - Sub-categories provide detailed intent analysis
+   - Recorded to Weave for analytics
+
+2. **Conditional Citation Check** (RAG queries only):
+   - **Only applied to `RAG_QUESTION` and `MIXED` queries**
+   - Plan Search and Booking queries skip citation checks (performance optimization)
+   - Blocks response if RAG response lacks proper source citations
 
 **Blocking Behavior:**
-- If citation check fails → Returns error message in Japanese
-- If faithfulness check fails → Returns error message
-- If relevancy check fails → Returns error message
-- All guardrail results are recorded in Weave for analysis
+- For RAG queries without citations → Returns error message in Japanese
+- For other query types → No blocking, citation check skipped
 
-**Error Messages:**
+**Error Message:**
 ```
 ⚠️ 申し訳ございません。適切な参照情報を含む回答を作成できませんでした。質問を言い換えてお試しください。
 (Sorry, we couldn't create a response with appropriate references. Please rephrase your question.)
 ```
 
+**Example Output (Verbose Mode):**
+```
+🔍 Step 1: Categorizing Query...
+  📂 Category: RAG_QUESTION
+  📁 Sub-category: compatibility
+  💭 Reasoning: The user is asking about device compatibility...
+
+🤖 Step 2: Running Agent...
+
+🛡️ Step 3: Applying Citation Guardrail (RAG Query Detected)...
+  📚 Source Citation: True
+
+✅ Citation check passed! Response includes proper references.
+```
+
 ### Test with Sample Queries
 
-Run 10 predefined queries to test the system:
+Run 10 predefined queries with intelligent guardrails:
 
 ```python
-# Run with verbose mode to see guardrails
+# Run with verbose mode to see categorization and guardrails
 asyncio.run(run_sample_queries(verbose=True))
 
 # Run in silent mode (default)
@@ -177,7 +236,7 @@ asyncio.run(run_sample_queries())
 Or test a single query:
 
 ```python
-# With verbose mode
+# With verbose mode (shows categorization + citation checks)
 asyncio.run(single_query_demo("What devices support eSIM?", verbose=True))
 
 # Silent mode
