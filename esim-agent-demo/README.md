@@ -127,6 +127,26 @@ Run the interactive demo to chat with the eSIM agent system:
 uv run python demo.py
 ```
 
+**Note:** The `run_agent()` function automatically applies guardrail scorers in the background:
+- **Faithfulness Guard**: Detects hallucinations and unfaithful responses
+- **Relevancy Guard**: Detects irrelevant responses  
+- **Citation Monitor**: Monitors source attribution
+
+Alerts appear only if quality issues are detected. Guardrails run asynchronously with zero latency impact.
+
+### Guardrails Demo
+
+Run the standalone guardrails demo to see quality checks in action:
+
+```bash
+uv run python demo_simple_guardrails.py
+```
+
+This demo explicitly shows:
+- Real-time guardrail evaluation results
+- Faithfulness, relevancy, and citation scores
+- Blocking/non-blocking behavior
+
 Example interactions:
 - "I'm traveling to Japan for 7 days" → Plan Search
 - "How do I activate an eSIM?" → RAG
