@@ -14,6 +14,11 @@ from weave.integrations.openai_agents.openai_agents import WeaveTracingProcessor
 
 from src.utils import load_config
 from src.agents import create_esim_agent
+from evaluation.scorers_rag import (
+    RAGFaithfulnessScorer,
+    RAGAnswerRelevancyScorer,
+    RAGSourceCitationScorer,
+)
 
 
 # Load environment variables
@@ -30,21 +35,88 @@ weave.init(project_name=project_name)
 # Set up OpenAI Agents tracing processor
 set_trace_processors([WeaveTracingProcessor()])
 
+# Initialize guardrail scorers at module level for efficiency
+faithfulness_guard = RAGFaithfulnessScorer()
+relevancy_guard = RAGAnswerRelevancyScorer()
+citation_monitor = RAGSourceCitationScorer()
+
 
 @weave.op()
-async def run_agent(prompt: str):
+async def run_agent(prompt: str, apply_guardrails: bool = True):
     """
     Run the agent with a single prompt.
+    Automatically applies guardrail scorers in the background for quality assurance.
     
     Args:
         prompt: User input
+        apply_guardrails: Whether to apply guardrail scorers (default: True)
         
     Returns:
         Agent response
     """
     esim_agent = create_esim_agent()
     response = await Runner.run(esim_agent, prompt)
-    return response.final_output
+    output = response.final_output
+    
+    # Apply guardrails in the background (non-blocking for user)
+    if apply_guardrails:
+        asyncio.create_task(_apply_guardrails_async(str(output), prompt))
+    
+    return output
+
+
+async def _apply_guardrails_async(output: str, prompt: str):
+    """
+    Apply guardrail scorers asynchronously in the background.
+    This runs after the response is returned to the user.
+    
+    Args:
+        output: Agent response
+        prompt: User input
+    """
+    try:
+        model_output_dict = {"output": output}
+        
+        # Run all scorers in parallel for efficiency
+        await asyncio.gather(
+            _check_faithfulness(model_output_dict, prompt),
+            _check_relevancy(model_output_dict, prompt),
+            _check_citation(model_output_dict),
+            return_exceptions=True  # Don't fail if one scorer fails
+        )
+    except Exception as e:
+        # Log error but don't interrupt the user experience
+        print(f"⚠️ Guardrail scoring error: {e}")
+
+
+async def _check_faithfulness(model_output: dict, prompt: str):
+    """Check if response is faithful to knowledge base."""
+    try:
+        result = faithfulness_guard.score(model_output=model_output, input=prompt)
+        if not result.get('faithfulness', True):
+            print(f"🚨 Guardrail Alert: Unfaithful response detected!")
+    except Exception:
+        pass  # Silent failure
+
+
+async def _check_relevancy(model_output: dict, prompt: str):
+    """Check if response is relevant to the question."""
+    try:
+        result = relevancy_guard.score(model_output=model_output, input=prompt)
+        if not result.get('answer_relevancy', True):
+            print(f"🚨 Guardrail Alert: Irrelevant response detected!")
+    except Exception:
+        pass  # Silent failure
+
+
+async def _check_citation(model_output: dict):
+    """Monitor if response includes source citations."""
+    try:
+        result = citation_monitor.score(model_output=model_output)
+        if not result.get('source_citation', True):
+            print(f"ℹ️  Note: Response missing source citations")
+    except Exception:
+        pass  # Silent failure
 
 
 @weave.op()
