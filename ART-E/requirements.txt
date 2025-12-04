@@ -1,0 +1,28 @@
+# ===========================================
+# ART-E Email Search Agent - 依存パッケージ
+# ===========================================
+
+# ART (Agent Reinforcement Training) フレームワーク
+openpipe-art==0.5.2
+
+# LLM関連
+openai>=1.0.0
+litellm>=1.0.0
+
+# LangChain (ツール変換用)
+langchain-core>=0.1.0
+
+# Weights & Biases (ログ・トレーニング)
+weave>=0.50.0
+wandb>=0.16.0
+
+# データセット処理
+datasets>=2.14.0
+
+# ユーティリティ
+pydantic>=2.0.0
+tenacity>=8.0.0
+tqdm>=4.65.0
+python-dotenv>=1.0.0
+
+
