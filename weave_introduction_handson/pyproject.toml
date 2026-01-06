@@ -13,5 +13,5 @@ dependencies = [
     "numpy>=2.3.3",
     "openai==1.76.2",
     "wandb==0.19.10",
-    "weave==0.51.44",
+    "weave==0.52.22",
 ]
