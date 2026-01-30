@@ -1,117 +1,215 @@
-# W&B Weave ハンズオン
+# Weave Introduction Handson
 
-[English version is here](README_EN.md)
+W&B Weave を使った Trace、評価、モニタリングのハンズオンです。
 
-## 概要（このスクリプトで実現すること）
-このリポジトリには、W&B Weaveを学ぶためのハンズオン教材が含まれています。LLMベースのアプリケーションの追跡、実験、評価、デプロイ、改善のためのフレームワークであるW&B Weaveと、W&Bが提供する推論サービスW&B Inferenceを体験していきます。
+---
 
-Weaveの全体像を理解されたい方は、[こちらのページ](https://wandbai.notion.site/W-B-Models-Weave-22dad8882177429ba1e9f0f05e7ceac3?source=copy_link)を参照してください。[Weaveのデモ(10分)](https://www.youtube.com/watch?v=Ua0Wx9fqhDo&t=144s)や[Weaveドキュメント](https://wandb.me/weave)などのリンクをまとめています。
+## Weaveを初めて聞いたという方へ
 
+Weave をキャッチアップするためのアセット（ドキュメント、デモ動画、チュートリアル等）は[こちらのページ](https://wandbai.notion.site/W-B-Models-Weave-22dad8882177429ba1e9f0f05e7ceac3?source=copy_link)にまとめています。
 
-## 環境構築・事前準備
+## W&Bのアカウント発行・環境構築方法
 
-1. **W&Bのアカウント発行・環境構築方法**
-   
-   [こちらのページ](https://wandbai.notion.site/W-B-Models-Weave-22dad8882177429ba1e9f0f05e7ceac3?source=copy_link)にW&Bのアカウント発行方法・環境構築方法を記載しています。instructionに従いながら、W&Bのアカウントを発行、API keyの取得を行なってください。Enterpriseのお客様で発行方法やWANDB_BASE_URLがわからない方は、担当のW&Bエンジニアまでご連絡ください。
+[こちらのページ](https://wandbai.notion.site/W-B-Models-Weave-22dad8882177429ba1e9f0f05e7ceac3?source=copy_link)にW&Bのアカウント発行方法・環境構築方法を記載しています。instructionに従いながら、W&Bのアカウントを発行、API keyの取得を行なってください。Enterpriseのお客様で発行方法やWANDB_BASE_URLがわからない方は、担当のW&Bエンジニアまでご連絡ください。
 
-   W&Bの無料アカウントでのteamの作り方は下記の通りです。
-   
-   Enterpriseの環境の方は、Adminの方のみTeamを作成できます。Adminの方にTeamを聞いてください。
+Enterpriseの環境の方は、Adminの方のみTeamを作成できます。Adminの方に既存のTeam名を聞いてください。または新しいTeam作成を依頼してください。W&Bの無料アカウントでのteamの作り方は下記の通りです。
 
-   **Teamとは何か？**
+### Teamとは何か？
 
-   W&BはTeam, Project, Run(W&B Models), Trace (W&B Weave)という単位で実験を管理します。同じTeamに所属しているチームメートには自動的に実験結果が共有されます。ProjectはTeamの下の階層のフォルダのような管理単位です。Enterpriseの方は、Adminの方が複数のTeamを作れ、Free planの場合は1つしか作ることができません（複数のTeamに所属することはできます）。
+W&BはTeam, Project, Run(W&B Models), Trace (W&B Weave)という単位で実験を管理します。同じTeamに所属しているチームメートには自動的に実験結果が共有されます。ProjectはTeamの下の階層のフォルダのような管理単位です。Enterpriseの方は、Adminの方が複数のTeamを作れ、Free planの場合は1つしか作ることができません（複数のTeamに所属することはできます）。
 
-   ![teamとは](img/whatisteam.png)
+![teamとは](img/whatisteam.png)
 
+### Team(entity)の作成と招待
 
+Top pageの"Create a team to collaborate"をクリックし、teamを作成します。なお、Freeプランの場合、teamは一つしか作れません
+![team作成](img/howtocreateteam.png)
 
-   **Team(entity)の作成と招待** 
-
-   Top pageの"Create a team to collaborate"をクリックし、teamを作成します。なお、Freeプランの場合、teamは一つしか作れません
-   ![team作成](img/howtocreateteam.png)
-
-   参考：作成したteamのadminであれば、team memberを招待することができます
-   ![team invite](img/howtoinviteteammember.png)
+参考：作成したteamのadminであれば、team memberを招待することができます
+![team invite](img/howtoinviteteammember.png)
 
 
-2. **推論LLMの準備**
+---
 
-   LLMのAPIの推論には、OpenAIのAPIまたは、W&B Inference (β機能)を利用します。OpenAIのAPIが使えない場合は、W&B Inferenceをご利用ください。
-   
+## このハンズオンで学べること
 
-   補足：2025年より、W&Bが推論のエンドポイントを提供しており、$5までは無料で利用できます。W&B Inferenceのドキュメントは[こちら](https://docs.wandb.ai/guides/inference/)です。W&B Inferenceで利用できるモデルの一覧は[こちら](https://wandb.ai/inference)です。
+### 1. Tracing (トレーシング)
+- `1_1_0` 基本的なトレーシング (@weave.op, Library Integration, エラートラッキング)
+- `1_2_1` Agent SDK (ツール呼び出し, Threads)
+- `1_2_2` マルチモーダル (画像, 音声, 動画, PDF, HTML)
+- `1_3` 高度なトレーシング (Display Name, Kind/Color, Attributes, PII Redaction, Sampling)
+- `1_4` Playground (UI機能の解説)
 
-3. **環境構築**
+### 2. Asset Management (アセット管理)
+- `2_1` プロンプト管理 (StringPrompt, MessagesPrompt, weave.ref)
+- `2_2` データセット管理 (Dataset, publish, ref)
+- `2_3` モデル管理 (weave.Model, 複数メソッド)
+- `2_4` Scorer 作成 (カスタムScorer, Built-in Scorers)
+- `2_5` アセットの呼び出し (weave.ref でロード)
 
-   3.1 Google Colabを利用する場合
-      - Google Colabの場合は、以下のリンクを利用してください
+### 3. Evaluation (評価・モニタリング)
+- `3_1` オフライン評価 (weave.Evaluation, 複数Scorer)
+- `3_2` EvaluationLogger (柔軟なバッチ評価)
+- `3_3` オンラインフィードバック (Reaction, Note, カスタムフィードバック)
+- `3_4` ガードレールとモニタリング (Scorer をガードレールとして使用)
 
-         <a href="https://colab.research.google.com/drive/1bdymP7p7d4z7izsS-PhMUxXcD38p9Hqr" target="_blank">
-         <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
-         </a>
+---
 
-   3.2 ローカル実行の場合
-   - Python 3.8以上 / [uv](https://github.com/astral-sh/uv)（推奨）または pip
+## 環境構築・デモの前に確認してほしいこと
 
-      ローカル実行の場合は、以下のフローに従って環境構築をしてください:
-   - **リポジトリをクローン:**
-      ```bash
-      git clone https://github.com/olachinkei/wandb-handson.git
-      cd wandb-handson/weave_introduction
-      ```
+ハンズオンを始める前に、環境が正しくセットアップされているか確認してください。
 
-   - **uvを使用した環境構築（推奨）:**
-      ```bash
-      # uvがインストールされていない場合はインストール
-      curl -LsSf https://astral.sh/uv/install.sh | sh
+### 確認手順
 
-      # 仮想環境を作成・アクティベート
-      uv venv
-      source .venv/bin/activate  # Windowsの場合: .venv\Scripts\activate
+**1:依存関係をインストール:**
 
-      # 依存関係をインストール
-      uv pip install -r requirements.txt
-      ```
+**uv を使う場合（推奨）:**
+```bash
+cd weave_introduction_handson
+uv sync
+```
 
-      **pipを使用する場合:**
-      ```bash
-      python -m venv venv
-      source venv/bin/activate  # Windowsの場合: venv\Scripts\activate
-      pip install -r requirements.txt
-      ```
-      
-      **Jupyter Labを起動してノートブックを開く:**
-      ```bash
-      jupyter lab weave_intro_notebook.ipynb
-      ```
+pip を使う場合:
+```bash
+cd weave_introduction_handson
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+```
 
-4. **環境変数の設定**
-   `WANDB_API_KEY`は[こちら](https://docs.wandb.ai/support/find_api_key/)を参考にして取得してください。
-   ```bash
-   Google Colabを利用の方は、最初のセルに入力をしてください。
+**2:`.env` ファイルを作成（下記「環境変数の設定」を参照）**
 
-   export WANDB_BASE_URL="https://api.wandb.ai" # dedicated cloudやオンプレミスを利用の方のみ
-   export WANDB_API_KEY="your_wandb_api_key_here"
-   export GOOGLE_API_KEY="your_google_api_key" # optional if you want to try video
-   ```
-   **注意:** 
-   - dedicated cloudやオンプレミス環境をお使いの場合は、`WANDB_BASE_URL`を適切に変更してください。
-   - Azure OpenAIを使用する場合は、環境変数に`USE_AZURE_OPENAI=true`を設定してください。
+**3:動作確認スクリプトを実行:**
 
-5. **ハンズオンまでに確認いただきたいステップ**
+**uv を使う場合:**
+```bash
+uv run python jp/1_1_0_basic_trace.py
+```
 
-   jupyter notebook（または Google Colab）の中の以下のセクションが実装できることをご確認ください。
-   - 🪄 `weave`ライブラリのインストールとログイン
-   - 関数の入力と出力をトラッキング
-      - カスタム関数のトラッキング
-      - Integrationを利用したトラッキング（W&B Inference、OpenAI、Anthropic、Mistralなど）
+pip を使う場合:
+```bash
+python jp/1_1_0_basic_trace.py
+```
 
-   ご不明なことがあれば、W&B鎌田 (keisuke.kamata@wandb.com)までご連絡ください。
+以下のメッセージが表示されれば成功です:
+```
+============================================================
+Basic Trace Demo Complete!
+============================================================
+```
+
+このメッセージが表示されない場合は、エラーメッセージを確認して環境変数や依存関係を見直してください。
+
+---
+
+---
+
+## 環境構築
+
+### セットアップ
+
+**uv を使う場合（推奨）:**
+```bash
+cd weave_introduction_handson
+uv sync
+```
+
+pip を使う場合:
+```bash
+cd weave_introduction_handson
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+### 環境変数の設定
+
+`.env` ファイルを作成:
+
+```env
+# 必須
+WANDB_API_KEY=your_wandb_api_key
+OPENAI_API_KEY=your_openai_api_key
+
+# オプション
+WANDB_ENTITY=your_team_name
+WANDB_PROJECT=weave-handson
+
+# Gemini を使う場合
+GOOGLE_API_KEY=your_google_api_key
+
+# Dedicated Cloud やオンプレミスを利用している場合
+WANDB_BASE_URL=https://your-instance.wandb.io
+```
+
+**注意**: Dedicated Cloud やオンプレミス環境を利用している場合は、`WANDB_BASE_URL` に自社インスタンスの URL を設定してください。
+
+### LLMプロバイダーの切り替え
+
+`config.yaml` で OpenAI / Gemini を切り替えられます:
+
+```yaml
+# OpenAI を使う場合
+provider: "openai"
+
+# Gemini を使う場合
+provider: "gemini"
+```
+
+### その他の便利な環境変数
+
+詳細: [公式ドキュメント](https://docs.wandb.ai/weave/guides/core-types/env-vars)
+
+| 変数名 | デフォルト | 説明 |
+|--------|---------|------|
+| `WEAVE_DISABLED` | false | トレーシング無効化 |
+| `WEAVE_PRINT_CALL_LINK` | true | UI リンク出力 |
+| `WEAVE_PARALLELISM` | 20 | 評価時の並列数 |
+
+---
+
+## ハンズオンの構成
+
+```
+jp/
+├── config_loader.py         # LLM設定ローダー
+├── 1_1_0_basic_trace.py     # 基本的なトレーシング
+├── 1_2_1_agent_sdk.py       # Agent SDK
+├── 1_2_2_multimodal.py      # マルチモーダル対応
+├── 1_3_advanced_trace.py    # 高度なトレーシング
+├── 1_4_playground.py        # Playground
+├── 2_1_prompt.py            # プロンプト管理
+├── 2_2_dataset.py           # データセット管理
+├── 2_3_model.py             # モデル管理
+├── 2_4_score.py             # Scorer 作成
+├── 2_5_call.py              # アセットの呼び出し
+├── 3_1_offline_evaluation.py    # オフライン評価
+├── 3_2_evaluation_logger.py     # EvaluationLoggerによるオフライン評価体系の構築
+├── 3_3_online_feedback.py       # オンラインフィードバック
+└── 3_4_guardrail_monitoring.py  # ガードレール
+```
+
+---
+
+## 実行方法
+
+**uv を使う場合:**
+```bash
+uv run python jp/1_1_0_basic_trace.py
+```
+
+pip を使う場合:
+```bash
+python jp/1_1_0_basic_trace.py
+```
+
+---
 
 ## リソース
 
-- **ドキュメント**: [W&B Weave Documentation](https://weave-docs.wandb.ai/)
+- **ドキュメント**: [W&B Weave Documentation](https://docs.wandb.ai/weave)
+- **Built-in Scorers**: [Built-in Scorers](https://docs.wandb.ai/weave/guides/evaluation/builtin_scorers)
+- **環境変数**: [Environment Variables](https://docs.wandb.ai/weave/guides/core-types/env-vars)
 - **動画**:
   - [日本語チュートリアル](https://www.youtube.com/watch?v=Ua0Wx9fqhDo&t=295s)
-  - [英語チュートリアル](https://www.youtube.com/watch?v=sJNjw6U2Tvg&t=522s) 
+  - [英語チュートリアル](https://www.youtube.com/watch?v=sJNjw6U2Tvg&t=522s)
