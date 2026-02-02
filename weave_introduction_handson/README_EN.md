@@ -2,114 +2,163 @@
 
 [Japanese Version](README.md)
 
-## Overview (What this script accomplishes)
-This repository contains hands-on materials for learning W&B Weave. You will experience W&B Weave, a framework for tracking, experimenting, evaluating, deploying, and improving LLM-based applications, as well as W&B Inference, the inference service provided by W&B.
+## Overview
+This repository contains hands-on materials for learning W&B Weave - a framework for tracking, evaluating, and monitoring LLM applications.
 
-For those who want to understand the complete picture of Weave, please refer to [this page](https://wandbai.notion.site/How-to-start-W-B-Models-and-Weave-4ebc2500493a47ad8307da1748dced57?source=copy_link). It contains links to [Weave demo (10 minutes)](https://www.youtube.com/watch?v=tRGoT1QV8VA) and [Weave documentation](https://wandb.me/weave).
+For those new to Weave, please refer to [this page](https://wandbai.notion.site/How-to-start-W-B-Models-and-Weave-4ebc2500493a47ad8307da1748dced57?source=copy_link) for comprehensive resources including [Weave demo (10 minutes)](https://www.youtube.com/watch?v=tRGoT1QV8VA) and [Weave documentation](https://wandb.me/weave).
+
+---
+
+## What You'll Learn
+
+### 1. Tracing
+- `1_1_0` Basic Tracing (@weave.op, Library Integration, Error Tracking)
+- `1_2_1` Agent SDK (Tool Calls, Threads)
+- `1_2_2_multimodal_openai` Multimodal - OpenAI (Image, Audio, PDF)
+- `1_2_2_multimodal_gemini` Multimodal - Gemini (Image, Audio, Video, PDF)
+- `1_3` Advanced Tracing (Display Name, Kind/Color, Attributes, PII Redaction, Sampling)
+- `1_4` Playground (UI Features)
+
+### 2. Asset Management
+- `2_1` Prompt Management (StringPrompt, MessagesPrompt, weave.ref)
+- `2_2` Dataset Management (Dataset, publish, ref)
+- `2_3` Model Management (weave.Model, multiple methods)
+- `2_4` Scorer Creation (Custom Scorers, Built-in Scorers, LLM as a Judge)
+
+### 3. Evaluation & Monitoring
+- `3_1` Offline Evaluation (weave.Evaluation, multiple scorers)
+- `3_2` EvaluationLogger (Flexible batch evaluation)
+- `3_3` Online Feedback (Reactions, Notes, Custom Feedback)
+- `3_4` Guardrails and Monitoring (Using Scorers as guardrails)
+
+---
 
 
 ## Environment Setup & Prerequisites
 
-1. **W&B Account Creation & Environment Setup**
-   
-   [This page](https://wandbai.notion.site/W-B-Models-Weave-22dad8882177429ba1e9f0f05e7ceac3?source=copy_link) contains instructions for W&B account creation and environment setup. Please follow the instructions to create a W&B account and obtain an API key. Enterprise customers who are unsure about the issuance method or WANDB_BASE_URL should contact their assigned W&B engineer.
+### Setup Steps
 
-   How to create teams and projects for W&B free accounts is described below. For Enterprise environment users, only Admins can create Teams. Please ask your Admin about Teams.
+**Using uv (recommended):**
+```bash
+cd weave_introduction_handson
+uv sync
+```
 
-   **1.0 What is a Team?**
+**Using pip:**
+```bash
+cd weave_introduction_handson
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+```
 
-   W&B manages experiments in units of Team, Project, Run (W&B Models), and Trace (W&B Weave). Experiment results are automatically shared with teammates belonging to the same Team. Projects are folder-like management units under Teams. For Enterprise users, Admins can create multiple Teams, while Free plan users can only create one (though they can belong to multiple Teams).
+### Environment Variables
 
-   ![What is a team](img/whatisteam.png)
+Create a `.env` file:
 
+```env
+# Required
+WANDB_API_KEY=your_wandb_api_key
+OPENAI_API_KEY=your_openai_api_key
 
+# Optional
+WANDB_ENTITY=your_team_name
+WANDB_PROJECT=weave-handson
 
-   **1.1 Team (entity) Creation and Invitation** 
+# For Gemini
+GOOGLE_API_KEY=your_google_api_key
 
-   Click "Create a team to collaborate" on the top page to create a team. Note that Free plan users can only create one team.
-   ![Team creation](img/howtocreateteam.png)
+# For Dedicated Cloud or On-premises
+WANDB_BASE_URL=https://your-instance.wandb.io
+```
 
-   If you are an admin of the created team, you can invite team members.
-   ![Team invite](img/howtoinviteteammember.png)
+**Note**: If using Dedicated Cloud or on-premises environment, set `WANDB_BASE_URL` to your instance URL.
 
-   **1.2 Project Creation**
+### LLM Provider Configuration
 
-   Projects can be created by pressing the "+New project" button within a Team, or by executing wandb.init("entity name"/"project name") in Python.
-   ![Project creation](img/howtocreateproject.png). If you don't have any projects, the UI may look different as shown below. Please scroll down and press "Start Exploring" to create your first project, then return to home and click the projects tab.
-   
-   ![Initial project view](img/initialproject.png)
+Switch between OpenAI and Gemini in `config.yaml`:
 
-2. **W&B Inference Preparation**
+```yaml
+# Use OpenAI
+provider: "openai"
 
-   For LLM API inference, we use W&B Inference (β feature). Starting from 2025, W&B provides inference endpoints. Up to $5 is free to use, so we'll use this for the hands-on. W&B Inference documentation is [here](https://docs.wandb.ai/guides/inference/). A list of models available with W&B Inference is [here](https://wandb.ai/inference). To use W&B Inference, you need a team (entity) other than your personal team (entity). Please refer to the above instructions for team creation.
+# Use Gemini
+provider: "gemini"
+```
 
-3. **Environment Setup**
+### Verification
 
-   3.1 Using Google Colab
-      - For Google Colab, please use the following link
+Run the verification script:
 
-        <a href="https://colab.research.google.com/drive/1bdymP7p7d4z7izsS-PhMUxXcD38p9Hqr" target="_blank">
-         <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
-         </a>
+**Using uv:**
+```bash
+uv run python jp/1_1_0_basic_trace.py
+```
 
-   3.2 Local Execution
-   - Python 3.8 or higher / [uv](https://github.com/astral-sh/uv) (recommended) or pip
+**Using pip:**
+```bash
+python jp/1_1_0_basic_trace.py
+```
 
-      For local execution, please follow this workflow for environment setup:
-   - **Clone the repository:**
-      ```bash
-      git clone https://github.com/olachinkei/wandb-handson.git
-      cd wandb-handson/weave_introduction_handson
-      ```
+Success message:
+```
+============================================================
+Basic Trace Demo Complete!
+============================================================
+```
 
-   - **Environment setup using uv (recommended):**
-      ```bash
-      # Install uv if not already installed
-      curl -LsSf https://astral.sh/uv/install.sh | sh
+---
 
-      # Create and activate virtual environment
-      uv venv
-      source .venv/bin/activate  # For Windows: .venv\Scripts\activate
+## Project Structure
 
-      # Install dependencies
-      uv pip install -r requirements.txt
-      ```
+```
+jp/  (Japanese version)
+├── config_loader.py                # LLM configuration loader
+├── 1_1_0_basic_trace.py            # Basic tracing
+├── 1_2_1_agent_sdk.py              # Agent SDK
+├── 1_2_2_multimodal_openai.py      # Multimodal - OpenAI
+├── 1_2_2_multimodal_gemini.py      # Multimodal - Gemini
+├── 1_3_advanced_trace.py           # Advanced tracing
+├── 1_4_playground.py               # Playground
+├── 2_1_prompt.py                   # Prompt management
+├── 2_2_dataset.py                  # Dataset management
+├── 2_3_model.py                    # Model management
+├── 2_4_score.py                    # Scorer creation
+├── 3_1_offline_evaluation.py      # Offline evaluation
+├── 3_2_evaluation_logger.py       # EvaluationLogger
+├── 3_3_online_feedback.py         # Online feedback
+└── 3_4_guardrail_monitoring.py    # Guardrails
 
-      **Using pip:**
-      ```bash
-      python -m venv venv
-      source venv/bin/activate  # For Windows: venv\Scripts\activate
-      pip install -r requirements.txt
-      ```
-      
-      **Launch Jupyter Lab and open the notebook:**
-      ```bash
-      jupyter lab weave_intro_notebook_with_wandb_inference.ipynb
-      ```
+en/  (English version - same structure)
+```
 
-4. **Environment Variable Setup**
-   Please obtain `WANDB_API_KEY` by referring to [this guide](https://docs.wandb.ai/support/find_api_key/).
-   ```bash
-   For Google Colab users, please enter this in the first cell.
+---
 
-   export WANDB_BASE_URL="https://api.wandb.ai" # Only for dedicated cloud or on-premises users
-   export WANDB_API_KEY="your_wandb_api_key_here" 
-   export WANDB_API_KEY_PUBLIC_CLOUD="your_public_cloud_wandb_api_key_here"  # Public cloud users use the same value as WANDB_API_KEY
-   export GOOGLE_API_KEY="your_google_api_key" # optional if you want to try video
-   ```
-   **Note:** 
-   - If you are using dedicated cloud or on-premises environment, please change `WANDB_BASE_URL` appropriately.
-   - If using Azure OpenAI, set the environment variable `USE_AZURE_OPENAI=true`.
+## Running Scripts
 
-5. **Steps to Verify Before the Hands-on**
+**Using uv:**
+```bash
+uv run python jp/1_1_0_basic_trace.py
+```
 
-   Please confirm that you can implement the following sections in the jupyter notebook (or Google Colab):
-   - 🪄 Installation and login of the `weave` library
-   - Tracking function inputs and outputs
-      - Custom function tracking
-      - Tracking using integrations (W&B Inference, OpenAI, Anthropic, Mistral, etc.)
+**Using pip:**
+```bash
+python jp/1_1_0_basic_trace.py
+```
 
-   If you have any questions, please contact W&B Kamata (keisuke.kamata@wandb.com).
+---
+
+## Additional Environment Variables
+
+See [official documentation](https://docs.wandb.ai/weave/guides/core-types/env-vars) for details.
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `WEAVE_DISABLED` | false | Disable tracing |
+| `WEAVE_PRINT_CALL_LINK` | true | Print UI links |
+| `WEAVE_PARALLELISM` | 20 | Evaluation parallelism |
+
+---
 
 ## Resources
 
