@@ -48,7 +48,7 @@ def contains_answer_scorer(expected: str, output: dict) -> dict:
     return {'contains_answer': expected.lower() in generated.lower()}
 
 
-class LLMJudgeScorer(Scorer):
+class LLMJudgeScorer(Scorer): #recommend to use Scorer to manage the scorer version
     """LLM as a Judge scorer."""
     
     @weave.op
@@ -84,7 +84,7 @@ class QAModel(Model):
     @weave.op()
     def predict(self, question: str) -> dict:
         messages = [
-            {"role": "system", "content": "Answer concisely. Include only the answer."},
+            {"role": "system", "content": "Answer concisely. Include only the answer."}, #When writing chemical formulas, use subscript numbers like H2O, CO2.
             {"role": "user", "content": question},
         ]
         return {"answer": chat_completion(messages, temperature=0.3)}
@@ -126,6 +126,7 @@ evaluation = Evaluation(
         contains_answer_scorer,
         LLMJudgeScorer(),
     ],
+    name="qa_evaluation",
 )
 
 print("Running evaluation with 3 scorers...")

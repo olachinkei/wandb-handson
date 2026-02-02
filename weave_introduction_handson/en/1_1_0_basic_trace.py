@@ -101,8 +101,9 @@ elif vendor == "gemini":
     
     # Using Gemini client directly
     # Automatically traced without @weave.op()
+    from config_loader import get_model_name
     genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
-    model = genai.GenerativeModel("gemini-1.5-flash")
+    model = genai.GenerativeModel(get_model_name())
     
     response = model.generate_content("Tell me a short joke.")
     

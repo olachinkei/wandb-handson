@@ -194,3 +194,7 @@ cython_debug/
 .cursorindexingignore
 
 weave_introduction/videos/
+
+# Weave outputs
+weave_introduction_handson/outputs/
+weave_introduction_handson/assets.json

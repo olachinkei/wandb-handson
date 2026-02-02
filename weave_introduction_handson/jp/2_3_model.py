@@ -4,7 +4,7 @@
 このスクリプトで学べること:
 ================================
 1. weave.Model の作成と公開
-2. 複数のメソッド（predict, invoke, generate など）
+2. 複数のメソッド（predict, analyze, translate など）
 3. モデルパラメータの追跡
 4. weave.ref() でモデルを読み込む
 """
@@ -53,45 +53,34 @@ class TextAssistant(Model):
     - @weave.op() を付けたメソッドが自動的にトレースされる
     - publish() でバージョン管理できる
     
-    predict 以外のメソッド名も使えます！
+    predict メソッドの特別な役割:
+    - weave.Model の主要インターフェース
+    - Evaluation で自動的に呼び出されるメソッド
+    - モデルのバージョン間で統一された予測 API を提供
+    
+    その他のメソッドも定義でき、タスクごとに使い分けられます。
     """
     model_name: str
     temperature: float = 0.3
     max_tokens: int = 150
     
     # ---------------------------------------------------------
-    # predict: 標準的な予測メソッド
+    # predict: モデルの主要な予測メソッド（必須）
     # ---------------------------------------------------------
     @weave.op()
     def predict(self, question: str) -> dict:
-        """質問に回答する（標準的なメソッド名）"""
+        """質問に回答する
+        
+        predict は weave.Model の標準インターフェース。
+        - Evaluation で自動的にこのメソッドが呼び出される
+        - モデルのバージョン管理と追跡の中心となる
+        """
         messages = [
             {"role": "system", "content": "Answer concisely."},
             {"role": "user", "content": question},
         ]
         answer = chat_completion(messages, temperature=self.temperature, max_tokens=self.max_tokens)
         return {"answer": answer, "model": self.model_name}
-    
-    # ---------------------------------------------------------
-    # invoke: LangChain スタイルのメソッド名
-    # ---------------------------------------------------------
-    @weave.op()
-    def invoke(self, prompt: str) -> str:
-        """プロンプトを実行する（LangChain スタイル）"""
-        messages = [{"role": "user", "content": prompt}]
-        return chat_completion(messages, temperature=self.temperature, max_tokens=self.max_tokens)
-    
-    # ---------------------------------------------------------
-    # generate: 生成タスク用
-    # ---------------------------------------------------------
-    @weave.op()
-    def generate(self, topic: str, style: str = "informative") -> str:
-        """トピックについてテキストを生成"""
-        messages = [
-            {"role": "system", "content": f"Write in a {style} style."},
-            {"role": "user", "content": f"Write about: {topic}"},
-        ]
-        return chat_completion(messages, temperature=0.7, max_tokens=self.max_tokens)
     
     # ---------------------------------------------------------
     # analyze: 分析タスク用
@@ -141,20 +130,11 @@ print("\n" + "=" * 60)
 print("2. 各メソッドの実行")
 print("=" * 60)
 
-# predict
-print("\n--- predict ---")
+# predict - モデルの主要インターフェース
+print("\n--- predict (モデルの主要メソッド) ---")
+print("※ Evaluation で自動的に呼び出されるメソッド")
 result = assistant.predict("What is Python?")
 print(f"Answer: {result['answer'][:80]}...")
-
-# invoke
-print("\n--- invoke ---")
-result = assistant.invoke("Explain AI in one sentence.")
-print(f"Result: {result[:80]}...")
-
-# generate
-print("\n--- generate ---")
-result = assistant.generate("machine learning", style="casual")
-print(f"Generated: {result[:80]}...")
 
 # analyze
 print("\n--- analyze ---")
@@ -203,9 +183,9 @@ model = weave.ref("text_assistant:latest").get()
 model = weave.ref("text_assistant:v1").get()
 
 # 読み込んだモデルを使う
-result = model.predict("question")
-result = model.invoke("prompt")
-result = model.generate("topic")
+result = model.predict("question")  # 主要メソッド (Evaluation で使用)
+result = model.analyze("text")      # カスタムメソッド
+result = model.translate("text", target_lang="English")  # カスタムメソッド
 """)
 
 
@@ -214,3 +194,9 @@ print("Model Management Demo Complete!")
 print("=" * 60)
 print(f"\n登録したモデルは {ASSETS_FILE} に保存されました")
 print("Weave UI でモデルのパラメータを確認してください")
+print("""
+重要なポイント:
+- predict() は weave.Model の標準インターフェース
+- Evaluation で自動的に predict() が呼び出される
+- 他のメソッドも定義できるが、評価には predict() を使用
+""")

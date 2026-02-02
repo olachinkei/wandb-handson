@@ -124,52 +124,10 @@ for i in range(3):
 
 
 # =============================================================================
-# 3. JSON Validator
+# 3. PII Masking Info
 # =============================================================================
 print("\n" + "=" * 60)
-print("3. JSON Format Validator")
-print("=" * 60)
-
-
-class JSONValidator(Scorer):
-    """Validate JSON format."""
-    
-    @weave.op
-    def score(self, output: str) -> dict:
-        try:
-            json.loads(output)
-            return {"is_valid_json": True}
-        except:
-            return {"is_valid_json": False}
-
-
-@weave.op()
-def generate_json(prompt: str) -> str:
-    """Generate JSON response."""
-    messages = [
-        {"role": "system", "content": "Return a JSON object with 'answer' and 'confidence'."},
-        {"role": "user", "content": prompt},
-    ]
-    return chat_completion(messages, temperature=0)
-
-
-async def validate_json_output(prompt: str) -> dict:
-    result, call = generate_json.call(prompt)
-    validator = JSONValidator()
-    validation = await call.apply_scorer(validator)
-    return {"output": result, "valid": validation.result.get("is_valid_json")}
-
-
-result = asyncio.run(validate_json_output("What is 2+2?"))
-print(f"Valid JSON: {result['valid']}")
-print(f"Output: {result['output'][:60]}...")
-
-
-# =============================================================================
-# 4. PII Masking Info
-# =============================================================================
-print("\n" + "=" * 60)
-print("4. PII Masking Reference")
+print("3. PII Masking Reference")
 print("=" * 60)
 
 print("""

@@ -18,6 +18,7 @@
 """
 
 import os
+import time
 import uuid
 from dataclasses import dataclass
 from typing import Any
@@ -58,7 +59,7 @@ def analyze_sentiment(text: str) -> str:
 
 result = analyze_sentiment("I love this product!")
 print(f"Sentiment: {result[:30]}...")
-
+time.sleep(2)  # 次の API 呼び出しまで待機
 
 # =============================================================================
 # 2. Kind & Color - トレースの分類と色をカスタマイズ
@@ -218,8 +219,8 @@ result = process_user_data(
 print(f"Result (実際): {result}")
 
 
-# REDACT_KEYS を使ったカスタムキーのマスク
-print("\n--- REDACT_KEYS ---")
+# 方法3: REDACT_KEYS を使ったカスタムキーのマスク
+print("\n--- 方法3: REDACT_KEYS ---")
 print("""
 特定のキー名を持つ値を自動的にマスク:
 

@@ -126,6 +126,7 @@ evaluation = Evaluation(
         contains_answer_scorer,
         LLMJudgeScorer(),
     ],
+    name="qa_evaluation",
 )
 
 print("Running evaluation with 3 scorers...")

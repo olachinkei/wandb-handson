@@ -3,7 +3,7 @@
 
 # デフォルトのLLMプロバイダー: "openai" or "gemini"
 # Gemini を使う場合は "gemini" に変更してください
-provider: "openai"
+provider: "gemini"
 
 # OpenAI設定
 openai:
@@ -12,7 +12,7 @@ openai:
 
 # Gemini設定
 gemini:
-  model: "gemini-1.5-flash"
+  model: "gemini-3-flash-preview"
   embedding_model: "text-embedding-004"
 
 # 共通設定
