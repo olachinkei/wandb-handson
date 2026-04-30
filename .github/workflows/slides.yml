@@ -5,7 +5,7 @@ on:
     branches: [main]
     paths:
       - "ART-E/docs/**"
-      - "ART-E/.github/workflows/slides.yml"
+      - ".github/workflows/slides.yml"
 
 permissions:
   contents: read

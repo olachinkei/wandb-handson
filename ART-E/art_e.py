@@ -494,16 +494,24 @@ async def train(config: Config):
     # ===========================================
     # トレーニングイテレータの設定
     # ===========================================
+    current_step = await model.get_step()
+    if current_step >= config.training.max_steps:
+        print(f"⚠️ モデルは既にステップ {current_step} まで学習済みです（max_steps={config.training.max_steps}）")
+        print(f"   続きからトレーニングするには --max-steps {current_step + config.training.max_steps} を指定してください")
+        print(f"   新規にトレーニングするにはモデル名を変更してください（config.py の ModelConfig.name）")
+        return
+
     training_iterator = iterate_dataset(
         training_scenarios,
         groups_per_step=config.training.groups_per_step,
         num_epochs=config.training.num_epochs,
-        initial_step=await model.get_step(),
+        initial_step=current_step,
     )
-    
+
     # ===========================================
     # メイントレーニングループ
     # ===========================================
+    print(f"開始ステップ: {current_step}")
     print("=" * 60)
     print("トレーニングループ開始")
     print("=" * 60)
@@ -637,7 +645,14 @@ def parse_args():
         action="store_true",
         help="デモモード（小さいパラメータで実行）"
     )
-    
+
+    parser.add_argument(
+        "--name",
+        type=str,
+        default=None,
+        help="モデル名を上書き（新規トレーニング時に使用）"
+    )
+
     parser.add_argument(
         "--project",
         type=str,
@@ -703,6 +718,8 @@ async def main():
     config = get_config(use_demo=args.demo)
     
     # コマンドライン引数で上書き
+    if args.name:
+        config.model.name = args.name
     if args.project:
         config.model.project = args.project
     if args.max_steps:
