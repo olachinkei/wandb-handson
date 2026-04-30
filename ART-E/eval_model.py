@@ -8,10 +8,10 @@ art_e.pyでトレーニングした後に使用します。
 
 使い方:
     # 基本的な使用法（artifact_pathは必須）
-    python eval_model.py --artifact-path "wandb-artifact:///agent-lab/ARTE-Email-Search-Agent/email-agent-003:v160"
+    python eval_model.py --artifact-path "agent-lab/ARTE-Email-Search-Agent/email-agent-003:v160"
 
     # シナリオ数を指定して評価
-    python eval_model.py --artifact-path "wandb-artifact:///..." --num-scenarios 10
+    python eval_model.py --artifact-path "agent-lab/..." --num-scenarios 10
 """
 
 import argparse
@@ -29,7 +29,9 @@ from dotenv import load_dotenv
 from langchain_core.utils.function_calling import convert_to_openai_tool
 from litellm import acompletion
 from pydantic import BaseModel, Field
-from tenacity import retry, stop_after_attempt
+import time
+
+from tenacity import retry, retry_if_exception, stop_after_attempt, wait_exponential
 
 # ローカルモジュール
 from config import Config, get_config
@@ -235,14 +237,30 @@ async def rollout_test(
     # ===========================================
     # エージェントループ
     # ===========================================
-    for _ in range(max_turns):
-        # モデルからの応答を取得
-        response = client.chat.completions.create(
+    def _is_retryable(exc):
+        if isinstance(exc, openai.RateLimitError):
+            return True
+        if isinstance(exc, openai.BadRequestError) and "Already borrowed" in str(exc):
+            return True
+        return False
+
+    @retry(
+        retry=retry_if_exception(_is_retryable),
+        wait=wait_exponential(min=5, max=60),
+        stop=stop_after_attempt(5),
+        before_sleep=lambda rs: print(f"  ⏳ モデルがビジー状態です。{rs.next_action.sleep:.0f}秒後にリトライ... (試行 {rs.attempt_number}/5)"),
+    )
+    def call_model(messages, tools):
+        return client.chat.completions.create(
             model=artifact_path,
             temperature=1,
-            messages=result.messages,
-            tools=result.tools,
+            messages=messages,
+            tools=tools,
         )
+
+    for _ in range(max_turns):
+        # モデルからの応答を取得
+        response = call_model(result.messages, result.tools)
 
         response_message = response.choices[0].message
         
@@ -436,7 +454,11 @@ async def test_model(
             "環境変数 WANDB_API_KEY または --api-key オプションで指定してください。\n"
             "APIキーは https://wandb.ai/authorize から取得できます。"
         )
-    
+
+    # wandb-artifact:/// プレフィックスを自動補完
+    if not artifact_path.startswith("wandb-artifact:///"):
+        artifact_path = f"wandb-artifact:///{artifact_path}"
+
     # ===========================================
     # OpenAIクライアント設定（W&B Inference用）
     # ===========================================
@@ -523,7 +545,7 @@ def parse_args():
         required=True,
         help=(
             "W&Bアーティファクトパス（必須）\n"
-            "例: wandb-artifact:///agent-lab/ARTE-Email-Search-Agent/email-agent-003:v160"
+            "例: agent-lab/ARTE-Email-Search-Agent/email-agent-003:v160"
         )
     )
     
@@ -594,4 +616,4 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-# python eval_model.py --artifact-path "wandb-artifact:///agent-lab/ARTE-Email-Search-Agent/email-agent-003:v160" --num-scenarios 10
+# python eval_model.py --artifact-path "agent-lab/ARTE-Email-Search-Agent/email-agent-003:v160" --num-scenarios 10
