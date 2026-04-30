@@ -133,6 +133,32 @@ python eval_model.py --artifact-path "your-entity/your-project/model-name:versio
 | `--seed` | 乱数シード | None |
 | `--api-key` | W&B APIキー | 環境変数から取得 |
 
+## 🤖 Advanced Topic: coding agentで次の改善の一手を試す
+
+トレーニングや推論評価を一通り実行したら、[wandb/skills](https://github.com/wandb/skills) をインストールしたcoding agentに、W&B / Weaveのログを見ながら次の改善案を考えさせ、コード変更と再評価まで試させることができます。
+
+```bash
+npx skills add wandb/skills
+export WANDB_API_KEY=<your-key>
+```
+
+おすすめの流れ:
+
+1. `python art_e.py` でトレーニングを実行し、W&B / WeaveにRunやTraceを記録します。
+2. `python eval_model.py --artifact-path "your-entity/your-project/model-name:version"` で学習済みモデルを評価します。
+3. W&B UIまたはWeave UIで、報酬、失敗したシナリオ、RULERの評価、Traceの内容を確認します。
+4. coding agentに「このART-EプロジェクトのW&B/Weave結果を見て、次に改善すべき一手を提案し、最小変更で試してください」と依頼します。
+5. agentが提案した改善を1つ選び、プロンプト、ツール設計、報酬設計、評価シナリオなどを変更して再実行します。
+6. Before/Afterの評価結果を比較し、改善が有効なら設定やREADMEに反映します。効果が薄ければTraceやScorerを見直して次の仮説を立てます。
+
+例:
+
+```text
+このART-EプロジェクトのW&B Run、Weave Trace、評価結果を確認して、
+メール検索エージェントが失敗しやすいケースを1つ特定してください。
+最小限のコード変更で改善案を実装し、再評価してBefore/Afterを説明してください。
+```
+
 ## 📚 参考リンク
 
 - [W&B Training と Serverless RL](https://note.com/wandb_jp/n/n6ef91cd095f4?magazine_key=m94adeea366ce)
