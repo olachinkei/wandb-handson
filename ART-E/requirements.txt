@@ -3,7 +3,7 @@
 # ===========================================
 
 # ART (Agent Reinforcement Training) フレームワーク
-openpipe-art==0.5.2
+openpipe-art==0.5.17
 
 # LLM関連
 openai>=1.0.0

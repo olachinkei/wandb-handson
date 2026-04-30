@@ -377,11 +377,15 @@ async def initialize_model(config: Config) -> art.TrainableModel:
         random.seed(config.dataset.seed)
 
     # モデルの宣言
+    internal_config = None
+    if config.backend.use_local:
+        internal_config = {"engine_args": {"gpu_memory_utilization": 0.7}}
     model = art.TrainableModel(
         name=config.model.name,
         project=config.model.project_name,
         entity=config.model.entity,
         base_model=config.model.base_model,
+        _internal_config=internal_config,
     )
 
     # バックエンドの初期化

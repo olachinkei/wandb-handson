@@ -57,7 +57,7 @@ source .venv/bin/activate  # Linux/macOS
 uv pip install -r requirements.txt
 
 # 自前の GPU で LocalBackend を使う場合は追加で以下を実行
-# uv pip install torch polars
+# uv pip install torch polars tblib
 ```
 
 ### 環境変数の設定
