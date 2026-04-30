@@ -3,7 +3,7 @@
 
 # デフォルトのLLMプロバイダー: "openai" or "gemini"
 # Gemini を使う場合は "gemini" に変更してください
-provider: "gemini"
+provider: "openai"
 
 # OpenAI設定
 openai:

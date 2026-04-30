@@ -10,11 +10,11 @@ ART-E Email Search Agent - メインモジュール
 - トレーニングループ
 
 使い方:
-    # 本番トレーニング
+    # トレーニング（Serverless Backend）
     python art_e.py
-    
-    # デモモード（小さいパラメータ）
-    python art_e.py --demo
+
+    # ローカル GPU を使用
+    python art_e.py --local
 """
 
 import argparse
@@ -364,11 +364,11 @@ async def _register_model_with_retry(model: art.TrainableModel, backend: Serverl
 
 async def initialize_model(config: Config) -> art.TrainableModel:
     """
-    ARTモデルを初期化してサーバレスバックエンドに登録
-    
+    ARTモデルを初期化してバックエンドに登録
+
     Args:
         config: 設定オブジェクト
-    
+
     Returns:
         art.TrainableModel: 初期化済みのモデル
     """
@@ -379,13 +379,19 @@ async def initialize_model(config: Config) -> art.TrainableModel:
     # モデルの宣言
     model = art.TrainableModel(
         name=config.model.name,
-        project=config.model.project,
+        project=config.model.project_name,
+        entity=config.model.entity,
         base_model=config.model.base_model,
     )
 
-    # サーバレスバックエンドの初期化
-    # トレーニングと推論はWeights & Biasesサーバーで実行
-    backend = ServerlessBackend()
+    # バックエンドの初期化
+    if config.backend.use_local:
+        from art.local import LocalBackend
+        print(f"  LocalBackend を使用（パス: {config.backend.local_path}）")
+        backend = LocalBackend(path=config.backend.local_path)
+    else:
+        print("  ServerlessBackend を使用（CoreWeave GPU）")
+        backend = ServerlessBackend()
 
     # モデルをバックエンドに登録（リトライ付き）
     try:
@@ -442,7 +448,7 @@ async def train(config: Config):
     print("=" * 60)
     print()
     print("【設定】")
-    print(f"  プロジェクト名: {config.model.project}")
+    print(f"  プロジェクト: {config.model.project}")
     print(f"  モデル名: {config.model.name}")
     print(f"  ベースモデル: {config.model.base_model}")
     print()
@@ -613,7 +619,7 @@ async def train(config: Config):
     print()
     print("次のステップ:")
     print("  1. W&B/Weaveダッシュボードでメトリクスを確認")
-    print("  2. python test_model.py でモデルをテスト")
+    print("  2. python eval_model.py でモデルをテスト")
 
 
 # ===========================================
@@ -666,7 +672,20 @@ def parse_args():
         default=None,
         help="学習率を上書き"
     )
-    
+
+    parser.add_argument(
+        "--local",
+        action="store_true",
+        help="ローカル GPU を使用（LocalBackend）"
+    )
+
+    parser.add_argument(
+        "--local-path",
+        type=str,
+        default="./.art",
+        help="LocalBackend のデータ保存先パス（デフォルト: ./.art）"
+    )
+
     return parser.parse_args()
 
 
@@ -694,7 +713,10 @@ async def main():
         config.training.rollouts_per_group = args.rollouts_per_group
     if args.learning_rate:
         config.training.learning_rate = args.learning_rate
-    
+    if args.local:
+        config.backend.use_local = True
+        config.backend.local_path = args.local_path
+
     # トレーニング実行
     await train(config)
 

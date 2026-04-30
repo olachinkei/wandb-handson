@@ -1,32 +1,35 @@
 # ART-E: Email Search Agent
 
-[ART (Agent Reinforcement Training)](https://github.com/openpipe/art) を使用して、メール検索エージェントをトレーニングするプロジェクトです。
+## はじめに
 
-## 📝 概要
+**Agentic RL（エージェント強化学習）** は、LLMをツール呼び出しや複数ステップの推論が必要なタスクに特化させるための強化学習手法です。汎用モデルに対して、企業固有のタスク（メール検索、カスタマーサポート、文書要約など）を実行するエージェントとしての能力を、実際のタスク遂行を通じて学習させます。
 
-ART-Eは、Enronメールデータセットを使用して、LLMベースのメール検索エージェントを強化学習でトレーニングします。
+**[ART](https://github.com/openpipe/art)** は、W&Bが買収した [OpenPipe](https://openpipe.ai) が開発した Agentic RL フレームワークです。GRPO（Group Relative Policy Optimization）とRULER（相対スコアリング）を組み合わせ、数行のコードでエージェントの強化学習を実行できます。
 
-### 主な機能
+このハンズオンでは、**[W&B Training](https://docs.wandb.ai/ja/training)** を使用します。Serverless RL は、W&B の親会社である **CoreWeave** が提供する GPU リソース上で、インフラ構築不要で RL トレーニングを実行できるサービスです。トレーニングと推論の両方がクラウド上で実行されるため、手元に GPU がなくてもエージェントの強化学習を試すことができます。 詳しくは以下のブログ記事を参照してください：
+- [W&B Training と Serverless RL](https://note.com/wandb_jp/n/n6ef91cd095f4?magazine_key=m94adeea366ce)
 
-- **メール検索**: キーワードベースのフルテキスト検索
-- **メール読み取り**: 特定のメールの詳細取得
-- **質問応答**: ユーザーの質問に対してメールから回答を生成
+## 📝 ハンズオンの概要
 
-### 使用技術
+ART-Eは、Enronメールデータセットを使用して、LLMベースのメール検索エージェントを強化学習でトレーニングするプロジェクトです。エージェントはキーワードによるメール検索、特定メールの詳細取得、ユーザーの質問に対するメールからの回答生成を行います。
 
-- **ベースモデル**: Qwen 3 14B
-- **強化学習**: GRPO (Group Relative Policy Optimization)
-- **評価**: RULER (相対スコアリング手法)
-- **ロギング**: Weights & Biases / Weave
+ベースモデルに Qwen 3 14B を使用し、GRPO（Group Relative Policy Optimization）で強化学習、RULER（相対スコアリング手法）で評価を行います。トレーニングの記録には Weights & Biases / Weave を使用します。
 
 ## 🔧 環境構築
+
+
+### GPU について 
+
+- W&B multi-tenant SaaSをご利用の場合: このハンズオンでは Serverless Backend (GPU) を使用するため、手元に GPU は基本的に不要です。トレーニングと推論は CoreWeave のクラウド GPU 上で実行されます。
+
+- W&B Dedicated Cloud, Onpremiseをご利用の場合: Serverless Backend (GPU) を使用できないので、GPUをご準備いただく必要があります。Qwen 3 14B モデルのトレーニングには、VRAM 80GB 以上の GPU　(NVIDIA H100 80GBやA100 80GB）が推奨となります。
 
 ### 前提条件
 
 - Python 3.12以上
 - [uv](https://docs.astral.sh/uv/) パッケージマネージャー
 
-### uvのインストール
+**uvのインストール**
 
 ```bash
 # macOS/Linux
@@ -52,223 +55,83 @@ source .venv/bin/activate  # Linux/macOS
 
 # 依存パッケージをインストール
 uv pip install -r requirements.txt
+
+# 自前の GPU で LocalBackend を使う場合は追加で以下を実行
+# uv pip install torch polars
 ```
 
 ### 環境変数の設定
 
-`.env.example` を `.env` にコピーして、APIキーを設定します：
+`.env.example` を `.env` にコピーして、環境変数を設定します。
 
 ```bash
-# .env ファイルを作成
 cp .env.example .env
-
-# .env ファイルを編集
-# OpenAI API Key（RULERジャッジモデル用）
-OPENAI_API_KEY=your_openai_api_key_here
-
-# Weights & Biases API Key（推論・トレーニング・ログ用）
-WANDB_API_KEY=your_wandb_api_key_here
 ```
 
-**APIキーの取得先:**
-- OpenAI: https://platform.openai.com/api-keys
-- W&B: https://wandb.ai/authorize
+`.env` ファイルに以下の2つのAPIキーを設定してください：
+
+- **`OPENAI_API_KEY`**: RULER評価のジャッジモデル（GPT-4.1 / o4-mini）で使用します。[OpenAI API Keys](https://platform.openai.com/api-keys) から取得できます。
+- **`WANDB_API_KEY`**: トレーニング・推論・ログの記録に使用します。[W&B Authorize](https://wandb.ai/authorize) から取得できます。
+
+Dedicated Cloud やオンプレミス環境の W&B を使用する場合は、追加で **`WANDB_BASE_URL`** にインスタンスの URL を設定してください（例: `https://wandb.your-company.com`）。SaaS版（wandb.ai）を使用する場合は設定不要です。
 
 ## 🚀 実行方法
 
 ### トレーニングの実行
 
+初回実行時は Enron メールデータセットのダウンロードに数分かかります。データベース（`enron_emails.db`）は初回実行時に自動生成されます。
+
 ```bash
 # 仮想環境をアクティベート
 source .venv/bin/activate
 
-# 本番トレーニング（推奨パラメータ）
+# トレーニング実行（Serverless Backend / CoreWeave GPU を使用）
 python art_e.py
-
-# デモモード（小さいパラメータで高速実行）
-python art_e.py --demo
 
 # カスタムパラメータ
 python art_e.py --project my-project --max-steps 100 --groups-per-step 4
+
+# 自前の GPU を使う場合（LocalBackend）
+python art_e.py --local
+
+# LocalBackend のデータ保存先を指定
+python art_e.py --local --local-path /data/art
 ```
+
+デフォルトでは Serverless Backend（CoreWeave GPU）を使用します。Dedicated Cloud やオンプレミス環境など自前の GPU でトレーニングする場合は `--local` オプションを指定してください。LocalBackend はローカルマシン上で vLLM（推論）と Unsloth/torchtune（学習）を実行します。
 
 ### コマンドラインオプション
 
 | オプション | 説明 | デフォルト |
 |-----------|------|-----------|
-| `--demo` | デモモード（小さいパラメータ） | False |
-| `--project` | Weave/W&Bプロジェクト名 | email-search-agent |
-| `--max-steps` | 最大トレーニングステップ数 | 500 (本番) / 50 (デモ) |
-| `--groups-per-step` | ステップあたりのグループ数 | 8 (本番) / 2 (デモ) |
-| `--rollouts-per-group` | グループあたりのロールアウト数 | 8 (本番) / 4 (デモ) |
+| `--project` | Weave/W&Bプロジェクト名 | ARTE-Email-Search-Agent |
+| `--max-steps` | 最大トレーニングステップ数 | 5 |
+| `--groups-per-step` | ステップあたりのグループ数 | 2 |
+| `--rollouts-per-group` | グループあたりのロールアウト数 | 4 |
 | `--learning-rate` | 学習率 | 1e-5 |
+| `--local` | ローカル GPU を使用（LocalBackend） | False |
+| `--local-path` | LocalBackend のデータ保存先パス | ./.art |
 
-### モデルのテスト
+### 学習したモデルを使って推論する
 
-トレーニング後、以下のコマンドでモデルをテストできます：
-
-```bash
-# 基本的なテスト（5シナリオ）
-python test_model.py
-
-# より多くのシナリオでテスト
-python test_model.py --num-scenarios 20
-
-# デモモード
-python test_model.py --demo
-```
-
-### Jupyter Notebookとして実行
+トレーニング後、以下のコマンドでモデルの推論・評価を実行できます：
 
 ```bash
-# Jupyterをインストール（まだの場合）
-uv pip install jupyter
-
-# Jupyter Labを起動
-jupyter lab
-
-# "art_e (1).ipynb" を開いて実行
+python eval_model.py --artifact-path "wandb-artifact:///your-entity/your-project/model-name:version" --num-scenarios 20
 ```
 
-## 📁 ファイル構成
-
-```
-ART-E/
-├── README.md           # このファイル
-├── requirements.txt    # 依存パッケージ
-├── .env.example        # 環境変数テンプレート
-├── .env                # 環境変数（要作成）
-├── config.py           # 設定管理
-├── art_e.py            # メインスクリプト（トレーニング）
-├── test_model.py       # モデルテスト
-├── utils.py            # ユーティリティ関数
-├── art_e (1).ipynb     # Jupyter Notebook版
-└── enron_emails.db     # メールデータベース（自動生成）
-```
-
-## ⚙️ 設定の変更
-
-`config.py` で各種設定を変更できます：
-
-### 本番用設定（デフォルト）
-
-```python
-# config.py の default_config
-TrainingConfig(
-    groups_per_step=8,        # 各ステップでのグループ数
-    num_epochs=20,            # エポック数
-    rollouts_per_group=8,     # 各グループのロールアウト数
-    learning_rate=1e-5,       # 学習率
-    max_steps=500,            # 最大ステップ数
-    validation_step_interval=10,  # バリデーション間隔
-)
-
-DatasetConfig(
-    train_limit=500,          # トレーニングシナリオ数
-    val_limit=100,            # バリデーションシナリオ数
-)
-```
-
-### デモ用設定（高速テスト用）
-
-```python
-# config.py の demo_config
-TrainingConfig(
-    groups_per_step=2,
-    num_epochs=20,
-    rollouts_per_group=4,
-    learning_rate=1e-5,
-    max_steps=50,
-    validation_step_interval=5,
-)
-
-DatasetConfig(
-    train_limit=50,
-    val_limit=20,
-)
-```
-
-## 🔍 コード構成
-
-### config.py
-
-設定管理を担当：
-
-- `ModelConfig`: モデル設定（名前、プロジェクト、ベースモデル）
-- `TrainingConfig`: トレーニング設定（学習率、ステップ数など）
-- `DatasetConfig`: データセット設定（シナリオ数など）
-- `RulerConfig`: RULER評価設定（ジャッジモデルなど）
-
-### utils.py
-
-データモデルとデータベース操作を担当：
-
-- **データモデル**
-  - `Email`: メールデータ
-  - `Scenario`: トレーニング/テストシナリオ
-  - `SearchResult`: 検索結果
-  - `FinalAnswer`: 最終回答
-
-- **データベース関数**
-  - `create_email_database()`: Enronデータセットからデータベース作成
-  - `search_emails()`: メール検索
-  - `read_email()`: メール読み取り
-  - `load_scenarios()`: シナリオ読み込み
-
-### art_e.py
-
-トレーニングを担当：
-
-- **RULER評価**
-  - `judge_correctness()`: 回答正確性の評価
-
-- **エージェント実行**
-  - `ProjectTrajectory`: 実行軌跡
-  - `rollout()`: エージェントのロールアウト
-
-- **トレーニング**
-  - `train()`: メイントレーニングループ
-  - `initialize_model()`: モデル初期化
-
-### test_model.py
-
-モデルテストを担当：
-
-- `test_single_scenario()`: 単一シナリオでテスト
-- `test_model()`: 複数シナリオでテスト
-
-## 🎯 エージェントのツール
-
-エージェントは以下の3つのツールを使用できます：
-
-| ツール名 | 説明 |
-|---------|------|
-| `search_inbox` | キーワードでメールを検索 |
-| `read_email` | 特定のメールIDから詳細を取得 |
-| `return_final_answer` | 最終回答とソースメールIDを返却 |
-
-## 📊 RULER評価について
-
-RULERは相対スコアリング手法で、以下の特徴があります：
-
-1. **相対評価**: 複数の回答を相互に比較
-2. **GRPOとの相性**: 正規化されたスコアのみが必要
-3. **効率的**: 共通プレフィックスの重複排除
-
-## ⚠️ 注意事項
-
-- 初回実行時、Enronメールデータセットのダウンロードに数分かかります
-- データベース（`enron_emails.db`）は初回実行時に自動生成されます
-- トレーニングにはGPUリソースが必要です（W&Bサーバーで実行）
+| オプション | 説明 | デフォルト |
+|-----------|------|-----------|
+| `--artifact-path` | W&Bアーティファクトパス（必須） | - |
+| `--num-scenarios` | テストするシナリオ数 | 5 |
+| `--project` | Weave/W&Bプロジェクト名 | email-search-agent |
+| `--seed` | 乱数シード | None |
+| `--api-key` | W&B APIキー | 環境変数から取得 |
 
 ## 📚 参考リンク
 
+- [W&B Training と Serverless RL](https://note.com/wandb_jp/n/n6ef91cd095f4?magazine_key=m94adeea366ce)
 - [ART ドキュメント](https://art.openpipe.ai)
 - [ART GitHub](https://github.com/openpipe/art)
 - [RULER ドキュメント](https://art.openpipe.ai/fundamentals/ruler)
 - [ART-E ブログ記事](https://openpipe.ai/blog/art-e-mail-agent)
-- [Discord コミュニティ](https://discord.gg/zbBHRUpwf4)
-
-## 📄 ライセンス
-
-このプロジェクトはARTフレームワークに基づいています。

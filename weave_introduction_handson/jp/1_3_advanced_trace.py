@@ -69,9 +69,10 @@ print("2. Kind & Color")
 print("=" * 60)
 
 
-@weave.op(kind="llm", color="blue")
+# Note: 新しい Weave では @weave.op(kind="llm", color="blue") で UI 上の分類・色を指定可能
+@weave.op()
 def llm_call(prompt: str) -> str:
-    """kind='llm' と color='blue' で LLM 呼び出しを視覚的に区別。
+    """LLM 呼び出し（新しい Weave では kind='llm', color='blue' で視覚的に区別可能）。
     
     Available kinds: agent, llm, tool, search
     Available colors: red, orange, yellow, green, blue, purple
@@ -80,16 +81,16 @@ def llm_call(prompt: str) -> str:
     return chat_completion(messages)
 
 
-@weave.op(kind="tool", color="green")
+@weave.op()
 def search_database(query: str) -> list:
-    """kind='tool' と color='green' でツール呼び出しを区別。"""
+    """ツール呼び出し（新しい Weave では kind='tool', color='green' で区別可能）。"""
     # モックのデータベース検索
     return [{"id": 1, "title": f"Result for: {query}"}]
 
 
-@weave.op(kind="agent", color="purple")
+@weave.op()
 def agent_pipeline(user_query: str) -> str:
-    """kind='agent' でエージェントパイプラインを表現。
+    """エージェントパイプライン（新しい Weave では kind='agent', color='purple' で表現可能）。
     
     ネストした呼び出しで色分けを確認できます。
     """
@@ -229,6 +230,8 @@ from weave.utils import sanitize
 # カスタムキーを追加
 sanitize.add_redact_key("api_key")
 sanitize.add_redact_key("secret_token")
+
+
 
 デフォルトでマスクされるキー:
 - api_key

@@ -84,7 +84,7 @@ class QAModel(Model):
     @weave.op()
     def predict(self, question: str) -> dict:
         messages = [
-            {"role": "system", "content": "Answer concisely. Include only the answer."}, #When writing chemical formulas, use subscript numbers like H2O, CO2.
+            {"role": "system", "content": "Answer concisely. Include only the answer. When writing chemical formulas, use subscript numbers like H2O, CO2."},
             {"role": "user", "content": question},
         ]
         return {"answer": chat_completion(messages, temperature=0.3)}

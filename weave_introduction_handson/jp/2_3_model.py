@@ -114,7 +114,7 @@ class TextAssistant(Model):
 # モデルを作成
 assistant = TextAssistant(
     model_name=get_model_name(),
-    temperature=0.3,
+    temperature=0.2,
     max_tokens=150,
 )
 

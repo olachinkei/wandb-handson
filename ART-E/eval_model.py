@@ -1,20 +1,17 @@
 """
 ===========================================
-ART-E Email Search Agent - モデルテスト (W&B Inference)
+ART-E Email Search Agent - モデル評価 (W&B Inference)
 ===========================================
 
-このモジュールは、トレーニング済みモデルをW&B Inference APIを使用してテストします。
+このモジュールは、トレーニング済みモデルをW&B Inference APIを使用して評価します。
 art_e.pyでトレーニングした後に使用します。
 
 使い方:
     # 基本的な使用法（artifact_pathは必須）
-    python test_model.py --artifact-path "wandb-artifact:///agent-lab/ARTE-Email-Search-Agent/email-agent-003:v160"
-    
-    # 特定のシナリオ数でテスト
-    python test_model.py --artifact-path "wandb-artifact:///..." --num-scenarios 10
-    
-    # デモモード（小さいパラメータ）
-    python test_model.py --artifact-path "wandb-artifact:///..." --demo
+    python eval_model.py --artifact-path "wandb-artifact:///agent-lab/ARTE-Email-Search-Agent/email-agent-003:v160"
+
+    # シナリオ数を指定して評価
+    python eval_model.py --artifact-path "wandb-artifact:///..." --num-scenarios 10
 """
 
 import argparse
@@ -597,4 +594,4 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-# python test_model.py --artifact-path "wandb-artifact:///agent-lab/ARTE-Email-Search-Agent/email-agent-003:v160" --num-scenarios 10
+# python eval_model.py --artifact-path "wandb-artifact:///agent-lab/ARTE-Email-Search-Agent/email-agent-003:v160" --num-scenarios 10

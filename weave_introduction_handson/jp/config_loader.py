@@ -5,6 +5,7 @@ config.yaml でOpenAI/Geminiを切り替えられます。
 """
 
 import os
+import weave
 from pathlib import Path
 import yaml
 from dotenv import load_dotenv
@@ -69,7 +70,6 @@ def get_max_tokens() -> int:
     """Get default max tokens."""
     config = load_config()
     return config.get("default_max_tokens", 150)
-
 
 def chat_completion(messages: list, temperature: float = None, max_tokens: int = None) -> str:
     """
