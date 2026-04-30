@@ -13,6 +13,7 @@ ART-E Email Search Agent - 設定モジュール
 
 import os
 from dataclasses import dataclass, field
+from datetime import datetime
 from typing import Optional
 
 
@@ -26,7 +27,7 @@ class ModelConfig:
         project: "entity/project" 形式のプロジェクト名
         base_model: ベースモデルのHugging Face ID
     """
-    name: str = "email-agent-003"
+    name: str = ""
     project: str = "ARTE-Email-Search-Agent"
     base_model: str = "OpenPipe/Qwen3-14B-Instruct"
 
@@ -193,6 +194,9 @@ def get_config(use_demo: bool = False) -> Config:
         config.model.project = project
     if entity:
         config.model.project = f"{entity}/{config.model.project}"
+
+    if not config.model.name:
+        config.model.name = f"email-agent-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
 
     return config
 
