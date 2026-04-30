@@ -1,0 +1,21 @@
+# ===========================================
+# ART-E Email Search Agent - LocalBackend 追加依存パッケージ
+# ===========================================
+#
+# ローカル GPU でトレーニング・評価する場合に必要です。
+# 先に基本パッケージをインストールしてください:
+#   uv pip install -r requirements.txt
+#
+# その後、このファイルをインストール:
+#   uv pip install -r requirements_local.txt
+#
+# 注意: Python >= 3.11 が必要です。
+
+# ART フレームワーク（backend extras: vLLM, Unsloth, TRL 等を含む）
+openpipe-art[backend]==0.5.17
+
+# gql 4.x (weave との互換性)
+gql>=4.0.0
+
+# torchtune (LocalBackend のモデル管理)
+torchtune>=0.6.0

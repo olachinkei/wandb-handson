@@ -1,14 +1,21 @@
 """
 ===========================================
-ART-E Email Search Agent - モデル評価 (W&B Inference)
+ART-E Email Search Agent - モデル評価
 ===========================================
 
-このモジュールは、トレーニング済みモデルをW&B Inference APIを使用して評価します。
+このモジュールは、トレーニング済みモデルを評価します。
 art_e.pyでトレーニングした後に使用します。
 
+2つのモードをサポート:
+  - W&B Inference（デフォルト）: クラウド上のモデルを使用
+  - ローカル（--local）: ローカルGPUでvLLMサーバーを起動して使用
+
 使い方:
-    # 基本的な使用法（artifact_pathは必須）
+    # W&B Inference で評価
     python eval_model.py --artifact-path "agent-lab/ARTE-Email-Search-Agent/email-agent-003:v160"
+
+    # ローカル GPU で評価
+    python eval_model.py --artifact-path "agent-lab/ARTE-Email-Search-Agent/email-agent-003:v160" --local
 
     # シナリオ数を指定して評価
     python eval_model.py --artifact-path "agent-lab/..." --num-scenarios 10
@@ -20,6 +27,9 @@ import json
 import logging
 import os
 import random
+import signal
+import subprocess
+import sys
 from dataclasses import asdict
 from textwrap import dedent
 
@@ -29,7 +39,6 @@ from dotenv import load_dotenv
 from langchain_core.utils.function_calling import convert_to_openai_tool
 from litellm import acompletion
 from pydantic import BaseModel, Field
-import time
 
 from tenacity import retry, retry_if_exception, stop_after_attempt, wait_exponential
 
@@ -414,26 +423,87 @@ async def test_single_scenario(
     return result
 
 
+async def _setup_local_inference(artifact_path: str, config: Config):
+    """
+    ローカル vLLM サーバーを起動してクライアントを返す
+
+    W&Bアーティファクトをダウンロードし、ベースモデル + LoRA アダプタで
+    vLLM の OpenAI 互換サーバーを起動します。
+
+    Returns:
+        (client, model_name, process): OpenAIクライアント、モデル名、vLLMプロセス
+    """
+    import wandb
+
+    clean_path = artifact_path.replace("wandb-artifact:///", "")
+
+    print("W&Bアーティファクトをダウンロード中...")
+    api = wandb.Api()
+    artifact = api.artifact(clean_path)
+    lora_path = artifact.download()
+    print(f"  ダウンロード完了: {lora_path}")
+
+    port = 8132
+    lora_name = "default"
+
+    print(f"ローカル vLLM サーバーを起動中 (port {port})...")
+    proc = subprocess.Popen(
+        [
+            sys.executable, "-m", "vllm.entrypoints.openai.api_server",
+            "--model", config.model.base_model,
+            "--enable-lora",
+            "--lora-modules", f"{lora_name}={lora_path}",
+            "--gpu-memory-utilization", "0.8",
+            "--max-model-len", "4096",
+            "--port", str(port),
+        ],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+
+    client = openai.OpenAI(
+        base_url=f"http://localhost:{port}/v1",
+        api_key="local",
+    )
+
+    for i in range(180):
+        if proc.poll() is not None:
+            stderr = proc.stderr.read().decode() if proc.stderr else ""
+            raise RuntimeError(f"vLLM サーバーが異常終了しました:\n{stderr[-2000:]}")
+        try:
+            client.models.list()
+            print(f"  vLLM サーバー起動完了")
+            return client, lora_name, proc
+        except Exception:
+            pass
+        await asyncio.sleep(1)
+
+    proc.kill()
+    raise RuntimeError("vLLM サーバーの起動がタイムアウトしました（180秒）")
+
+
 async def test_model(
     config: Config,
     artifact_path: str,
     num_scenarios: int = 5,
     api_key: str | None = None,
+    local: bool = False,
 ):
     """
-    トレーニング済みモデルをテスト（W&B Inference使用）
-    
+    トレーニング済みモデルをテスト
+
     Args:
         config: 設定オブジェクト
         artifact_path: W&Bアーティファクトパス
         num_scenarios: テストするシナリオ数
         api_key: W&B APIキー（省略時は環境変数から取得）
+        local: Trueでローカル vLLM サーバーを使用
     """
     # ===========================================
     # 設定をグローバルにセット
     # ===========================================
     set_config(config)
-    
+
     # ===========================================
     # Weaveの初期化
     # ===========================================
@@ -441,92 +511,111 @@ async def test_model(
         config.model.project,
         settings={"print_call_link": False},
     )
-    
-    # ===========================================
-    # APIキーの取得
-    # ===========================================
-    if api_key is None:
-        api_key = os.environ.get("WANDB_API_KEY") or os.environ.get("OPENAI_API_KEY")
-    
-    if not api_key:
-        raise ValueError(
-            "APIキーが設定されていません。\n"
-            "環境変数 WANDB_API_KEY または --api-key オプションで指定してください。\n"
-            "APIキーは https://wandb.ai/authorize から取得できます。"
+
+    vllm_proc = None
+
+    try:
+        if local:
+            # ===========================================
+            # ローカル vLLM サーバーモード
+            # ===========================================
+            client, model_name, vllm_proc = await _setup_local_inference(
+                artifact_path, config
+            )
+            mode_label = "ローカル vLLM"
+        else:
+            # ===========================================
+            # W&B Inference モード
+            # ===========================================
+            if api_key is None:
+                api_key = os.environ.get("WANDB_API_KEY") or os.environ.get("OPENAI_API_KEY")
+
+            if not api_key:
+                raise ValueError(
+                    "APIキーが設定されていません。\n"
+                    "環境変数 WANDB_API_KEY または --api-key オプションで指定してください。\n"
+                    "APIキーは https://wandb.ai/authorize から取得できます。"
+                )
+
+            if not artifact_path.startswith("wandb-artifact:///"):
+                artifact_path = f"wandb-artifact:///{artifact_path}"
+
+            client = openai.OpenAI(
+                base_url="https://api.inference.wandb.ai/v1",
+                api_key=api_key,
+                default_headers={
+                    "X-Wandb-Project": config.model.project,
+                }
+            )
+            model_name = artifact_path
+            mode_label = "W&B Inference"
+
+        # ===========================================
+        # モデル情報表示
+        # ===========================================
+        print("=" * 60)
+        print(f"ART-E Email Search Agent - モデルテスト ({mode_label})")
+        print("=" * 60)
+        print()
+        print(f"プロジェクト: {config.model.project}")
+        print(f"アーティファクトパス: {artifact_path}")
+        print(f"テストシナリオ数: {num_scenarios}")
+        print()
+
+        # ===========================================
+        # シナリオの読み込み
+        # ===========================================
+        print("テストシナリオを読み込み中...")
+        test_scenarios = load_scenarios(
+            split="train",
+            limit=num_scenarios,
+            max_messages=config.dataset.max_messages,
+            shuffle=config.dataset.shuffle,
+            seed=config.dataset.seed,
         )
 
-    # wandb-artifact:/// プレフィックスを自動補完
-    if not artifact_path.startswith("wandb-artifact:///"):
-        artifact_path = f"wandb-artifact:///{artifact_path}"
+        print(f"読み込んだシナリオ数: {len(test_scenarios)}")
 
-    # ===========================================
-    # OpenAIクライアント設定（W&B Inference用）
-    # ===========================================
-    client = openai.OpenAI(
-        base_url="https://api.inference.wandb.ai/v1",
-        api_key=api_key,
-        # 使用状況トラッキング用のプロジェクト設定
-        default_headers={
-            "X-Wandb-Project": config.model.project,
-        }
-    )
-    
-    # ===========================================
-    # モデル情報表示
-    # ===========================================
-    print("=" * 60)
-    print("ART-E Email Search Agent - モデルテスト (W&B Inference)")
-    print("=" * 60)
-    print()
-    print(f"プロジェクト: {config.model.project}")
-    print(f"アーティファクトパス: {artifact_path}")
-    print(f"テストシナリオ数: {num_scenarios}")
-    print()
-    
-    # ===========================================
-    # シナリオの読み込み
-    # ===========================================
-    print("テストシナリオを読み込み中...")
-    test_scenarios = load_scenarios(
-        split="train",
-        limit=num_scenarios,
-        max_messages=config.dataset.max_messages,
-        shuffle=config.dataset.shuffle,
-        seed=config.dataset.seed,
-    )
-    
-    print(f"読み込んだシナリオ数: {len(test_scenarios)}")
-    
-    # ===========================================
-    # テスト実行
-    # ===========================================
-    correct_count = 0
-    total_count = 0
-    
-    for i, scenario in enumerate(test_scenarios):
-        print(f"\n\n{'#'*60}")
-        print(f"# テスト {i+1}/{len(test_scenarios)}")
-        print(f"{'#'*60}")
-        
-        result = await test_single_scenario(
-            client, artifact_path, scenario, config, step=i
-        )
-        
-        total_count += 1
-        if result.metrics.get("correct", 0) > 0:
-            correct_count += 1
-    
-    # ===========================================
-    # 結果サマリー
-    # ===========================================
-    print("\n")
-    print("=" * 60)
-    print("テスト結果サマリー")
-    print("=" * 60)
-    print(f"正解数: {correct_count}/{total_count}")
-    print(f"正解率: {correct_count/total_count*100:.1f}%")
-    print()
-    print("🎉 テスト完了！")
+        # ===========================================
+        # テスト実行
+        # ===========================================
+        correct_count = 0
+        total_count = 0
+
+        for i, scenario in enumerate(test_scenarios):
+            print(f"\n\n{'#'*60}")
+            print(f"# テスト {i+1}/{len(test_scenarios)}")
+            print(f"{'#'*60}")
+
+            result = await test_single_scenario(
+                client, model_name, scenario, config, step=i
+            )
+
+            total_count += 1
+            if result.metrics.get("correct", 0) > 0:
+                correct_count += 1
+
+        # ===========================================
+        # 結果サマリー
+        # ===========================================
+        print("\n")
+        print("=" * 60)
+        print("テスト結果サマリー")
+        print("=" * 60)
+        print(f"正解数: {correct_count}/{total_count}")
+        print(f"正解率: {correct_count/total_count*100:.1f}%")
+        print()
+        print("🎉 テスト完了！")
+
+    finally:
+        if vllm_proc is not None:
+            print("\nvLLM サーバーを停止中...")
+            vllm_proc.send_signal(signal.SIGTERM)
+            try:
+                vllm_proc.wait(timeout=10)
+            except subprocess.TimeoutExpired:
+                vllm_proc.kill()
+            print("  停止完了")
 
 
 # ===========================================
@@ -549,6 +638,12 @@ def parse_args():
         )
     )
     
+    parser.add_argument(
+        "--local",
+        action="store_true",
+        help="ローカル GPU で vLLM サーバーを起動して評価"
+    )
+
     parser.add_argument(
         "--demo",
         action="store_true",
@@ -611,9 +706,11 @@ async def main():
         artifact_path=args.artifact_path,
         num_scenarios=args.num_scenarios,
         api_key=args.api_key,
+        local=args.local,
     )
 
 
 if __name__ == "__main__":
     asyncio.run(main())
-# python eval_model.py --artifact-path "agent-lab/ARTE-Email-Search-Agent/email-agent-003:v160" --num-scenarios 10
+# W&B Inference: python eval_model.py --artifact-path "agent-lab/ARTE-Email-Search-Agent/email-agent-003:v160"
+# ローカル GPU:   python eval_model.py --artifact-path "agent-lab/ARTE-Email-Search-Agent/email-agent-003:v160" --local
