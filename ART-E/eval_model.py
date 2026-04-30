@@ -456,6 +456,8 @@ async def _setup_local_inference(artifact_path: str, config: Config):
             "--gpu-memory-utilization", "0.8",
             "--max-model-len", "4096",
             "--port", str(port),
+            "--enable-auto-tool-choice",
+            "--tool-call-parser", "hermes",
         ],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
