@@ -14,8 +14,5 @@
 # ART フレームワーク（backend extras: vLLM, Unsloth, TRL 等を含む）
 openpipe-art[backend]==0.5.17
 
-# gql 4.x (weave との互換性)
-gql>=4.0.0
-
 # torchtune (LocalBackend のモデル管理)
 torchtune>=0.6.0
