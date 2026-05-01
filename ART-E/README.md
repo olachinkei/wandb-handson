@@ -48,15 +48,21 @@ brew install uv
 # リポジトリをクローン（またはディレクトリに移動）
 cd ART-E
 
-# 仮想環境を作成してパッケージをインストール
+# 仮想環境を作成
 uv venv
 source .venv/bin/activate  # Linux/macOS
 # .venv\Scripts\activate  # Windows
+```
 
-# 依存パッケージをインストール（Serverless Backend を使う場合）
+**Serverless Backend を使う場合（GPU 不要）:**
+
+```bash
 uv pip install -r requirements.txt
+```
 
-# 自前の GPU で LocalBackend を使う場合はこちらだけでOK（requirements.txt の内容を含みます）
+**自前の GPU で LocalBackend を使う場合（これだけでOK）:**
+
+```bash
 uv pip install --override overrides.txt -r requirements_local.txt
 ```
 
