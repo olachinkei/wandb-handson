@@ -53,10 +53,10 @@ uv venv
 source .venv/bin/activate  # Linux/macOS
 # .venv\Scripts\activate  # Windows
 
-# 依存パッケージをインストール
+# 依存パッケージをインストール（Serverless Backend を使う場合）
 uv pip install -r requirements.txt
 
-# 自前の GPU で LocalBackend を使う場合は追加で以下を実行
+# 自前の GPU で LocalBackend を使う場合はこちらだけでOK（requirements.txt の内容を含みます）
 uv pip install -r requirements_local.txt
 ```
 
