@@ -8,6 +8,8 @@
 # 注意: Python >= 3.11 が必要です。
 
 # ART フレームワーク（backend extras: vLLM, Unsloth, TRL 等を含む）
+# NOTE: openpipe-art 0.5.17 は gql<4 を要求するが、weave は gql>=4 が必要。
+# art のコード自体は gql 4 で動作するため override で解決する (cf. OpenPipe/ART#644)。
 openpipe-art[backend]==0.5.17
 
 # LLM関連

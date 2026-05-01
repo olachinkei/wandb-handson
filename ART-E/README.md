@@ -57,7 +57,7 @@ source .venv/bin/activate  # Linux/macOS
 uv pip install -r requirements.txt
 
 # 自前の GPU で LocalBackend を使う場合はこちらだけでOK（requirements.txt の内容を含みます）
-uv pip install -r requirements_local.txt
+uv pip install --override overrides.txt -r requirements_local.txt
 ```
 
 ### 環境変数の設定
