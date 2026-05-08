@@ -60,3 +60,6 @@ wandb/
 *.ckpt
 checkpoints/
 
+# ART local data
+.art/
+

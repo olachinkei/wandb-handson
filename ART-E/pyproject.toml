@@ -1,0 +1,29 @@
+[project]
+name = "art-e"
+version = "0.1.0"
+description = "ART-E Email Search Agent - Agentic RL hands-on"
+requires-python = ">=3.11,<3.13"
+dependencies = [
+    "openpipe-art==0.5.17",
+    "openai>=1.0.0",
+    "litellm>=1.0.0",
+    "langchain-core>=0.1.0",
+    "weave>=0.50.0",
+    "wandb>=0.16.0",
+    "datasets>=2.14.0",
+    "pydantic>=2.0.0",
+    "tenacity>=8.0.0",
+    "tqdm>=4.65.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.optional-dependencies]
+local = [
+    "openpipe-art[backend]==0.5.17",
+    "torchtune>=0.6.0",
+]
+
+[tool.uv]
+override-dependencies = [
+    "gql>=4.0.0",
+]
