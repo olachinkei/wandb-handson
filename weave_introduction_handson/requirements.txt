@@ -5,5 +5,4 @@ nest_asyncio
 numpy
 jupyter
 moviepy==1.0.3
-google-genai
-azure-identity 
+azure-identity

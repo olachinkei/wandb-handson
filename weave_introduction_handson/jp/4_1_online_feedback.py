@@ -1,5 +1,5 @@
 """
-3_3: Online Feedback - オンラインフィードバック
+4_1: Online Feedback - オンラインフィードバック
 
 このスクリプトで学べること:
 ================================
@@ -28,32 +28,31 @@ client_weave = weave.init(f"{os.getenv('WANDB_ENTITY')}/{os.getenv('WANDB_PROJEC
 
 
 # =============================================================================
-# 1. Basic Feedback
+# 1. Feedback API - トレース済み call へのフィードバック付与
 # =============================================================================
 print("\n" + "=" * 60)
-print("1. Basic Feedback")
+print("1. Feedback API - トレース済み call へのフィードバック付与")
 print("=" * 60)
 
 
 @weave.op()
-def generate_response(query: str) -> str:
-    """Generate a response."""
+def answer_question(question: str) -> str:
+    """質問応答を実行し、返された call に後からフィードバックを付与する例。"""
     messages = [
-        {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": query},
+        {"role": "system", "content": "Answer briefly and clearly."},
+        {"role": "user", "content": question},
     ]
-    return chat_completion(messages)
+    return chat_completion(messages, max_tokens=120)
 
 
-# Generate and add feedback
-result, call = generate_response.call("What is the meaning of life?")
-print(f"Response: {result[:80]}...")
+answer, call = answer_question.call("W&B Weave は何をするためのツールですか？")
+print(f"Answer: {answer[:80]}...")
 
-# Add feedback
-call.feedback.add_reaction("👍")
-call.feedback.add_note("Thoughtful philosophical response.")
-call.feedback.add("quality", {"score": 4, "reason": "Clear and well-structured"})
-
+# SDK から reaction / note / 任意の structured feedback を追加
+reaction_id = call.feedback.add_reaction("👍")
+note_id = call.feedback.add_note("簡潔でわかりやすい回答")
+score_id = call.feedback.add("quality_score", {"value": 4})
+print(f"Feedback IDs: reaction={reaction_id}, note={note_id}, score={score_id}")
 print(f"Added feedback to call: {call.id}")
 
 

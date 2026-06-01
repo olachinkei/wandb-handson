@@ -1,19 +1,10 @@
 # Weave Handson Configuration
-# LLMプロバイダーとモデルの設定
-
-# デフォルトのLLMプロバイダー: "openai" or "gemini"
-# Gemini を使う場合は "gemini" に変更してください
-provider: "openai"
+# OpenAI モデルの設定
 
 # OpenAI設定
 openai:
   model: "gpt-4o-mini"
   embedding_model: "text-embedding-3-small"
-
-# Gemini設定
-gemini:
-  model: "gemini-3-flash-preview"
-  embedding_model: "text-embedding-004"
 
 # 共通設定
 default_temperature: 0.3

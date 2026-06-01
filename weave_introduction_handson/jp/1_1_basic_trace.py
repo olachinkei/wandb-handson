@@ -1,5 +1,5 @@
 """
-1_1_0: Basic Trace - 基本的なトレーシング
+1_1: Basic Trace - 基本的なトレーシング
 
 このスクリプトで学べること:
 ================================
@@ -21,7 +21,7 @@ import time
 from dotenv import load_dotenv
 import weave
 
-from config_loader import load_config, get_default_vendor, chat_completion
+from config_loader import chat_completion
 
 # Load environment variables
 load_dotenv()
@@ -63,53 +63,28 @@ print("=" * 60)
 
 print("""
 Library Integration とは:
-Weave は OpenAI、Anthropic、Gemini などの LLM ライブラリを
+Weave は OpenAI などの LLM ライブラリを
 自動的にトラッキングします。@weave.op() デコレータなしでも
 LLM API の呼び出しがトレースされます。
 """)
 
-# config.yaml の default_vendor に基づいてクライアントを選択
-vendor = get_default_vendor()
-print(f"使用するベンダー: {vendor} (config.yaml の default_vendor)")
+# OpenAI クライアントを直接使用
+# @weave.op() なしでも自動的にトレースされる
+import openai
 
-if vendor == "openai":
-    # =============================================
-    # OpenAI の場合
-    # =============================================
-    import openai
-    
-    # OpenAI クライアントを直接使用
-    # @weave.op() なしでも自動的にトレースされる
-    client = openai.OpenAI()
-    
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": "Tell me a short joke."},
-        ],
-        max_tokens=100,
-    )
-    
-    output = response.choices[0].message.content
-    print(f"OpenAI response: {output}")
+client = openai.OpenAI()
 
-elif vendor == "gemini":
-    # =============================================
-    # Gemini の場合
-    # =============================================
-    import google.generativeai as genai
-    
-    # Gemini クライアントを直接使用
-    # @weave.op() なしでも自動的にトレースされる
-    from config_loader import get_model_name
-    genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
-    model = genai.GenerativeModel(get_model_name())
-    
-    response = model.generate_content("Tell me a short joke.")
-    
-    output = response.text
-    print(f"Gemini response: {output}")
+response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "Tell me a short joke."},
+    ],
+    max_tokens=100,
+)
+
+output = response.choices[0].message.content
+print(f"OpenAI response: {output}")
 
 time.sleep(2)  # 次の API 呼び出しまで待機
 

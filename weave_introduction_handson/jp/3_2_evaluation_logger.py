@@ -1,25 +1,24 @@
 """
-3_2: Evaluation Logger - EvaluationLoggerの活用
+3_2: EvaluationLogger - 逐次ログによる柔軟な評価
 
 このスクリプトで学べること:
 ================================
-1. EvaluationLogger の基本的な使い方
-2. バッチ予測での評価
-3. カスタムスコアの記録
+1. EvaluationLogger - 推論ループ内で予測とスコアを逐次記録
+2. log_prediction / log_score / finish の使い方
+3. log_summary による評価全体の集計
+4. 既存の推論パイプラインへの組み込み
 
-EvaluationLogger の特徴:
-- 標準の Evaluation より柔軟
-- バッチ処理に対応
-- 既存のパイプラインへの統合が容易
+03_evaluations.ipynb の EvaluationLogger セクションをベースにしています。
 """
 
 import os
-import json
-from dotenv import load_dotenv
-import weave
-from weave import EvaluationLogger, Scorer
 
-from config_loader import chat_completion
+from dotenv import load_dotenv
+from openai import OpenAI
+import weave
+from weave import EvaluationLogger
+
+from config_loader import get_model_name
 
 # Load environment variables
 load_dotenv()
@@ -30,124 +29,106 @@ weave.init(f"{os.getenv('WANDB_ENTITY')}/{os.getenv('WANDB_PROJECT', 'weave-hand
 
 
 # =============================================================================
-# 1. Define Scorers (same as 3_1_offline_evaluation.py)
+# 1. Define Prediction Function
 # =============================================================================
 print("\n" + "=" * 60)
-print("1. Defining Scorers")
+print("1. Defining Prediction Function")
 print("=" * 60)
 
 
 @weave.op()
-def exact_match_scorer(expected: str, output: str) -> dict:
-    """Check for exact match."""
-    return {'exact_match': expected.lower() in output.lower()}
+def correct_grammar(sentence: str) -> dict:
+    """文法を修正する推論関数。既存パイプラインに近い形で利用できます。"""
+    client = OpenAI()
+    response = client.chat.completions.create(
+        model=get_model_name(),
+        messages=[
+            {
+                "role": "system",
+                "content": "Correct the grammar. Return only the corrected sentence.",
+            },
+            {"role": "user", "content": sentence},
+        ],
+        temperature=0,
+    )
+    return {"corrected": response.choices[0].message.content.strip()}
 
 
-@weave.op()
-def contains_answer_scorer(expected: str, output: str) -> dict:
-    """Check if expected answer is contained."""
-    return {'contains_answer': expected.lower() in output.lower()}
-
-
-class LLMJudgeScorer(Scorer):
-    """LLM as a Judge scorer."""
-    
-    @weave.op
-    def score(self, question: str, expected: str, output: str) -> dict:
-        messages = [
-            {"role": "system", "content": """Evaluate response quality.
-Return JSON: {"quality_score": 1-5, "is_correct": bool}"""},
-            {"role": "user", "content": f"Q: {question}\nExpected: {expected}\nResponse: {output}"},
-        ]
-        
-        try:
-            return json.loads(chat_completion(messages, temperature=0))
-        except:
-            return {"quality_score": 0, "is_correct": False}
-
-
-print("Defined: exact_match_scorer, contains_answer_scorer, LLMJudgeScorer")
+print("Defined: correct_grammar")
 
 
 # =============================================================================
-# 2. Basic EvaluationLogger
+# 2. Prepare EvaluationLogger
 # =============================================================================
 print("\n" + "=" * 60)
-print("2. Basic EvaluationLogger")
+print("2. Preparing EvaluationLogger")
 print("=" * 60)
 
-
-@weave.op
-def answer_question(question: str) -> str:
-    """Answer a question."""
-    messages = [
-        {"role": "system", "content": "Answer concisely."},
-        {"role": "user", "content": question},
-    ]
-    return chat_completion(messages)
-
-
-# Create logger
-eval_logger = EvaluationLogger(
-    model="qa_model",
-    dataset="qa_dataset",
-    name="qa_evaluation_logger",
-)
-
-# Evaluation samples
 samples = [
-    {"question": "What is the capital of France?", "expected": "Paris"},
-    {"question": "Who wrote 'Romeo and Juliet'?", "expected": "William Shakespeare"},
-    {"question": "What is the square root of 64?", "expected": "8"},
-    {"question": "What is the chemical symbol for water?", "expected": "H2O"},
-    {"question": "In which year did World War II end?", "expected": "1945"},
+    {"sentence": "I has a big dog.", "expected": "I have a big dog."},
+    {"sentence": "We runned very fast.", "expected": "We ran very fast."},
+    {"sentence": "He are happy.", "expected": "He is happy."},
+    {"sentence": "She goed to the store.", "expected": "She went to the store."},
+    {"sentence": "They was playing outside.", "expected": "They were playing outside."},
 ]
+
+eval_logger = EvaluationLogger(
+    name="grammar_eval_logger_v1",
+    model="grammar_corrector_v1",
+    dataset="grammar_eval",
+    scorers=["exact_match"],
+)
 
 print(f"Evaluating {len(samples)} samples...")
 
-llm_judge = LLMJudgeScorer()
-all_exact_match = []
-all_contains_answer = []
+
+# =============================================================================
+# 3. Log Predictions and Scores
+# =============================================================================
+print("\n" + "=" * 60)
+print("3. Logging Predictions and Scores")
+print("=" * 60)
+
+matches = []
 
 for sample in samples:
-    # Get prediction
-    output = answer_question(sample["question"])
-    
-    # Log prediction
+    output = correct_grammar(sample["sentence"])
+    corrected = output["corrected"]
+    is_match = corrected == sample["expected"]
+
     pred_logger = eval_logger.log_prediction(
-        inputs={"question": sample["question"]},
+        inputs={"sentence": sample["sentence"]},
         output=output,
     )
-    
-    # Apply scorers (same as 3_1_offline_evaluation.py)
-    exact_match_result = exact_match_scorer(sample["expected"], output)
-    contains_result = contains_answer_scorer(sample["expected"], output)
-    llm_judge_result = llm_judge.score(sample["question"], sample["expected"], output)
-    
-    # Log scores
-    pred_logger.log_score(scorer="exact_match_scorer", score=exact_match_result)
-    pred_logger.log_score(scorer="contains_answer_scorer", score=contains_result)
-    pred_logger.log_score(scorer="LLMJudgeScorer", score=llm_judge_result)
+    pred_logger.log_score("exact_match", is_match)
     pred_logger.finish()
-    
-    all_exact_match.append(exact_match_result['exact_match'])
-    all_contains_answer.append(contains_result['contains_answer'])
-    status = "✓" if contains_result['contains_answer'] else "✗"
-    print(f"  {status} {sample['question'][:30]}...")
 
-# Log summary
-exact_match_accuracy = sum(all_exact_match) / len(all_exact_match)
-contains_accuracy = sum(all_contains_answer) / len(all_contains_answer)
-eval_logger.log_summary({
-    "exact_match_accuracy": exact_match_accuracy,
-    "contains_answer_accuracy": contains_accuracy,
-    "total": len(samples)
-})
+    matches.append(is_match)
+    status = "OK" if is_match else "NG"
+    print(f"  {status}: {sample['sentence']} -> {corrected}")
 
-print(f"\nExact Match Accuracy: {exact_match_accuracy:.1%}")
-print(f"Contains Answer Accuracy: {contains_accuracy:.1%}")
+
+# =============================================================================
+# 4. Log Summary
+# =============================================================================
+print("\n" + "=" * 60)
+print("4. Logging Summary")
+print("=" * 60)
+
+accuracy = sum(matches) / len(matches)
+eval_logger.log_summary(
+    {
+        "exact_match_accuracy": accuracy,
+        "total": len(samples),
+        "note": "EvaluationLogger demo based on grammar correction samples",
+    }
+)
+eval_logger.finish()
+
+print(f"Exact Match Accuracy: {accuracy:.1%}")
 
 
 print("\n" + "=" * 60)
 print("Evaluation Logger Demo Complete!")
 print("=" * 60)
+print("Weave UI の Evals タブで逐次ログされた評価を確認してください。")

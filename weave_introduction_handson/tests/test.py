@@ -96,20 +96,15 @@ class TestProjectStructure:
         
         scripts = [
             "config_loader.py",
-            "1_1_0_basic_trace.py",
-            "1_2_1_agent_sdk.py",
-            "1_2_2_multimodal.py",
-            "1_3_advanced_trace.py",
-            "1_4_playground.py",
-            "2_1_prompt.py",
-            "2_2_dataset.py",
-            "2_3_model.py",
-            "2_4_score.py",
-            "2_5_call.py",
-            "3_1_offline_evaluation.py",
+            "1_1_basic_trace.py",
+            "1_2_agent_sdk.py",
+            "1_3_multimodal_openai.py",
+            "1_4_advanced_trace.py",
+            "2_1_assets.py",
+            "3_1_evaluation.py",
             "3_2_evaluation_logger.py",
-            "3_3_online_feedback.py",
-            "3_4_guardrail_monitoring.py",
+            "4_1_online_feedback.py",
+            "4_2_guardrail_monitoring.py",
         ]
         
         for script in scripts:
@@ -142,12 +137,9 @@ class TestConfig:
         with open(PROJECT_ROOT / "config.yaml") as f:
             config = yaml.safe_load(f)
         
-        assert "provider" in config
-        assert config["provider"] in ["openai", "gemini"]
         assert "openai" in config
-        assert "gemini" in config
         assert "model" in config["openai"]
-        assert "model" in config["gemini"]
+        assert "embedding_model" in config["openai"]
 
     def test_config_yaml_defaults(self):
         """Test config.yaml has reasonable defaults."""

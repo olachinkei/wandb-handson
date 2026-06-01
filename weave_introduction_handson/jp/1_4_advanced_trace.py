@@ -1,10 +1,10 @@
 """
-1_3: Advanced Trace - 高度なトレーシング
+1_4: Advanced Trace - 高度なトレーシング
 
 このスクリプトで学べること:
 ================================
 1. Custom Display Name - トレースの表示名をカスタマイズ
-2. Kind & Color - トレースの分類と色をカスタマイズ
+2. Custom Cost Tracking - 独自モデルのコスト定義
 3. Attributes - カスタムメタデータの付与
 4. PII Redaction - 個人情報の自動マスキング
 5. Threads - 会話セッションの管理
@@ -32,7 +32,7 @@ load_dotenv()
 
 # Initialize Weave
 # weave.init("entity/project") で初期化
-weave.init(f"{os.getenv('WANDB_ENTITY')}/{os.getenv('WANDB_PROJECT', 'weave-handson')}")
+client = weave.init(f"{os.getenv('WANDB_ENTITY')}/{os.getenv('WANDB_PROJECT', 'weave-handson')}")
 
 
 # =============================================================================
@@ -62,50 +62,36 @@ print(f"Sentiment: {result[:30]}...")
 time.sleep(2)  # 次の API 呼び出しまで待機
 
 # =============================================================================
-# 2. Kind & Color - トレースの分類と色をカスタマイズ
+# 2. Custom Cost Tracking - 独自モデルのコスト定義
 # =============================================================================
 print("\n" + "=" * 60)
-print("2. Kind & Color")
+print("2. Custom Cost Tracking - 独自モデルのコスト定義")
 print("=" * 60)
 
 
-# Note: 新しい Weave では @weave.op(kind="llm", color="blue") で UI 上の分類・色を指定可能
-@weave.op()
-def llm_call(prompt: str) -> str:
-    """LLM 呼び出し（新しい Weave では kind='llm', color='blue' で視覚的に区別可能）。
-    
-    Available kinds: agent, llm, tool, search
-    Available colors: red, orange, yellow, green, blue, purple
+CUSTOM_MODEL_ID = "my-custom-model-v1"
+
+
+def register_custom_cost() -> None:
+    """独自モデルのトークン単価を Weave に登録。
+
+    prompt_token_cost / completion_token_cost は 1 token あたりの USD です。
+    例: 100万 token あたり $2 / $6 のモデルなら、それぞれ 0.000002 / 0.000006。
     """
-    messages = [{"role": "user", "content": prompt}]
-    return chat_completion(messages)
+    existing_costs = client.query_costs(llm_ids=[CUSTOM_MODEL_ID])
+    if existing_costs:
+        print(f"Custom cost already registered: {CUSTOM_MODEL_ID}")
+        return
+
+    client.add_cost(
+        llm_id=CUSTOM_MODEL_ID,
+        prompt_token_cost=0.000002,
+        completion_token_cost=0.000006,
+    )
+    print(f"Custom cost registered: {CUSTOM_MODEL_ID}")
 
 
-@weave.op()
-def search_database(query: str) -> list:
-    """ツール呼び出し（新しい Weave では kind='tool', color='green' で区別可能）。"""
-    # モックのデータベース検索
-    return [{"id": 1, "title": f"Result for: {query}"}]
-
-
-@weave.op()
-def agent_pipeline(user_query: str) -> str:
-    """エージェントパイプライン（新しい Weave では kind='agent', color='purple' で表現可能）。
-    
-    ネストした呼び出しで色分けを確認できます。
-    """
-    # ツール呼び出し
-    results = search_database(user_query)
-    
-    # LLM 呼び出し
-    context = str(results)
-    response = llm_call(f"Context: {context}\nQuestion: {user_query}")
-    
-    return response
-
-
-result = agent_pipeline("What is machine learning?")
-print(f"Agent result: {result[:60]}...")
+register_custom_cost()
 
 
 # =============================================================================
@@ -309,7 +295,7 @@ print("=" * 60)
 print("""
 まとめ:
 - name: 表示名をカスタマイズ
-- kind/color: トレースを分類・色分け
+- custom cost: 独自モデルのコストを登録
 - attributes: メタデータを付与
 - redact_pii: 個人情報を自動マスク
 - postprocess: カスタムマスキング

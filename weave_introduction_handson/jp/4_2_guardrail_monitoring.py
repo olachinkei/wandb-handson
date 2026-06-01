@@ -1,5 +1,5 @@
 """
-3_4: Guardrails and Monitoring - ガードレールとモニタリング
+4_2: Guardrails and Monitoring - ガードレールとモニタリング
 
 このスクリプトで学べること:
 ================================

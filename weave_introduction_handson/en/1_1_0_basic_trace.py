@@ -21,7 +21,7 @@ import time
 from dotenv import load_dotenv
 import weave
 
-from config_loader import load_config, get_default_vendor, chat_completion
+from config_loader import chat_completion
 
 # Load environment variables
 load_dotenv()
@@ -63,52 +63,27 @@ print("=" * 60)
 
 print("""
 What is Library Integration:
-Weave automatically tracks LLM libraries like OpenAI, Anthropic, and Gemini.
+Weave automatically tracks LLM libraries like OpenAI.
 LLM API calls are traced even without the @weave.op() decorator.
 """)
 
-# Select client based on default_vendor in config.yaml
-vendor = get_default_vendor()
-print(f"Using vendor: {vendor} (from config.yaml default_vendor)")
+# Using OpenAI client directly
+# Automatically traced without @weave.op()
+import openai
 
-if vendor == "openai":
-    # =============================================
-    # OpenAI
-    # =============================================
-    import openai
-    
-    # Using OpenAI client directly
-    # Automatically traced without @weave.op()
-    client = openai.OpenAI()
-    
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": "Tell me a short joke."},
-        ],
-        max_tokens=100,
-    )
-    
-    output = response.choices[0].message.content
-    print(f"OpenAI response: {output}")
+client = openai.OpenAI()
 
-elif vendor == "gemini":
-    # =============================================
-    # Gemini
-    # =============================================
-    import google.generativeai as genai
-    
-    # Using Gemini client directly
-    # Automatically traced without @weave.op()
-    from config_loader import get_model_name
-    genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
-    model = genai.GenerativeModel(get_model_name())
-    
-    response = model.generate_content("Tell me a short joke.")
-    
-    output = response.text
-    print(f"Gemini response: {output}")
+response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "Tell me a short joke."},
+    ],
+    max_tokens=100,
+)
+
+output = response.choices[0].message.content
+print(f"OpenAI response: {output}")
 
 time.sleep(2)  # Wait before next API call
 
