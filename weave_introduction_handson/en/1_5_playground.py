@@ -1,5 +1,5 @@
 """
-1_4: Playground - Using the Playground
+1_5: Playground - Using the Playground
 
 ==========================================================
 What is Weave Playground
@@ -78,12 +78,12 @@ Reproduction from Traces
 Saving Prompts
    Once you have a good prompt, you can save it as
    weave.StringPrompt or weave.MessagesPrompt.
-   -> See 2_1_prompt.py
+   -> See 2_1_assets.py
 
 Integration with Evaluation
    Prompts tuned in Playground can be
    quantitatively evaluated with Evaluation.
-   -> See 3_1_offline_evaluation.py
+   -> See 3_1_evaluation.py
 
 ==========================================================
 Note
@@ -91,7 +91,7 @@ Note
 
 - Playground is a UI feature, so there's no code in this script
 - Access Weave UI to try it
-- First run 1_1_0_basic_trace.py to create traces,
+- First run 1_1_basic_trace.py to create traces,
   then try opening them in Playground
 """
 

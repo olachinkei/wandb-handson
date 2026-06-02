@@ -1,18 +1,18 @@
 """
-3_1: Offline Evaluation - Evaluation による系統的な評価
+3_1: Offline Evaluation - Systematic evaluation with Evaluation
 
-このスクリプトで学べること:
+What you'll learn in this script:
 ================================
-1. weave.Evaluation - データセット・モデル・スコアラーをまとめて評価
-2. weave.Dataset - 評価用データセットの作成
-3. weave.Model - 評価対象モデルの定義
-4. 関数スコアラーと weave.Scorer クラス
-5. summarize によるカスタム集計
+1. weave.Evaluation - Evaluate a dataset, model, and scorers together
+2. weave.Dataset - Create an evaluation dataset
+3. weave.Model - Define the model under evaluation
+4. Function scorers and the weave.Scorer class
+5. Custom aggregation with summarize
 
-実行後に確認する場所:
+Where to look after running:
 ================================
-- Evals タブ: 評価結果、各サンプルのスコア、集計
-- Traces タブ: 評価中に実行された model.predict
+- Evals tab: Evaluation results, per-sample scores, and aggregates
+- Traces tab: model.predict calls executed during evaluation
 """
 
 import asyncio
@@ -29,15 +29,15 @@ from config_loader import get_model_name
 load_dotenv()
 
 # Initialize Weave
-# weave.init("entity/project") で初期化
+# Initialize with weave.init("entity/project")
 weave.init(f"{os.getenv('WANDB_ENTITY')}/{os.getenv('WANDB_PROJECT', 'weave-handson')}")
 
 
 # =============================================================================
-# 1. Create Dataset - 評価用データセットの作成
+# 1. Create Dataset - Create an evaluation dataset
 # =============================================================================
 print("\n" + "=" * 60)
-print("1. Create Dataset - 評価用データセットの作成")
+print("1. Create Dataset - Create an evaluation dataset")
 print("=" * 60)
 
 dataset = Dataset(
@@ -55,15 +55,15 @@ print(f"Created dataset: {len(dataset.rows)} rows")
 
 
 # =============================================================================
-# 2. Define Model - 評価対象モデルの定義
+# 2. Define Model - Define the model under evaluation
 # =============================================================================
 print("\n" + "=" * 60)
-print("2. Define Model - 評価対象モデルの定義")
+print("2. Define Model - Define the model under evaluation")
 print("=" * 60)
 
 
 class GrammarCorrector(weave.Model):
-    """文法修正モデル。Evaluation は predict を自動的に呼び出します。"""
+    """Grammar correction model. Evaluation calls predict automatically."""
 
     model_name: str = get_model_name()
 
@@ -89,22 +89,22 @@ print(f"Created model: {model.model_name}")
 
 
 # =============================================================================
-# 3. Define Scorers - 評価関数の定義
+# 3. Define Scorers - Define evaluation functions
 # =============================================================================
 print("\n" + "=" * 60)
-print("3. Define Scorers - 評価関数の定義")
+print("3. Define Scorers - Define evaluation functions")
 print("=" * 60)
 
 
 @weave.op()
 def exact_match(expected: str, output: dict) -> dict:
-    """期待する修正文と完全一致するかをチェック。"""
+    """Check whether the corrected sentence exactly matches the expected text."""
     corrected = output.get("corrected", "") if isinstance(output, dict) else str(output)
     return {"match": expected.strip() == corrected.strip()}
 
 
 class SimilarityScorer(weave.Scorer):
-    """共通単語の割合で簡易類似度を計算し、平均値も集計する Scorer。"""
+    """Compute simple word-overlap similarity and aggregate the average."""
 
     @weave.op()
     def score(self, expected: str, output: dict) -> dict:
@@ -123,10 +123,10 @@ print("Defined: exact_match, SimilarityScorer")
 
 
 # =============================================================================
-# 4. Run Evaluation - 評価の実行
+# 4. Run Evaluation - Run the evaluation
 # =============================================================================
 print("\n" + "=" * 60)
-print("4. Run Evaluation - 評価の実行")
+print("4. Run Evaluation - Run the evaluation")
 print("=" * 60)
 
 evaluation = Evaluation(
@@ -149,12 +149,12 @@ print("\n" + "=" * 60)
 print("Offline Evaluation Demo Complete!")
 print("=" * 60)
 print("""
-まとめ:
-- Dataset、Model、Scorer を Evaluation にまとめて渡す
-- Evaluation.evaluate() で全サンプルを評価
-- summarize() で Scorer 単位の集計を追加
+Summary:
+- Pass a Dataset, Model, and Scorers into Evaluation
+- Run all samples with Evaluation.evaluate()
+- Add scorer-level aggregation with summarize()
 
-Weave UI で確認:
-- Evals タブで評価結果、各サンプルのスコア、集計を確認
-- Traces タブで model.predict の呼び出しを確認
+Check in Weave UI:
+- Use the Evals tab to inspect evaluation results, per-sample scores, and aggregates
+- Use the Traces tab to inspect model.predict calls
 """)

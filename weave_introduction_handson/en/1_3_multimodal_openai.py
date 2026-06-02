@@ -1,19 +1,19 @@
 """
-1_3: Multimodal Data Tracing - マルチモーダルデータのトレース
+1_3: Multimodal Data Tracing - Tracing multimodal data
 
-このスクリプトで学べること:
+What you'll learn in this script:
 ================================
-1. Annotated[bytes, Content[Literal[...]]] によるメディアタイプ付与
-2. PNG/JPG 画像のトレース
-3. MP3 音声のトレース
-4. MP4 動画のトレース
-5. PDF のトレース
-6. HTML のトレース
+1. Adding media types with Annotated[bytes, Content[Literal[...]]]
+2. Tracing PNG/JPG images
+3. Tracing MP3 audio
+4. Tracing MP4 video
+5. Tracing PDFs
+6. Tracing HTML
 
-実行後に確認する場所:
+Where to look after running:
 ================================
-- Traces タブ: 各メディア payload のプレビュー
-- Inputs/Outputs: Content 型で記録されたバイト列
+- Traces tab: Preview each media payload
+- Inputs/Outputs: Inspect byte payloads stored with Content types
 """
 
 import io
@@ -39,22 +39,22 @@ client = OpenAI()
 
 
 def download_bytes(url: str, timeout: int = 60) -> bytes:
-    """URL からバイト列を取得する小さなヘルパー。"""
+    """Small helper that downloads bytes from a URL."""
     with urllib.request.urlopen(url, timeout=timeout) as response:
         return response.read()
 
 
 # =============================================================================
-# 1. 画像 (PNG) - OpenAI gpt-image-1
+# 1. Image (PNG) - OpenAI gpt-image-1
 # =============================================================================
 print("\n" + "=" * 60)
-print("1. 画像 (PNG) - OpenAI gpt-image-1")
+print("1. Image (PNG) - OpenAI gpt-image-1")
 print("=" * 60)
 
 
 @weave.op()
 def generate_image(prompt: str) -> Annotated[bytes, Content[Literal["png"]]]:
-    """OpenAI で画像を生成し、PNG バイト列として Weave に記録します。"""
+    """Generate an image with OpenAI and log it as PNG bytes in Weave."""
     response = client.images.generate(
         model="gpt-image-1",
         prompt=prompt,
@@ -68,10 +68,10 @@ print(f"PNG image payload size: {len(image_bytes):,} bytes")
 
 
 # =============================================================================
-# 2. 画像 (JPG) - 既存画像のトレース
+# 2. Image (JPG) - Trace an existing image
 # =============================================================================
 print("\n" + "=" * 60)
-print("2. 画像 (JPG) - 既存画像のトレース")
+print("2. Image (JPG) - Trace an existing image")
 print("=" * 60)
 
 
@@ -79,7 +79,7 @@ print("=" * 60)
 def fetch_jpg_image(
     url: str = "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Example.jpg/640px-Example.jpg",
 ) -> Annotated[bytes, Content[Literal["jpg"]]]:
-    """JPG 画像をバイト列として返し、Weave UI でプレビューできるようにします。"""
+    """Return a JPG image as bytes so it can be previewed in Weave UI."""
     return download_bytes(url)
 
 
@@ -88,16 +88,16 @@ print(f"JPG image size: {len(jpg_bytes):,} bytes")
 
 
 # =============================================================================
-# 3. 音声 (MP3) - OpenAI TTS
+# 3. Audio (MP3) - OpenAI TTS
 # =============================================================================
 print("\n" + "=" * 60)
-print("3. 音声 (MP3) - OpenAI TTS")
+print("3. Audio (MP3) - OpenAI TTS")
 print("=" * 60)
 
 
 @weave.op()
 def text_to_speech(text: str, voice: str = "alloy") -> Annotated[bytes, Content[Literal["mp3"]]]:
-    """OpenAI TTS で音声を生成し、MP3 バイト列として Weave に記録します。"""
+    """Generate audio with OpenAI TTS and log it as MP3 bytes in Weave."""
     response = client.audio.speech.create(
         model="gpt-4o-mini-tts",
         voice=voice,
@@ -118,10 +118,10 @@ print(f"MP3 audio size: {len(audio_bytes):,} bytes")
 
 
 # =============================================================================
-# 4. 動画 (MP4) - OpenAI Sora 2
+# 4. Video (MP4) - OpenAI Sora 2
 # =============================================================================
 print("\n" + "=" * 60)
-print("4. 動画 (MP4) - OpenAI Sora 2")
+print("4. Video (MP4) - OpenAI Sora 2")
 print("=" * 60)
 
 
@@ -129,7 +129,7 @@ print("=" * 60)
 def generate_video(
     prompt: str = "A small robot waters a flower in a bright lab, cinematic lighting",
 ) -> Annotated[bytes, Content[Literal["mp4"]]]:
-    """OpenAI Sora 2 で動画を生成し、MP4 バイト列として Weave に記録します。"""
+    """Generate a video with OpenAI Sora 2 and log it as MP4 bytes in Weave."""
     reference_image_url = "https://assets.st-note.com/img/1762403176-PimhEZu3voSeGp5C0l9t4z2N.png"
     png = download_bytes(reference_image_url, timeout=30)
 
@@ -142,7 +142,7 @@ def generate_video(
     )
     result = client.videos.poll(video.id)
     if result.status != "completed":
-        raise RuntimeError(f"動画生成に失敗しました: {result.error}")
+        raise RuntimeError(f"Video generation failed: {result.error}")
 
     content = client.videos.download_content(video.id)
     with tempfile.NamedTemporaryFile(suffix=".mp4", delete=False) as tmp:
@@ -155,20 +155,20 @@ if os.getenv("RUN_EXPENSIVE_MULTIMODAL") == "1":
     video_bytes = generate_video()
     print(f"MP4 video size: {len(video_bytes):,} bytes")
 else:
-    print("RUN_EXPENSIVE_MULTIMODAL=1 を設定すると、Sora 2 の動画生成例を実行します。")
+    print("Set RUN_EXPENSIVE_MULTIMODAL=1 to run the Sora 2 video generation example.")
 
 
 # =============================================================================
-# 5. PDF - arXiv 論文
+# 5. PDF - arXiv paper
 # =============================================================================
 print("\n" + "=" * 60)
-print("5. PDF - arXiv 論文")
+print("5. PDF - arXiv paper")
 print("=" * 60)
 
 
 @weave.op()
 def fetch_arxiv_pdf(paper_id: str = "1706.03762") -> Annotated[bytes, Content[Literal["pdf"]]]:
-    """arXiv の PDF をダウンロードし、PDF バイト列として Weave に記録します。"""
+    """Download an arXiv PDF and log it as PDF bytes in Weave."""
     return download_bytes(f"https://arxiv.org/pdf/{paper_id}.pdf", timeout=60)
 
 
@@ -177,16 +177,16 @@ print(f"PDF size: {len(pdf_bytes):,} bytes")
 
 
 # =============================================================================
-# 6. HTML - Web ページ
+# 6. HTML - Web page
 # =============================================================================
 print("\n" + "=" * 60)
-print("6. HTML - Web ページ")
+print("6. HTML - Web page")
 print("=" * 60)
 
 
 @weave.op()
 def fetch_html(url: str = "https://example.com") -> Annotated[bytes, Content[Literal["html"]]]:
-    """HTML をバイト列として返し、Weave UI でプレビューできるようにします。"""
+    """Return HTML as bytes so it can be previewed in Weave UI."""
     return download_bytes(url, timeout=30)
 
 
@@ -198,15 +198,15 @@ print("\n" + "=" * 60)
 print("Multimodal Data Tracing Demo Complete!")
 print("=" * 60)
 print("""
-まとめ:
-- Annotated[bytes, Content[Literal["png"]]]: PNG 画像
-- Annotated[bytes, Content[Literal["jpg"]]]: JPG 画像
-- Annotated[bytes, Content[Literal["mp3"]]]: MP3 音声
-- Annotated[bytes, Content[Literal["mp4"]]]: MP4 動画
+Summary:
+- Annotated[bytes, Content[Literal["png"]]]: PNG image
+- Annotated[bytes, Content[Literal["jpg"]]]: JPG image
+- Annotated[bytes, Content[Literal["mp3"]]]: MP3 audio
+- Annotated[bytes, Content[Literal["mp4"]]]: MP4 video
 - Annotated[bytes, Content[Literal["pdf"]]]: PDF
 - Annotated[bytes, Content[Literal["html"]]]: HTML
 
-Weave UI で確認:
-- Traces タブで画像、音声、動画、PDF、HTML のプレビューを確認
-- Inputs/Outputs で Content 型として保存された payload を確認
+Check in Weave UI:
+- Use the Traces tab to preview images, audio, video, PDFs, and HTML
+- Use Inputs/Outputs to inspect payloads stored with Content types
 """)

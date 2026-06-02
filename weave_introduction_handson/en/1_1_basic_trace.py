@@ -1,5 +1,5 @@
 """
-1_1_0: Basic Trace - Fundamental Tracing
+1_1: Basic Trace - Fundamental tracing
 
 What you'll learn in this script:
 ================================
@@ -8,11 +8,10 @@ What you'll learn in this script:
 3. Nested function call tracking
 4. Error tracking
 
-Weave UI Tips:
---------------
-- Traces tab: View all calls in chronological order
-- Code tab: Automatically displays tracked code
-- Inputs/Outputs: Check inputs and outputs for each call
+Where to look after running:
+================================
+- Traces tab: Inputs, outputs, errors, and parent/child relationships for each call
+- Code tab: Tracked function definitions
 """
 
 import os
@@ -42,7 +41,7 @@ print("=" * 60)
 @weave.op()
 def echo(user_input: str) -> str:
     """Simple function that echoes input twice.
-    
+
     Just by adding the @weave.op() decorator,
     the function's inputs and outputs are automatically tracked.
     """
@@ -58,7 +57,7 @@ time.sleep(2)  # Wait before next API call
 # 2. Library Integration - Automatic LLM API Tracking
 # =============================================================================
 print("\n" + "=" * 60)
-print("2. Library Integration (LLM API)")
+print("2. Library Integration - Automatic LLM API tracking")
 print("=" * 60)
 
 print("""
@@ -99,7 +98,7 @@ print("=" * 60)
 @weave.op()
 def create_song(user_input: str) -> str:
     """Create a song based on user input.
-    
+
     This function calls echo() and LLM API internally.
     Weave automatically tracks this nested structure.
     """
@@ -128,13 +127,13 @@ print("=" * 60)
 @weave.op()
 def parse_json_response(user_input: str) -> dict:
     """Attempt to parse LLM response as JSON.
-    
+
     When an error occurs, Weave also records the error information.
     Nested structure: parse_json_response > echo > chat_completion
     """
     # Call echo (to create nested structure)
     echoed = echo(user_input)
-    
+
     messages = [
         {"role": "system", "content": "Create a song. Return as plain text."},
         {"role": "user", "content": echoed},
@@ -153,3 +152,13 @@ except json.JSONDecodeError as e:
 print("\n" + "=" * 60)
 print("Basic Trace Demo Complete!")
 print("=" * 60)
+print("""
+Summary:
+- Trace function inputs, outputs, and errors with @weave.op()
+- Automatically record LLM API calls with Library Integration
+- Inspect nested calls as parent/child relationships
+
+Check in Weave UI:
+- Use the Traces tab to inspect inputs, outputs, errors, and parent/child relationships
+- Use the Code tab to inspect tracked function definitions
+""")

@@ -10,11 +10,10 @@
 5. Threads - 会話セッションの管理
 6. Sampling Rate - トレーシングのサンプリング制御
 
-実運用Tips:
-----------
-- 本番環境では attributes で環境情報を付与
-- PII redaction で個人情報を保護
-- 高頻度な呼び出しにはサンプリングを設定
+実行後に確認する場所:
+================================
+- Traces タブ: display name、attributes、thread、sampled call
+- Usage/Cost: カスタムコスト設定の反映
 """
 
 import os
@@ -39,7 +38,7 @@ client = weave.init(f"{os.getenv('WANDB_ENTITY')}/{os.getenv('WANDB_PROJECT', 'w
 # 1. Custom Display Name - トレースの表示名をカスタマイズ
 # =============================================================================
 print("\n" + "=" * 60)
-print("1. Custom Display Name")
+print("1. Custom Display Name - トレースの表示名をカスタマイズ")
 print("=" * 60)
 
 
@@ -301,4 +300,9 @@ print("""
 - postprocess: カスタムマスキング
 - thread: 会話をグループ化
 - tracing_sample_rate: サンプリング制御
+
+Weave UI で確認:
+- Traces タブで display name、attributes、thread を確認
+- Inputs/Outputs でマスク後の値を確認
+- Usage/Cost でカスタムコストの反映を確認
 """)

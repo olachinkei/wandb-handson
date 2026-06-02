@@ -1,20 +1,19 @@
 """
-3_4: Guardrails and Monitoring
+4_2: Guardrails and Monitoring - Guardrails and monitoring
 
 What you'll learn in this script:
 ================================
-1. Using Scorers as guardrails
-2. Real-time safety checks
-3. Scorers for monitoring
+1. Use Scorers as guardrails
+2. Run real-time safety checks
+3. Use Scorers for monitoring
 
-Monitoring can also be configured from the UI!
-- Real-time monitoring in Traces tab
-- Extract conditions with filter features
-- Save monitoring conditions with Saved Views
+Where to look after running:
+================================
+- Traces tab: Safety and quality scores added with apply_scorer
+- Saved Views: Monitoring views for calls that match specific conditions
 """
 
 import os
-import json
 import asyncio
 import random
 from dotenv import load_dotenv
@@ -32,17 +31,17 @@ weave.init(f"{os.getenv('WANDB_ENTITY')}/{os.getenv('WANDB_PROJECT', 'weave-hand
 
 
 # =============================================================================
-# 1. Toxicity Guardrail
+# 1. Toxicity Guardrail - Safety check
 # =============================================================================
 print("\n" + "=" * 60)
-print("1. Toxicity Guardrail")
+print("1. Toxicity Guardrail - Safety check")
 print("=" * 60)
 
 
 class ToxicityGuardrail(Scorer):
     """Guard against toxic content."""
     toxic_keywords: list = ["hate", "violence", "harmful"]
-    
+
     @weave.op
     def score(self, output: str) -> dict:
         text = output if isinstance(output, str) else str(output)
@@ -56,7 +55,7 @@ class ToxicityGuardrail(Scorer):
 
 @weave.op()
 def generate_text(prompt: str) -> str:
-    """Generate text response."""
+    """Generate a text response."""
     messages = [
         {"role": "system", "content": "You are a helpful assistant."},
         {"role": "user", "content": prompt},
@@ -65,12 +64,12 @@ def generate_text(prompt: str) -> str:
 
 
 async def safe_generate(prompt: str) -> str:
-    """Generate with safety guardrail."""
+    """Generate with a safety guardrail."""
     result, call = generate_text.call(prompt)
-    
+
     guardrail = ToxicityGuardrail()
     safety = await call.apply_scorer(guardrail)
-    
+
     if not safety.result.get("is_safe", True):
         return f"Content flagged: {safety.result.get('flagged_keywords')}"
     return result
@@ -82,10 +81,10 @@ print(f"Response: {response[:80]}...")
 
 
 # =============================================================================
-# 2. Quality Monitor
+# 2. Quality Monitor - Quality monitoring
 # =============================================================================
 print("\n" + "=" * 60)
-print("2. Quality Monitor")
+print("2. Quality Monitor - Quality monitoring")
 print("=" * 60)
 
 
@@ -93,7 +92,7 @@ class QualityMonitor(Scorer):
     """Monitor response quality."""
     min_length: int = 20
     max_length: int = 1000
-    
+
     @weave.op
     def score(self, output: str) -> dict:
         text = output if isinstance(output, str) else str(output)
@@ -107,14 +106,14 @@ class QualityMonitor(Scorer):
 async def generate_with_monitoring(prompt: str, sample_rate: float = 0.5) -> str:
     """Generate with sampled monitoring."""
     result, call = generate_text.call(prompt)
-    
-    # Sample monitoring (only apply to some responses)
+
+    # Sample monitoring: only score some responses.
     if random.random() < sample_rate:
         monitor = QualityMonitor()
         quality = await call.apply_scorer(monitor)
         if not quality.result.get("quality_ok"):
             print(f"  Quality alert: {quality.result}")
-    
+
     return result
 
 
@@ -123,38 +122,16 @@ for i in range(3):
     print(f"  {i+1}. {response[:60]}...")
 
 
-# =============================================================================
-# 3. PII Masking Info
-# =============================================================================
-print("\n" + "=" * 60)
-print("3. PII Masking Reference")
-print("=" * 60)
-
-print("""
-About PII Masking:
-====================
-Weave integrates Microsoft Presidio to
-automatically mask PII before sending traces.
-
-Details: https://docs.wandb.ai/weave/guides/tracking/redact-pii
-
-Configuration example:
-  weave.init(
-      "project",
-      settings={
-          "pii_redaction": PresidioSettings(
-              enabled=True,
-              entities=["EMAIL_ADDRESS", "PHONE_NUMBER"],
-          )
-      }
-  )
-""")
-
-
 print("\n" + "=" * 60)
 print("Guardrails and Monitoring Demo Complete!")
 print("=" * 60)
-print("\nCheck in Weave UI:")
-print("- Traces with scores in Traces tab")
-print("- Filter to extract problematic traces")
-print("- Save monitoring conditions with Saved Views")
+print("""
+Summary:
+- Run Scorers as guardrails with call.apply_scorer()
+- Check safety with ToxicityGuardrail
+- Monitor response quality with sampled QualityMonitor scoring
+
+Check in Weave UI:
+- Use the Traces tab to inspect apply_scorer results
+- Use filters and Saved Views to monitor calls that match specific conditions
+""")

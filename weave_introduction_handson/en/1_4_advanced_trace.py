@@ -1,23 +1,23 @@
 """
-1_3: Advanced Trace - Advanced Tracing
+1_4: Advanced Trace - Advanced tracing
 
 What you'll learn in this script:
 ================================
 1. Custom Display Name - Customize trace display names
-2. Kind & Color - Customize trace classification and colors
+2. Custom Cost Tracking - Define costs for custom models
 3. Attributes - Attach custom metadata
-4. PII Redaction - Automatic masking of personal information
-5. Threads - Conversation session management
-6. Sampling Rate - Tracing sampling control
+4. PII Redaction - Automatically mask personal information
+5. Threads - Manage conversation sessions
+6. Sampling Rate - Control tracing sampling
 
-Production Tips:
-----------
-- Use attributes to attach environment info in production
-- Use PII redaction to protect personal information
-- Set sampling for high-frequency calls
+Where to look after running:
+================================
+- Traces tab: display name, attributes, thread, and sampled calls
+- Usage/Cost: Custom cost tracking
 """
 
 import os
+import time
 import uuid
 from dataclasses import dataclass
 from typing import Any
@@ -31,23 +31,23 @@ load_dotenv()
 
 # Initialize Weave
 # Initialize with weave.init("entity/project")
-weave.init(f"{os.getenv('WANDB_ENTITY')}/{os.getenv('WANDB_PROJECT', 'weave-handson')}")
+client = weave.init(f"{os.getenv('WANDB_ENTITY')}/{os.getenv('WANDB_PROJECT', 'weave-handson')}")
 
 
 # =============================================================================
-# 1. Custom Display Name
+# 1. Custom Display Name - Customize trace display names
 # =============================================================================
 print("\n" + "=" * 60)
-print("1. Custom Display Name")
+print("1. Custom Display Name - Customize trace display names")
 print("=" * 60)
 
 
-# Method 1: Set display name with name parameter
+# Method 1: Set display name with the name parameter.
 @weave.op(name="sentiment_analyzer")
 def analyze_sentiment(text: str) -> str:
-    """Customize the name displayed in Weave UI with name parameter.
-    
-    Function name is analyze_sentiment, but displayed as sentiment_analyzer in UI.
+    """Customize the name displayed in Weave UI with the name parameter.
+
+    The function name is analyze_sentiment, but the UI displays sentiment_analyzer.
     """
     messages = [
         {"role": "system", "content": "Analyze sentiment. Return: positive/negative/neutral"},
@@ -58,52 +58,39 @@ def analyze_sentiment(text: str) -> str:
 
 result = analyze_sentiment("I love this product!")
 print(f"Sentiment: {result[:30]}...")
-
+time.sleep(2)  # Wait before next API call
 
 # =============================================================================
-# 2. Kind & Color - Customize trace classification and colors
+# 2. Custom Cost Tracking - Define costs for custom models
 # =============================================================================
 print("\n" + "=" * 60)
-print("2. Kind & Color")
+print("2. Custom Cost Tracking - Define costs for custom models")
 print("=" * 60)
 
 
-@weave.op(kind="llm", color="blue")
-def llm_call(prompt: str) -> str:
-    """Visually distinguish LLM calls with kind='llm' and color='blue'.
-    
-    Available kinds: agent, llm, tool, search
-    Available colors: red, orange, yellow, green, blue, purple
+CUSTOM_MODEL_ID = "my-custom-model-v1"
+
+
+def register_custom_cost() -> None:
+    """Register token costs for a custom model in Weave.
+
+    prompt_token_cost / completion_token_cost are USD per token.
+    For example, $2 / $6 per 1M tokens becomes 0.000002 / 0.000006.
     """
-    messages = [{"role": "user", "content": prompt}]
-    return chat_completion(messages)
+    existing_costs = client.query_costs(llm_ids=[CUSTOM_MODEL_ID])
+    if existing_costs:
+        print(f"Custom cost already registered: {CUSTOM_MODEL_ID}")
+        return
+
+    client.add_cost(
+        llm_id=CUSTOM_MODEL_ID,
+        prompt_token_cost=0.000002,
+        completion_token_cost=0.000006,
+    )
+    print(f"Custom cost registered: {CUSTOM_MODEL_ID}")
 
 
-@weave.op(kind="tool", color="green")
-def search_database(query: str) -> list:
-    """Distinguish tool calls with kind='tool' and color='green'."""
-    # Mock database search
-    return [{"id": 1, "title": f"Result for: {query}"}]
-
-
-@weave.op(kind="agent", color="purple")
-def agent_pipeline(user_query: str) -> str:
-    """Express agent pipeline with kind='agent'.
-    
-    You can see color coding in nested calls.
-    """
-    # Tool call
-    results = search_database(user_query)
-    
-    # LLM call
-    context = str(results)
-    response = llm_call(f"Context: {context}\nQuestion: {user_query}")
-    
-    return response
-
-
-result = agent_pipeline("What is machine learning?")
-print(f"Agent result: {result[:60]}...")
+register_custom_cost()
 
 
 # =============================================================================
@@ -116,7 +103,7 @@ print("=" * 60)
 
 @weave.op()
 def process_request(text: str) -> str:
-    """Traced along with metadata attached via attributes."""
+    """This call is traced together with metadata attached through attributes."""
     messages = [
         {"role": "system", "content": "Summarize briefly."},
         {"role": "user", "content": text},
@@ -124,7 +111,7 @@ def process_request(text: str) -> str:
     return chat_completion(messages)
 
 
-# Attach attributes with context manager
+# Attach attributes with a context manager.
 with weave.attributes({
     "environment": "development",
     "user_id": "user_123",
@@ -136,18 +123,18 @@ with weave.attributes({
 
 
 # =============================================================================
-# 4. PII Redaction - Automatic masking of personal information
+# 4. PII Redaction - Automatically mask personal information
 # =============================================================================
 print("\n" + "=" * 60)
-print("4. PII Redaction - Automatic masking of personal information")
+print("4. PII Redaction - Automatically mask personal information")
 print("=" * 60)
 
 print("""
-PII Redaction Configuration:
+PII Redaction configuration:
 ============================
 
-Method 1: Enable in weave.init (using Microsoft Presidio)
-------------------------------------------------------
+Method 1: Enable it in weave.init (using Microsoft Presidio)
+-----------------------------------------------------------
 pip install presidio-analyzer presidio-anonymizer
 
 weave.init(
@@ -165,7 +152,7 @@ Entities masked by default:
 """)
 
 
-# Method 2: Custom masking with postprocess_inputs / postprocess_output
+# Method 2: Custom masking with postprocess_inputs / postprocess_output.
 @dataclass
 class UserData:
     name: str
@@ -174,7 +161,7 @@ class UserData:
 
 
 def redact_inputs(inputs: dict[str, Any]) -> dict[str, Any]:
-    """Mask sensitive information from inputs"""
+    """Mask sensitive information from inputs."""
     redacted = inputs.copy()
     if "email" in redacted:
         redacted["email"] = "***@***.***"
@@ -184,9 +171,9 @@ def redact_inputs(inputs: dict[str, Any]) -> dict[str, Any]:
 
 
 def redact_output(output: UserData) -> UserData:
-    """Mask sensitive information from output"""
+    """Mask sensitive information from outputs."""
     return UserData(
-        name=output.name[:1] + "***",  # Keep only first character
+        name=output.name[:1] + "***",  # Keep only the first character.
         email="***@***.***",
         message=output.message,
     )
@@ -198,9 +185,8 @@ def redact_output(output: UserData) -> UserData:
 )
 def process_user_data(name: str, email: str, password: str) -> UserData:
     """Mask sensitive information with postprocess_inputs/output.
-    
-    Original data is used for actual processing,
-    but masked data is logged to Weave.
+
+    The original data is used for the actual work, but Weave logs the masked data.
     """
     return UserData(
         name=name,
@@ -209,7 +195,6 @@ def process_user_data(name: str, email: str, password: str) -> UserData:
     )
 
 
-# Execute
 result = process_user_data(
     name="John Doe",
     email="john.doe@example.com",
@@ -218,8 +203,8 @@ result = process_user_data(
 print(f"Result (actual): {result}")
 
 
-# REDACT_KEYS for custom key masking
-print("\n--- REDACT_KEYS ---")
+# Method 3: Mask custom keys with REDACT_KEYS.
+print("\n--- Method 3: REDACT_KEYS ---")
 print("""
 Automatically mask values with specific key names:
 
@@ -247,7 +232,7 @@ print("=" * 60)
 class ChatSession:
     def __init__(self):
         self.messages = []
-    
+
     @weave.op()
     def send_message(self, user_message: str) -> str:
         self.messages.append({"role": "user", "content": user_message})
@@ -276,21 +261,21 @@ print("6. Sampling Rate - Sampling control")
 print("=" * 60)
 
 
-@weave.op(tracing_sample_rate=0.1)  # Only trace 10%
+@weave.op(tracing_sample_rate=0.1)  # Trace only 10%.
 def high_frequency_validation(data: str) -> bool:
-    """High-frequency function. Only 10% is traced.
-    
+    """High-frequency function. Only 10% of calls are traced.
+
     tracing_sample_rate:
-    - 0.0: No tracing
-    - 0.1: Trace only 10%
-    - 1.0: Trace all (default)
+    - 0.0: Do not trace
+    - 0.1: Trace 10%
+    - 1.0: Trace all calls (default)
     """
     return len(data) > 0
 
 
 @weave.op()
 def process_batch(items: list) -> dict:
-    """Batch processing. Internal validation is traced only 10%."""
+    """Batch processing. Internal validation is traced only 10% of the time."""
     valid = sum(1 for item in items if high_frequency_validation(item))
     return {"total": len(items), "valid": valid}
 
@@ -304,11 +289,16 @@ print("Advanced Trace Demo Complete!")
 print("=" * 60)
 print("""
 Summary:
-- name: Customize display name
-- kind/color: Classify and color-code traces
+- name: Customize display names
+- custom cost: Register custom model costs
 - attributes: Attach metadata
-- redact_pii: Auto-mask personal information
-- postprocess: Custom masking
-- thread: Group conversations
-- tracing_sample_rate: Sampling control
+- redact_pii: Automatically mask personal information
+- postprocess: Apply custom masking
+- thread: Group conversation turns
+- tracing_sample_rate: Control sampling
+
+Check in Weave UI:
+- Use the Traces tab to inspect display names, attributes, and threads
+- Use Inputs/Outputs to inspect masked values
+- Use Usage/Cost to inspect custom cost tracking
 """)

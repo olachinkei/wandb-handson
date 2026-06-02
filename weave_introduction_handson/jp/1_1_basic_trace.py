@@ -8,11 +8,10 @@
 3. ネストした関数呼び出しのトラッキング
 4. エラートラッキング
 
-Weave UI Tips:
---------------
-- Traces タブ: すべての呼び出しを時系列で確認
-- Code タブ: トラッキングしたコードを自動表示
-- Inputs/Outputs: 各呼び出しの入出力を確認
+実行後に確認する場所:
+================================
+- Traces タブ: 各 call の入出力、エラー、親子関係
+- Code タブ: トラッキングされた関数定義
 """
 
 import os
@@ -35,7 +34,7 @@ weave.init(f"{os.getenv('WANDB_ENTITY')}/{os.getenv('WANDB_PROJECT', 'weave-hand
 # 1. Basic Function Tracing - 基本的な関数トレーシング
 # =============================================================================
 print("\n" + "=" * 60)
-print("1. Basic Function Tracing")
+print("1. Basic Function Tracing - 基本的な関数トレーシング")
 print("=" * 60)
 
 
@@ -58,7 +57,7 @@ time.sleep(2)  # 次の API 呼び出しまで待機
 # 2. Library Integration - LLM API の自動トラッキング
 # =============================================================================
 print("\n" + "=" * 60)
-print("2. Library Integration (LLM API)")
+print("2. Library Integration - LLM API の自動トラッキング")
 print("=" * 60)
 
 print("""
@@ -93,7 +92,7 @@ time.sleep(2)  # 次の API 呼び出しまで待機
 # 3. Nested Function Tracing - ネストした関数呼び出し
 # =============================================================================
 print("\n" + "=" * 60)
-print("3. Nested Function Tracing")
+print("3. Nested Function Tracing - ネストした関数呼び出し")
 print("=" * 60)
 
 
@@ -122,7 +121,7 @@ time.sleep(2)  # 次の API 呼び出しまで待機
 # 4. Error Tracking - エラートラッキング
 # =============================================================================
 print("\n" + "=" * 60)
-print("4. Error Tracking")
+print("4. Error Tracking - エラートラッキング")
 print("=" * 60)
 
 
@@ -154,3 +153,13 @@ except json.JSONDecodeError as e:
 print("\n" + "=" * 60)
 print("Basic Trace Demo Complete!")
 print("=" * 60)
+print("""
+まとめ:
+- @weave.op() で関数の入出力とエラーをトレース
+- LLM API 呼び出しは Library Integration で自動記録
+- ネストした呼び出しは親子関係として確認可能
+
+Weave UI で確認:
+- Traces タブで各 call の入出力、エラー、親子関係を確認
+- Code タブでトラッキングされた関数定義を確認
+""")

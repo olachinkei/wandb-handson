@@ -1,18 +1,18 @@
 """
-2_1: Assets and Scorers - アセット管理と評価関数
+2_1: Assets and Scorers - Asset management and evaluation functions
 
-このスクリプトで学べること:
+What you'll learn in this script:
 ================================
-1. weave.Model - LLM ラッパーのバージョン管理
-2. weave.StringPrompt / weave.MessagesPrompt - プロンプトのバージョン管理
-3. weave.Dataset - データセットの作成・取得
-4. Scorer - 評価関数の作成と公開
-5. Built-in Scorers - Weave 提供スコアラーの使い方
+1. weave.Model - Version LLM wrappers
+2. weave.StringPrompt / weave.MessagesPrompt - Version prompts
+3. weave.Dataset - Create and retrieve datasets
+4. Scorer - Create and publish evaluation functions
+5. Built-in Scorers - Use scorers provided by Weave
 
-実行後に確認する場所:
+Where to look after running:
 ================================
-- Models / Prompts / Datasets: 公開したアセット
-- Scorers: 作成した評価関数
+- Models / Prompts / Datasets: Published assets
+- Scorers: Evaluation functions you created
 """
 
 import asyncio
@@ -31,7 +31,7 @@ from config_loader import chat_completion, get_model_name
 load_dotenv()
 
 # Initialize Weave
-# weave.init("entity/project") で初期化
+# Initialize with weave.init("entity/project")
 ENTITY = os.getenv("WANDB_ENTITY")
 PROJECT = os.getenv("WANDB_PROJECT", "weave-handson")
 weave.init(f"{ENTITY}/{PROJECT}")
@@ -41,7 +41,7 @@ ASSETS_FILE = Path(__file__).parent.parent / "assets.json"
 
 
 def save_asset_ref(asset_type: str, name: str, ref: str):
-    """Save asset reference to local file."""
+    """Save an asset reference to a local file."""
     assets = json.load(open(ASSETS_FILE)) if ASSETS_FILE.exists() else {}
     assets.setdefault(asset_type, {})[name] = ref
     json.dump(assets, open(ASSETS_FILE, "w"), indent=2)
@@ -49,19 +49,19 @@ def save_asset_ref(asset_type: str, name: str, ref: str):
 
 
 # =============================================================================
-# 1. weave.Model - LLM ラッパーのバージョン管理
+# 1. weave.Model - Version an LLM wrapper
 # =============================================================================
 print("\n" + "=" * 60)
-print("1. weave.Model - LLM ラッパーのバージョン管理")
+print("1. weave.Model - Version an LLM wrapper")
 print("=" * 60)
 
 
 class GrammarCorrector(weave.Model):
-    """文法修正モデル。
+    """Grammar correction model.
 
-    weave.Model を継承し、predict に @weave.op() を付けることで、
-    system_message / model_name / temperature などの設定と推論コードを
-    一体としてバージョン管理できます。
+    By inheriting from weave.Model and decorating predict with @weave.op(),
+    configuration such as system_message / model_name / temperature and
+    inference code can be versioned together.
     """
 
     system_message: str
@@ -104,13 +104,13 @@ print(f"Retrieved model: system_message={retrieved_model.system_message[:60]}...
 
 
 # =============================================================================
-# 2. weave.StringPrompt / weave.MessagesPrompt - プロンプト管理
+# 2. weave.StringPrompt / weave.MessagesPrompt - Prompt management
 # =============================================================================
 print("\n" + "=" * 60)
-print("2. weave.StringPrompt / weave.MessagesPrompt - プロンプト管理")
+print("2. weave.StringPrompt / weave.MessagesPrompt - Prompt management")
 print("=" * 60)
 
-# StringPrompt - 単一文字列プロンプト
+# StringPrompt - single string prompt
 system_prompt = weave.StringPrompt("You speak like a friendly pirate.")
 prompt_ref = weave.publish(system_prompt, name="pirate_prompt")
 save_asset_ref("prompts", "pirate_prompt", prompt_ref.uri())
@@ -122,7 +122,7 @@ messages = [
 response = chat_completion(messages, max_tokens=80)
 print(f"StringPrompt response: {response[:100]}...")
 
-# MessagesPrompt - 会話履歴形式
+# MessagesPrompt - chat-message prompt template
 messages_prompt = weave.MessagesPrompt(
     [
         {"role": "system", "content": "You are a helpful assistant specializing in {domain}."},
@@ -144,10 +144,10 @@ print(f"Loaded prompt messages: {loaded_prompt.format(domain='AI', question='Wha
 
 
 # =============================================================================
-# 3. weave.Dataset - データセットの作成・取得
+# 3. weave.Dataset - Create and retrieve datasets
 # =============================================================================
 print("\n" + "=" * 60)
-print("3. weave.Dataset - データセットの作成・取得")
+print("3. weave.Dataset - Create and retrieve datasets")
 print("=" * 60)
 
 grammar_dataset = Dataset(
@@ -183,23 +183,23 @@ print(f"First row: {dict(retrieved_dataset.rows[0])}")
 
 
 # =============================================================================
-# 4. Basic Scorer - 関数ベース
+# 4. Basic Scorer - Function-based
 # =============================================================================
 print("\n" + "=" * 60)
-print("4. Basic Scorer - 関数ベース")
+print("4. Basic Scorer - Function-based")
 print("=" * 60)
 
 
 @weave.op()
 def exact_match_scorer(expected: str, output: dict) -> dict:
-    """完全一致をチェック（大文字小文字無視）"""
+    """Check exact match, ignoring case."""
     generated = output.get("answer", "") if isinstance(output, dict) else str(output)
     return {"exact_match": expected.lower().strip() in generated.lower().strip()}
 
 
 @weave.op()
 def contains_answer_scorer(expected: str, output: dict) -> dict:
-    """期待する答えが含まれているかチェック"""
+    """Check whether the expected answer is contained in the output."""
     generated = output.get("answer", "") if isinstance(output, dict) else str(output)
     return {"contains_answer": expected.lower() in generated.lower()}
 
@@ -211,15 +211,15 @@ print(f"Contains answer: {result}")
 
 
 # =============================================================================
-# 5. Class-based Scorer - クラスベース
+# 5. Class-based Scorer
 # =============================================================================
 print("\n" + "=" * 60)
-print("5. Class-based Scorer - クラスベース")
+print("5. Class-based Scorer")
 print("=" * 60)
 
 
 class LengthScorer(Scorer):
-    """レスポンスの長さをチェック"""
+    """Check response length."""
 
     min_length: int = 10
     max_length: int = 500
@@ -243,15 +243,15 @@ print(f"Length score: {result}")
 
 
 # =============================================================================
-# 6. LLM as a Judge - LLM を評価者として使う
+# 6. LLM as a Judge
 # =============================================================================
 print("\n" + "=" * 60)
-print("6. LLM as a Judge - LLM を評価者として使う")
+print("6. LLM as a Judge")
 print("=" * 60)
 
 
 class LLMJudgeScorer(Scorer):
-    """LLMを評価者として使用"""
+    """Use an LLM as an evaluator."""
 
     criteria: str = "helpfulness"
 
@@ -285,71 +285,38 @@ print(f"LLM Judge score: {result}")
 
 
 # =============================================================================
-# 7. Built-in Scorers - Weave 提供のスコアラー
+# 7. Built-in Scorers - Weave-provided scorers
 # =============================================================================
 print("\n" + "=" * 60)
-print("7. Built-in Scorers - Weave 提供のスコアラー")
+print("7. Built-in Scorers - Weave-provided scorers")
 print("=" * 60)
 
 print("""
-Weave が提供する Built-in Scorers:
+Built-in Scorers provided by Weave:
 ==================================
 
-インストール: pip install weave[scorers]
+Installation: pip install weave[scorers]
 
-1. ValidJSONScorer - JSON形式検証
-   from weave.scorers import ValidJSONScorer
-   scorer = ValidJSONScorer()
+1. ValidJSONScorer - JSON format validation
+2. ValidXMLScorer - XML format validation
+3. HallucinationFreeScorer - Hallucination detection
+4. SummarizationScorer - Summarization quality evaluation
+5. OpenAIModerationScorer - Content moderation
+6. EmbeddingSimilarityScorer - Embedding similarity
+7. PydanticScorer - Pydantic schema validation
+8. ContextEntityRecallScorer (RAGAS) - Entity recall
+9. ContextRelevancyScorer (RAGAS) - Context relevancy
 
-2. ValidXMLScorer - XML形式検証
-   from weave.scorers import ValidXMLScorer
-   scorer = ValidXMLScorer()
-
-3. HallucinationFreeScorer - ハルシネーション検出
-   from weave.scorers import HallucinationFreeScorer
-   scorer = HallucinationFreeScorer(model_id="openai/gpt-4o")
-
-4. SummarizationScorer - 要約品質評価
-   from weave.scorers import SummarizationScorer
-   scorer = SummarizationScorer(model_id="openai/gpt-4o")
-
-5. OpenAIModerationScorer - コンテンツモデレーション
-   from weave.scorers import OpenAIModerationScorer
-   scorer = OpenAIModerationScorer()
-
-6. EmbeddingSimilarityScorer - 埋め込み類似度
-   from weave.scorers import EmbeddingSimilarityScorer
-   scorer = EmbeddingSimilarityScorer(
-       model_id="openai/text-embedding-3-small",
-       threshold=0.7
-   )
-
-7. PydanticScorer - Pydanticスキーマ検証
-   from weave.scorers import PydanticScorer
-   from pydantic import BaseModel
-   class MySchema(BaseModel):
-       name: str
-       value: int
-   scorer = PydanticScorer(model=MySchema)
-
-8. ContextEntityRecallScorer (RAGAS) - エンティティリコール
-   from weave.scorers import ContextEntityRecallScorer
-   scorer = ContextEntityRecallScorer(model_id="openai/gpt-4o")
-
-9. ContextRelevancyScorer (RAGAS) - コンテキスト関連性
-   from weave.scorers import ContextRelevancyScorer
-   scorer = ContextRelevancyScorer(model_id="openai/gpt-4o")
-
-※ LLMベースのスコアラーは litellm と統合されており、
-  model_id で様々なプロバイダーのモデルを指定可能です。
+LLM-based scorers integrate with litellm, so you can specify
+models from many providers with model_id.
 """)
 
 
 # =============================================================================
-# 8. Using Built-in Scorers - 実行例
+# 8. Using Built-in Scorers - Example
 # =============================================================================
 print("\n" + "=" * 60)
-print("8. Using Built-in Scorers - 実行例")
+print("8. Using Built-in Scorers - Example")
 print("=" * 60)
 
 try:
@@ -368,23 +335,23 @@ try:
     print("\nHallucinationFreeScorer:")
     print("  from weave.scorers import HallucinationFreeScorer")
     print("  scorer = HallucinationFreeScorer(model_id='openai/gpt-4o')")
-    print("  # Evaluation時に context カラムが必要")
+    print("  # Requires a context column when used in Evaluation")
 
 except ImportError:
-    print("Built-in scorers not installed. Run: pip install weave[scorers]")
+    print("Built-in scorers are not installed. Run: pip install weave[scorers]")
 
 
 print("\n" + "=" * 60)
 print("Assets and Scorers Demo Complete!")
 print("=" * 60)
-print(f"\n登録したアセット参照: {ASSETS_FILE}")
+print(f"\nRegistered asset references: {ASSETS_FILE}")
 print("""
-まとめ:
-- weave.Model / Prompt / Dataset を作成して公開
-- 関数ベースとクラスベースの Scorer を定義
-- Built-in Scorers の種類と使い方を確認
+Summary:
+- Create and publish weave.Model / Prompt / Dataset assets
+- Define function-based and class-based Scorers
+- Review the types and usage of Built-in Scorers
 
-Weave UI で確認:
-- Models / Prompts / Datasets で公開したアセットを確認
-- Scorers で作成した評価関数を確認
+Check in Weave UI:
+- Use Models / Prompts / Datasets to inspect published assets
+- Use Scorers to inspect the evaluation functions you created
 """)

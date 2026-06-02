@@ -1,5 +1,5 @@
 """
-1_2_1: OpenAI Agent SDK - Building Agents
+1_2: OpenAI Agent SDK - Building agents
 
 What you'll learn in this script:
 ================================
@@ -7,14 +7,10 @@ What you'll learn in this script:
 2. Defining tools with function_tool
 3. Tracing with WeaveTracingProcessor
 
-Prerequisites:
---------
-pip install openai-agents
-
-References:
-----
-- OpenAI Agent SDK: https://github.com/openai/openai-agents-python
-- Weave Integration: https://docs.wandb.ai/weave/guides/integrations/openai-agents
+Where to look after running:
+================================
+- Traces tab: Agent execution and tool calls
+- Code tab: Tracked functions and Agent SDK integration
 """
 
 import os
@@ -36,10 +32,10 @@ set_trace_processors([WeaveTracingProcessor()])
 
 
 # =============================================================================
-# Agent with Multiple Tools
+# 1. Agent with Multiple Tools
 # =============================================================================
 print("\n" + "=" * 60)
-print("Agent with Multiple Tools")
+print("1. Agent with Multiple Tools")
 print("=" * 60)
 
 
@@ -85,9 +81,12 @@ print("\n" + "=" * 60)
 print("Agent SDK Demo Complete!")
 print("=" * 60)
 print("""
-Key Points:
-- Define tools with @function_tool
-- Create agents with Agent()
-- Run agents with Runner.run()
-- Enable tracing with set_trace_processors([WeaveTracingProcessor()])
+Summary:
+- Define Agent SDK tools with @function_tool
+- Create an agent with Agent() and run it with Runner.run()
+- Record agent execution in Weave with WeaveTracingProcessor
+
+Check in Weave UI:
+- Use the Traces tab to inspect agent execution and tool calls
+- Use Inputs/Outputs to inspect each tool call
 """)

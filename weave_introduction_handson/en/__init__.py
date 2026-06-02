@@ -1,1 +1,1 @@
-# Weave Introduction Handson - English Version (Coming soon)
+# Weave Introduction Hands-on - English version

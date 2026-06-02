@@ -7,14 +7,13 @@
 2. リアルタイムの安全性チェック
 3. モニタリング用の Scorer
 
-モニタリングは UI 上からも設定できます！
-- Traces タブでリアルタイム監視
-- フィルター機能で条件を抽出
-- Saved Views で監視条件を保存
+実行後に確認する場所:
+================================
+- Traces タブ: apply_scorer で付与された安全性・品質スコア
+- Saved Views: 条件に合う call の監視ビュー
 """
 
 import os
-import json
 import asyncio
 import random
 from dotenv import load_dotenv
@@ -32,10 +31,10 @@ weave.init(f"{os.getenv('WANDB_ENTITY')}/{os.getenv('WANDB_PROJECT', 'weave-hand
 
 
 # =============================================================================
-# 1. Toxicity Guardrail
+# 1. Toxicity Guardrail - 安全性チェック
 # =============================================================================
 print("\n" + "=" * 60)
-print("1. Toxicity Guardrail")
+print("1. Toxicity Guardrail - 安全性チェック")
 print("=" * 60)
 
 
@@ -82,10 +81,10 @@ print(f"Response: {response[:80]}...")
 
 
 # =============================================================================
-# 2. Quality Monitor
+# 2. Quality Monitor - 品質モニタリング
 # =============================================================================
 print("\n" + "=" * 60)
-print("2. Quality Monitor")
+print("2. Quality Monitor - 品質モニタリング")
 print("=" * 60)
 
 
@@ -126,3 +125,13 @@ for i in range(3):
 print("\n" + "=" * 60)
 print("Guardrails and Monitoring Demo Complete!")
 print("=" * 60)
+print("""
+まとめ:
+- Scorer を call.apply_scorer() でガードレールとして実行
+- ToxicityGuardrail で安全性をチェック
+- QualityMonitor でレスポンス品質をサンプリング監視
+
+Weave UI で確認:
+- Traces タブで apply_scorer の結果を確認
+- フィルターや Saved Views で条件に合う call を監視
+""")

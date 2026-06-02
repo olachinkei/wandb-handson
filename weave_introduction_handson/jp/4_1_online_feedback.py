@@ -7,10 +7,10 @@
 2. リアクション、ノート、カスタムフィードバック
 3. フィードバックの活用
 
-フィードバックの用途:
-- ユーザー満足度の追跡
-- 問題のあるレスポンスのマーク
-- チーム間のコメント共有
+実行後に確認する場所:
+================================
+- Traces タブ: フィードバック付きの call
+- Feedback 表示: reaction、note、custom feedback
 """
 
 import os
@@ -59,6 +59,13 @@ print(f"Added feedback to call: {call.id}")
 print("\n" + "=" * 60)
 print("Online Feedback Demo Complete!")
 print("=" * 60)
-print("\nWeave UI で確認:")
-print("- Traces タブでフィードバック付きトレースを確認")
-print("- リアクションでフィルタリング")
+print("""
+まとめ:
+- call.feedback.add_reaction() でリアクションを追加
+- call.feedback.add_note() でノートを追加
+- call.feedback.add() で任意の structured feedback を追加
+
+Weave UI で確認:
+- Traces タブでフィードバック付き call を確認
+- Feedback 表示で reaction、note、custom feedback を確認
+""")

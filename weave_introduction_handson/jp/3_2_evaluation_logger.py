@@ -8,7 +8,10 @@
 3. log_summary による評価全体の集計
 4. 既存の推論パイプラインへの組み込み
 
-03_evaluations.ipynb の EvaluationLogger セクションをベースにしています。
+実行後に確認する場所:
+================================
+- Evals タブ: 逐次ログされた予測、スコア、集計
+- Traces タブ: 推論関数の call
 """
 
 import os
@@ -29,10 +32,10 @@ weave.init(f"{os.getenv('WANDB_ENTITY')}/{os.getenv('WANDB_PROJECT', 'weave-hand
 
 
 # =============================================================================
-# 1. Define Prediction Function
+# 1. Define Prediction Function - 推論関数の定義
 # =============================================================================
 print("\n" + "=" * 60)
-print("1. Defining Prediction Function")
+print("1. Define Prediction Function - 推論関数の定義")
 print("=" * 60)
 
 
@@ -58,10 +61,10 @@ print("Defined: correct_grammar")
 
 
 # =============================================================================
-# 2. Prepare EvaluationLogger
+# 2. Prepare EvaluationLogger - ロガーの準備
 # =============================================================================
 print("\n" + "=" * 60)
-print("2. Preparing EvaluationLogger")
+print("2. Prepare EvaluationLogger - ロガーの準備")
 print("=" * 60)
 
 samples = [
@@ -83,10 +86,10 @@ print(f"Evaluating {len(samples)} samples...")
 
 
 # =============================================================================
-# 3. Log Predictions and Scores
+# 3. Log Predictions and Scores - 予測とスコアの記録
 # =============================================================================
 print("\n" + "=" * 60)
-print("3. Logging Predictions and Scores")
+print("3. Log Predictions and Scores - 予測とスコアの記録")
 print("=" * 60)
 
 matches = []
@@ -109,10 +112,10 @@ for sample in samples:
 
 
 # =============================================================================
-# 4. Log Summary
+# 4. Log Summary - 評価全体の集計
 # =============================================================================
 print("\n" + "=" * 60)
-print("4. Logging Summary")
+print("4. Log Summary - 評価全体の集計")
 print("=" * 60)
 
 accuracy = sum(matches) / len(matches)
@@ -120,7 +123,7 @@ eval_logger.log_summary(
     {
         "exact_match_accuracy": accuracy,
         "total": len(samples),
-        "note": "EvaluationLogger demo based on grammar correction samples",
+        "note": "Grammar correction samples evaluated with EvaluationLogger",
     }
 )
 eval_logger.finish()
@@ -131,4 +134,13 @@ print(f"Exact Match Accuracy: {accuracy:.1%}")
 print("\n" + "=" * 60)
 print("Evaluation Logger Demo Complete!")
 print("=" * 60)
-print("Weave UI の Evals タブで逐次ログされた評価を確認してください。")
+print("""
+まとめ:
+- EvaluationLogger で既存の推論ループを評価として記録
+- log_prediction() / log_score() / finish() でサンプル単位の結果を保存
+- log_summary() で評価全体の集計を保存
+
+Weave UI で確認:
+- Evals タブで逐次ログされた予測、スコア、集計を確認
+- Traces タブで correct_grammar の call を確認
+""")

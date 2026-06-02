@@ -7,14 +7,10 @@
 2. function_tool を使ったツール定義
 3. WeaveTracingProcessor によるトレーシング
 
-事前準備:
---------
-pip install openai-agents
-
-参考:
-----
-- OpenAI Agent SDK: https://github.com/openai/openai-agents-python
-- Weave Integration: https://docs.wandb.ai/weave/guides/integrations/openai-agents
+実行後に確認する場所:
+================================
+- Traces タブ: エージェント実行とツール呼び出し
+- Code タブ: トレースされた関数と Agent SDK 連携
 """
 
 import os
@@ -36,10 +32,10 @@ set_trace_processors([WeaveTracingProcessor()])
 
 
 # =============================================================================
-# Agent with Multiple Tools
+# 1. Agent with Multiple Tools - 複数ツールを持つエージェント
 # =============================================================================
 print("\n" + "=" * 60)
-print("Agent with Multiple Tools")
+print("1. Agent with Multiple Tools - 複数ツールを持つエージェント")
 print("=" * 60)
 
 
@@ -85,9 +81,12 @@ print("\n" + "=" * 60)
 print("Agent SDK Demo Complete!")
 print("=" * 60)
 print("""
-ポイント:
-- @function_tool でツールを定義
-- Agent() でエージェントを作成
-- Runner.run() でエージェントを実行
-- set_trace_processors([WeaveTracingProcessor()]) でトレーシングを有効化
+まとめ:
+- @function_tool で Agent SDK のツールを定義
+- Agent() と Runner.run() でエージェントを実行
+- WeaveTracingProcessor でエージェント実行を Weave に記録
+
+Weave UI で確認:
+- Traces タブでエージェント実行とツール呼び出しを確認
+- Inputs/Outputs で各ツールの入出力を確認
 """)
