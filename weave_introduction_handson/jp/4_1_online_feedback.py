@@ -13,18 +13,16 @@
 - Feedback 表示: reaction、note、custom feedback
 """
 
-import os
 from dotenv import load_dotenv
 import weave
 
-from config_loader import chat_completion
+from config_loader import chat_completion, init_weave
 
 # Load environment variables
 load_dotenv()
 
 # Initialize Weave
-# weave.init("entity/project") で初期化
-client_weave = weave.init(f"{os.getenv('WANDB_ENTITY')}/{os.getenv('WANDB_PROJECT', 'weave-handson')}")
+init_weave()
 
 
 # =============================================================================

@@ -14,21 +14,18 @@ Where to look after running:
 - Traces tab: Calls from the prediction function
 """
 
-import os
-
 from dotenv import load_dotenv
 from openai import OpenAI
 import weave
 from weave import EvaluationLogger
 
-from config_loader import get_model_name
+from config_loader import get_model_name, init_weave
 
 # Load environment variables
 load_dotenv()
 
 # Initialize Weave
-# Initialize with weave.init("entity/project")
-weave.init(f"{os.getenv('WANDB_ENTITY')}/{os.getenv('WANDB_PROJECT', 'weave-handson')}")
+init_weave()
 
 
 # =============================================================================

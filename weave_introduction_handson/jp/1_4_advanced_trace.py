@@ -16,22 +16,21 @@
 - Usage/Cost: カスタムコスト設定の反映
 """
 
-import os
 import time
 import uuid
 from dataclasses import dataclass
 from typing import Any
 from dotenv import load_dotenv
 import weave
+from weave.utils import sanitize
 
-from config_loader import chat_completion
+from config_loader import chat_completion, init_weave
 
 # Load environment variables
 load_dotenv()
 
 # Initialize Weave
-# weave.init("entity/project") で初期化
-client = weave.init(f"{os.getenv('WANDB_ENTITY')}/{os.getenv('WANDB_PROJECT', 'weave-handson')}")
+client = init_weave()
 
 
 # =============================================================================
@@ -223,6 +222,34 @@ sanitize.add_redact_key("secret_token")
 - auth_headers
 - authorization
 """)
+
+
+sanitize.add_redact_key("secret_token")
+
+
+@weave.op()
+def call_internal_service(payload: dict[str, Any]) -> dict[str, Any]:
+    """キー名に基づく自動マスクを確認するためのサンプル。
+
+    payload の api_key はデフォルトで、secret_token は add_redact_key で
+    Weave に記録される際に REDACTED になります。
+    """
+    return {
+        "status": "ok",
+        "user_id": payload["user_id"],
+        "used_secret_token_suffix": payload["secret_token"][-4:],
+    }
+
+
+redact_keys_result = call_internal_service({
+    "user_id": "user_123",
+    "api_key": "sk-demo-api-key-1234567890",
+    "secret_token": "internal-secret-token-abcdef",
+    "request": "Create a summary for this user.",
+})
+print(f"REDACT_KEYS に secret_token を追加: {sanitize.should_redact('secret_token')}")
+print(f"Result: {redact_keys_result}")
+print("Weave UI の Inputs で api_key と secret_token が REDACTED になっていることを確認してください。")
 
 
 # =============================================================================

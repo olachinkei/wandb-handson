@@ -14,20 +14,18 @@
 - Code タブ: トラッキングされた関数定義
 """
 
-import os
 import json
 import time
 from dotenv import load_dotenv
 import weave
 
-from config_loader import chat_completion
+from config_loader import chat_completion, init_weave
 
 # Load environment variables
 load_dotenv()
 
 # Initialize Weave
-# weave.init("entity/project") で初期化
-weave.init(f"{os.getenv('WANDB_ENTITY')}/{os.getenv('WANDB_PROJECT', 'weave-handson')}")
+init_weave()
 
 
 # =============================================================================

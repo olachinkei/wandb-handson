@@ -13,19 +13,19 @@ Where to look after running:
 - Code tab: Tracked functions and Agent SDK integration
 """
 
-import os
 import asyncio
 from dotenv import load_dotenv
 import weave
 from agents import Agent, Runner, function_tool, set_trace_processors
 from weave.integrations.openai_agents.openai_agents import WeaveTracingProcessor
 
+from config_loader import init_weave
+
 # Load environment variables
 load_dotenv()
 
 # Initialize Weave
-# Initialize with weave.init("entity/project")
-weave.init(f"{os.getenv('WANDB_ENTITY')}/{os.getenv('WANDB_PROJECT', 'weave-handson')}")
+init_weave()
 
 # Set WeaveTracingProcessor to enable tracing
 set_trace_processors([WeaveTracingProcessor()])
@@ -66,7 +66,6 @@ research_agent = Agent(
 )
 
 
-@weave.op()
 async def run_research(input: str) -> str:
     """Run Research Agent"""
     response = await Runner.run(research_agent, input)

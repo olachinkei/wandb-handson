@@ -16,22 +16,21 @@ Where to look after running:
 - Usage/Cost: Custom cost tracking
 """
 
-import os
 import time
 import uuid
 from dataclasses import dataclass
 from typing import Any
 from dotenv import load_dotenv
 import weave
+from weave.utils import sanitize
 
-from config_loader import chat_completion
+from config_loader import chat_completion, init_weave
 
 # Load environment variables
 load_dotenv()
 
 # Initialize Weave
-# Initialize with weave.init("entity/project")
-client = weave.init(f"{os.getenv('WANDB_ENTITY')}/{os.getenv('WANDB_PROJECT', 'weave-handson')}")
+client = init_weave()
 
 
 # =============================================================================
@@ -219,6 +218,34 @@ Keys masked by default:
 - auth_headers
 - authorization
 """)
+
+
+sanitize.add_redact_key("secret_token")
+
+
+@weave.op()
+def call_internal_service(payload: dict[str, Any]) -> dict[str, Any]:
+    """Sample used to verify key-name-based automatic masking.
+
+    payload["api_key"] is masked by default, and payload["secret_token"] is
+    masked after adding it with add_redact_key.
+    """
+    return {
+        "status": "ok",
+        "user_id": payload["user_id"],
+        "used_secret_token_suffix": payload["secret_token"][-4:],
+    }
+
+
+redact_keys_result = call_internal_service({
+    "user_id": "user_123",
+    "api_key": "sk-demo-api-key-1234567890",
+    "secret_token": "internal-secret-token-abcdef",
+    "request": "Create a summary for this user.",
+})
+print(f"Added secret_token to REDACT_KEYS: {sanitize.should_redact('secret_token')}")
+print(f"Result: {redact_keys_result}")
+print("Check the Weave UI Inputs to confirm api_key and secret_token are shown as REDACTED.")
 
 
 # =============================================================================

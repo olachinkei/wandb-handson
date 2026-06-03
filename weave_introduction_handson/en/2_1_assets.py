@@ -17,35 +17,19 @@ Where to look after running:
 
 import asyncio
 import json
-import os
-from pathlib import Path
 
 from dotenv import load_dotenv
 from openai import OpenAI
 import weave
 from weave import Dataset, Scorer
 
-from config_loader import chat_completion, get_model_name
+from config_loader import chat_completion, get_model_name, init_weave
 
 # Load environment variables
 load_dotenv()
 
 # Initialize Weave
-# Initialize with weave.init("entity/project")
-ENTITY = os.getenv("WANDB_ENTITY")
-PROJECT = os.getenv("WANDB_PROJECT", "weave-handson")
-weave.init(f"{ENTITY}/{PROJECT}")
-
-# Path to store asset references
-ASSETS_FILE = Path(__file__).parent.parent / "assets.json"
-
-
-def save_asset_ref(asset_type: str, name: str, ref: str):
-    """Save an asset reference to a local file."""
-    assets = json.load(open(ASSETS_FILE)) if ASSETS_FILE.exists() else {}
-    assets.setdefault(asset_type, {})[name] = ref
-    json.dump(assets, open(ASSETS_FILE, "w"), indent=2)
-    print(f"Saved {asset_type}/{name}: {ref}")
+init_weave()
 
 
 # =============================================================================
@@ -97,7 +81,7 @@ result = model_v2.predict("I has a big dog.")
 print(f"v2 result: {result}")
 
 model_ref = weave.publish(model_v2, name="grammar_corrector")
-save_asset_ref("models", "grammar_corrector", model_ref.uri())
+print(f"Published model: {model_ref.uri()}")
 
 retrieved_model = weave.ref(model_ref.uri()).get()
 print(f"Retrieved model: system_message={retrieved_model.system_message[:60]}...")
@@ -113,7 +97,7 @@ print("=" * 60)
 # StringPrompt - single string prompt
 system_prompt = weave.StringPrompt("You speak like a friendly pirate.")
 prompt_ref = weave.publish(system_prompt, name="pirate_prompt")
-save_asset_ref("prompts", "pirate_prompt", prompt_ref.uri())
+print(f"Published prompt: {prompt_ref.uri()}")
 
 messages = [
     {"role": "system", "content": system_prompt.format()},
@@ -130,7 +114,7 @@ messages_prompt = weave.MessagesPrompt(
     ]
 )
 messages_prompt_ref = weave.publish(messages_prompt, name="domain_expert_prompt")
-save_asset_ref("prompts", "domain_expert_prompt", messages_prompt_ref.uri())
+print(f"Published prompt: {messages_prompt_ref.uri()}")
 
 formatted = messages_prompt.format(
     domain="machine learning",
@@ -161,7 +145,7 @@ grammar_dataset = Dataset(
     ],
 )
 dataset_ref = weave.publish(grammar_dataset)
-save_asset_ref("datasets", "grammar_benchmark", dataset_ref.uri())
+print(f"Published dataset: {dataset_ref.uri()}")
 print(f"Published dataset: {len(grammar_dataset.rows)} rows")
 
 
@@ -174,7 +158,7 @@ _, call_1 = dummy_model.call("hello world")
 _, call_2 = dummy_model.call("weave is great")
 calls_dataset = Dataset.from_calls([call_1, call_2])
 calls_dataset_ref = weave.publish(calls_dataset, name="calls_dataset")
-save_asset_ref("datasets", "calls_dataset", calls_dataset_ref.uri())
+print(f"Published dataset from calls: {calls_dataset_ref.uri()}")
 print(f"Dataset from calls: {len(calls_dataset.rows)} rows")
 
 retrieved_dataset = weave.ref(dataset_ref.uri()).get()
@@ -236,7 +220,7 @@ class LengthScorer(Scorer):
 
 length_scorer = LengthScorer(min_length=20, max_length=200)
 length_ref = weave.publish(length_scorer, name="length_scorer")
-save_asset_ref("scorers", "length_scorer", length_ref.uri())
+print(f"Published scorer: {length_ref.uri()}")
 
 result = length_scorer.score({"answer": "This is a test response with some content."})
 print(f"Length score: {result}")
@@ -278,7 +262,7 @@ Return JSON: {{"score": 1-5, "reasoning": "brief explanation"}}""",
 
 judge = LLMJudgeScorer(criteria="accuracy and clarity")
 judge_ref = weave.publish(judge, name="llm_judge_scorer")
-save_asset_ref("scorers", "llm_judge_scorer", judge_ref.uri())
+print(f"Published scorer: {judge_ref.uri()}")
 
 result = judge.score("What is 2+2?", {"answer": "The answer is 4."})
 print(f"LLM Judge score: {result}")
@@ -344,7 +328,6 @@ except ImportError:
 print("\n" + "=" * 60)
 print("Assets and Scorers Demo Complete!")
 print("=" * 60)
-print(f"\nRegistered asset references: {ASSETS_FILE}")
 print("""
 Summary:
 - Create and publish weave.Model / Prompt / Dataset assets

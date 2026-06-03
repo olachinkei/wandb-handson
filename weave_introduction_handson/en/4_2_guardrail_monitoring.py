@@ -13,21 +13,19 @@ Where to look after running:
 - Saved Views: Monitoring views for calls that match specific conditions
 """
 
-import os
 import asyncio
 import random
 from dotenv import load_dotenv
 import weave
 from weave import Scorer
 
-from config_loader import chat_completion
+from config_loader import chat_completion, init_weave
 
 # Load environment variables
 load_dotenv()
 
 # Initialize Weave
-# Initialize with weave.init("entity/project")
-weave.init(f"{os.getenv('WANDB_ENTITY')}/{os.getenv('WANDB_PROJECT', 'weave-handson')}")
+init_weave()
 
 
 # =============================================================================

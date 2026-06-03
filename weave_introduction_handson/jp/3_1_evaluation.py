@@ -16,21 +16,19 @@
 """
 
 import asyncio
-import os
 
 from dotenv import load_dotenv
 from openai import OpenAI
 import weave
 from weave import Dataset, Evaluation
 
-from config_loader import get_model_name
+from config_loader import get_model_name, init_weave
 
 # Load environment variables
 load_dotenv()
 
 # Initialize Weave
-# weave.init("entity/project") で初期化
-weave.init(f"{os.getenv('WANDB_ENTITY')}/{os.getenv('WANDB_PROJECT', 'weave-handson')}")
+init_weave()
 
 
 # =============================================================================

@@ -14,20 +14,18 @@ Where to look after running:
 - Code tab: Tracked function definitions
 """
 
-import os
 import json
 import time
 from dotenv import load_dotenv
 import weave
 
-from config_loader import chat_completion
+from config_loader import chat_completion, init_weave
 
 # Load environment variables
 load_dotenv()
 
 # Initialize Weave
-# Initialize with weave.init("entity/project")
-weave.init(f"{os.getenv('WANDB_ENTITY')}/{os.getenv('WANDB_PROJECT', 'weave-handson')}")
+init_weave()
 
 
 # =============================================================================

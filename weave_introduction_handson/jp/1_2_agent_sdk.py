@@ -11,21 +11,31 @@
 ================================
 - Traces タブ: エージェント実行とツール呼び出し
 - Code タブ: トレースされた関数と Agent SDK 連携
+
+補足:
+================================
+このスクリプトでは、OpenAI Agents SDK と Weave の基本的な連携を扱います。
+Agent アプリケーションでは、LLM 呼び出しだけでなく、ツール実行や複数ステップの
+意思決定をまとめて追跡できることが重要です。
+
+Weave では Agent 向け Trace の新機能が開発されており、現時点では
+Public Preview として提供されています。最新の仕様は以下を確認してください。
+https://docs.wandb.ai/weave/guides/tracking/trace-agents
 """
 
-import os
 import asyncio
 from dotenv import load_dotenv
 import weave
 from agents import Agent, Runner, function_tool, set_trace_processors
 from weave.integrations.openai_agents.openai_agents import WeaveTracingProcessor
 
+from config_loader import init_weave
+
 # Load environment variables
 load_dotenv()
 
 # Initialize Weave
-# weave.init("entity/project") で初期化
-weave.init(f"{os.getenv('WANDB_ENTITY')}/{os.getenv('WANDB_PROJECT', 'weave-handson')}")
+init_weave()
 
 # WeaveTracingProcessor を設定してトレーシングを有効化
 set_trace_processors([WeaveTracingProcessor()])
@@ -66,7 +76,6 @@ research_agent = Agent(
 )
 
 
-@weave.op()
 async def run_research(input: str) -> str:
     """Research Agent を実行"""
     response = await Runner.run(research_agent, input)

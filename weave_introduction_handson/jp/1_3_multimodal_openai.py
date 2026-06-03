@@ -25,14 +25,17 @@ from typing import Annotated, Literal
 
 from dotenv import load_dotenv
 from openai import OpenAI
+from PIL import Image, ImageDraw
 import weave
 from weave import Content
+
+from config_loader import init_weave
 
 # Load environment variables
 load_dotenv()
 
 # Initialize Weave
-weave.init(f"{os.getenv('WANDB_ENTITY')}/{os.getenv('WANDB_PROJECT', 'weave-handson')}")
+init_weave()
 
 # OpenAI client
 client = OpenAI()
@@ -76,14 +79,22 @@ print("=" * 60)
 
 
 @weave.op()
-def fetch_jpg_image(
-    url: str = "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Example.jpg/640px-Example.jpg",
-) -> Annotated[bytes, Content[Literal["jpg"]]]:
-    """JPG 画像をバイト列として返し、Weave UI でプレビューできるようにします。"""
-    return download_bytes(url)
+def create_sample_jpg_image() -> Annotated[bytes, Content[Literal["jpg"]]]:
+    """サンプル JPG 画像を生成し、Weave UI でプレビューできるようにします。"""
+    image = Image.new("RGB", (640, 360), color=(244, 247, 251))
+    draw = ImageDraw.Draw(image)
+    draw.rectangle((0, 0, 640, 90), fill=(31, 64, 104))
+    draw.ellipse((72, 126, 252, 306), fill=(255, 195, 0), outline=(31, 64, 104), width=6)
+    draw.rounded_rectangle((330, 130, 568, 300), radius=24, fill=(82, 167, 255), outline=(31, 64, 104), width=6)
+    draw.line((92, 238, 232, 166), fill=(31, 64, 104), width=5)
+    draw.line((366, 166, 530, 264), fill=(255, 255, 255), width=8)
+
+    buffer = io.BytesIO()
+    image.save(buffer, format="JPEG", quality=90)
+    return buffer.getvalue()
 
 
-jpg_bytes = fetch_jpg_image()
+jpg_bytes = create_sample_jpg_image()
 print(f"JPG image size: {len(jpg_bytes):,} bytes")
 
 
