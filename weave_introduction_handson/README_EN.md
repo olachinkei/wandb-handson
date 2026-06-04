@@ -38,8 +38,6 @@ In Enterprise environments, only Admins can create Teams. Ask your Admin for an 
 - `1_2` Agent SDK (tool calls, Threads)
 - `1_3` Multimodal - OpenAI (image, audio, PDF)
 - `1_4` Advanced tracing (Display Name, Attributes, PII Redaction, Sampling)
-- `1_5` Playground (prompt experimentation: [documentation](https://docs.wandb.ai/weave/guides/tools/playground#use-the-playground-to-experiment-with-prompts))
-- `1_6` W&B Skills (W&B skills for AI agents: [wandb/skills](https://github.com/wandb/skills))
 
 **Note: Agent Tracing**
 
@@ -62,6 +60,15 @@ In this hands-on, `1_2` covers the basic integration between OpenAI Agents SDK a
 
 - `4_1` Online feedback (Reaction, Note, custom feedback)
 - `4_2` Guardrails and monitoring (using Scorers as guardrails)
+
+### 5. Other Useful Features
+
+- `5_1` W&B Skills / MCP (access W&B / Weave from AI agents: [Skills](https://github.com/wandb/skills), [MCP Server](https://docs.wandb.ai/platform/mcp-server))
+- `5_2` Automations (notifications and actions based on monitor metrics or trace activity: [documentation](https://docs.wandb.ai/weave/guides/evaluation/automations))
+- `5_3` Dynamic Leaderboards (persistent comparison views for Evaluation results: [documentation](https://docs.wandb.ai/weave/guides/evaluation/dynamic_leaderboards))
+- `5_4` Trace Plots (visualize cost, latency, and token usage: [documentation](https://docs.wandb.ai/weave/guides/tracking/trace-plots))
+- `5_5` Saved Views (save Trace / Eval filters, sorting, and columns: [documentation](https://docs.wandb.ai/weave/guides/tools/saved-views))
+- `5_6` Playground (re-run prompts and model settings from Traces: [documentation](https://docs.wandb.ai/weave/guides/tools/playground#use-the-playground-to-experiment-with-prompts))
 
 ## Environment Setup and Running Scripts
 
@@ -146,6 +153,10 @@ If this message does not appear, check the error message and review your environ
 - **W&B MCP Server**: [MCP Server Documentation](https://docs.wandb.ai/platform/mcp-server)
 - **Agent Trace**: [Trace agents](https://docs.wandb.ai/weave/guides/tracking/trace-agents)
 - **Built-in Scorers**: [Built-in Scorers](https://docs.wandb.ai/weave/guides/evaluation/builtin_scorers)
+- **Automations**: [Set up automations](https://docs.wandb.ai/weave/guides/evaluation/automations)
+- **Dynamic Leaderboards**: [Create dynamic Leaderboards](https://docs.wandb.ai/weave/guides/evaluation/dynamic_leaderboards)
+- **Trace Plots**: [Use trace plots](https://docs.wandb.ai/weave/guides/tracking/trace-plots)
+- **Saved Views**: [Create and manage saved views](https://docs.wandb.ai/weave/guides/tools/saved-views)
 - **Environment Variables**: [Environment Variables](https://docs.wandb.ai/weave/guides/core-types/env-vars)
 - **Videos**:
   - [Japanese Tutorial](https://www.youtube.com/watch?v=Ua0Wx9fqhDo&t=295s)
