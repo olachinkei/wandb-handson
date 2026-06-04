@@ -1,8 +1,10 @@
 # Weave Introduction Hands-on TypeScript
 
-W&B Weave を TypeScript / Node.js から使うためのハンズオンです。元の Python 版 `weave_introduction_handson` をベースに、TypeScript SDK で実行できる章と、Python SDK 専用または UI 操作中心の章を分けています。
+W&B Weave を TypeScript / Node.js から使うためのハンズオンです。
 
-詳しい対応状況は [docs/typescript-support.md](docs/typescript-support.md) を確認してください。
+元の Python 版 `weave_introduction_handson` をベースにしていますが、Python SDK と TypeScript SDK では対応している API が完全には同じではありません。この TypeScript 版では、実行できるもの、TypeScript では代替実装になるもの、現時点では未対応として説明だけにしているものを明確に分けています。
+
+詳しい対応表は [docs/typescript-support.md](docs/typescript-support.md) も確認してください。
 
 ## セットアップ
 
@@ -12,91 +14,149 @@ npm install
 cp .env.example .env
 ```
 
-`.env` に `WANDB_API_KEY` と `OPENAI_API_KEY` を設定します。Team を使う場合は `WANDB_ENTITY`、Dedicated Cloud / self-managed を使う場合は `WANDB_BASE_URL` も設定してください。
+`.env` に最低限、次の 2 つを設定します。
+
+```bash
+WANDB_API_KEY=...
+OPENAI_API_KEY=...
+```
+
+Team project に trace を保存する場合は `WANDB_ENTITY` も設定します。
+
+```bash
+WANDB_ENTITY=your_team_name
+WANDB_PROJECT=weave-handson-typescript
+```
+
+Dedicated Cloud / self-managed W&B を使う場合は `WANDB_BASE_URL` も設定してください。
+
+```bash
+WANDB_BASE_URL=https://your-instance.wandb.io
+```
+
+`RUN_EXPENSIVE_MULTIMODAL=1` は `.env.example` でデフォルト設定しています。`1_3_multimodal_openai.ts` で画像生成や音声生成を実行するためのフラグです。
 
 ## 実行方法
 
-TypeScript のソースコードは `jp/*.ts` にあります。Node.js はそのまま `.ts` を実行しないため、まず `npm run build` で JavaScript に変換します。変換後のファイルは `dist/jp/*.js` に出力されます。
+TypeScript のソースコードは `jp/*.ts` にあります。Node.js は通常そのまま `.ts` を実行しないため、まず `npm run build` で JavaScript に変換します。
 
-Weave の TypeScript SDK では、OpenAI SDK などを自動でトレースするために、アプリ本体より先に Weave の計装コードを読み込む必要があります。そのため、ビルド後の JavaScript は `node --import=weave/instrument ...` で起動します。
+変換後のファイルは `dist/jp/*.js` に出力されます。
 
-たとえば `jp/1_1_basic_trace.ts` は、ビルド後に `dist/jp/1_1_basic_trace.js` になり、次のように実行されます。
+例:
 
-```bash
-npm run build
-node --import=weave/instrument dist/jp/1_1_basic_trace.js
+```text
+jp/1_1_basic_trace.ts
+-> dist/jp/1_1_basic_trace.js
 ```
-
-`--import=weave/instrument` は、OpenAI SDK が読み込まれる前に Weave の自動計装を有効化するための Node.js オプションです。これを付けることで、`weave.op(...)` で囲んだ関数だけでなく、OpenAI SDK の呼び出しも Weave の Trace として記録されやすくなります。
-
-## OpenAI integration のバージョン注意
-
-この教材では **通常の OpenAI SDK integration を優先** しています。検証時点では、次の最新系の組み合わせで OpenAI SDK の呼び出しが Library Integration として trace されることを確認しています。
-
-```json
-{
-  "openai": "^6.42.0",
-  "weave": "^0.15.1"
-}
-```
-
-OpenAI client は通常の OpenAI SDK と同じように作成します。この教材では named import を使っています。
-
-```ts
-import { OpenAI } from "openai";
-
-const openai = new OpenAI();
-```
-
-この形にすると、`node --import=weave/instrument ...` で起動したときに `openai.chat.completions.create(...)` が `openai.chat.completions.create` という子 Trace として記録されます。
-
-注意点:
-
-- `weave@0.9.3` では `openai@6` の自動 trace が期待通りに動かないケースがありました。`openai@6` を使う場合は `weave@0.15.1` 以降を使ってください。
-- 最新 Weave では、patched function に `__isOp` が付くとは限りません。検証では `openai.chat.completions.create` が `wrappedWithAgents` に置き換わることを確認しています。
-- OpenAI Agents SDK integration は `1_2_agent_sdk.ts` で実行例として扱っています。
-- TypeScript で Agent SDK integration が必要な場合は、W&B までご連絡ください。
 
 よく使う章は `package.json` にショートカットを用意しています。
 
 ```bash
 npm run run:1_1
 npm run run:1_2
+npm run run:1_3
+npm run run:1_4
+npm run run:2_1
 npm run run:3_1
+npm run run:3_2
+npm run run:4_2
+npm run run:4_3
 ```
 
-`npm run run:1_1` は内部的には次と同じです。
+たとえば `npm run run:1_1` は内部的には次と同じです。
 
 ```bash
 npm run build
 node --import=weave/instrument dist/jp/1_1_basic_trace.js
 ```
 
+## `node --import=weave/instrument` とは
+
+TypeScript SDK の OpenAI integration では、アプリ本体より先に Weave の計装コードを読み込む必要があります。
+
+そのため、この教材ではビルド後の JavaScript を次の形で起動します。
+
+```bash
+node --import=weave/instrument dist/jp/1_1_basic_trace.js
+```
+
+`--import=weave/instrument` は Node.js の ESM preload です。OpenAI SDK が読み込まれる前に Weave の instrument を先に読み込み、`openai.chat.completions.create(...)` などの呼び出しを自動 trace できるようにします。
+
+`weave.op(...)` で明示的に包んだ通常の関数は、基本的にこの自動計装とは別に trace されます。一方で OpenAI SDK などの library integration を安定して trace するには、この `--import` 付きで起動するのが重要です。
+
+Node.js のバージョンによっては、Weave 側の instrument 読み込み時に `DEP0205` の deprecation warning が表示されることがあります。ハンズオンの実行自体や trace 記録が成功していれば、その警告は Node.js / SDK 側の警告として扱ってください。
+
+## TypeScript / ESM について
+
+このプロジェクトは `package.json` で `"type": "module"` を指定しているため、Node.js の ESM として動きます。
+
+そのため、import は次のように書きます。
+
+```ts
+import { OpenAI } from "openai";
+import * as weave from "weave";
+import { initWeave } from "../src/config.js";
+```
+
+TypeScript のソースでは `../src/config.js` のように `.js` 拡張子で import しています。これは ESM の実行時にはビルド後の JavaScript ファイルを読むためです。ソースは `.ts` ですが、実行されるのは `dist/src/config.js` です。
+
+## `await` の考え方
+
+`await` は「Promise が完了するまで待つ」ための JavaScript / TypeScript の書き方です。Weave 専用の書き方ではありません。
+
+同期関数を `weave.op(...)` で包んだだけなら、通常は `await` は不要です。
+
+```ts
+const echo = weave.op(function echo(text: string): string {
+  return text;
+});
+
+const result = echo("hello");
+```
+
+OpenAI API 呼び出しのように非同期処理をする関数は `async` になり、呼び出し側で `await` が必要です。
+
+```ts
+const answer = await openai.chat.completions.create({
+  model: "gpt-4o-mini",
+  messages: [{ role: "user", content: "Hello" }],
+});
+```
+
 ## Agenda
 
 ### 1. Tracing
 
-- `1_1` 基本的なトレーシング: 対応
-- `1_2` OpenAI Agents SDK Integration: 対応。`@openai/agents` と `weave.instrumentOpenAIAgents()` を使用
-- `1_3` マルチモーダル: Python は PNG / JPG / MP3 / MP4 / PDF / HTML を media preview として trace。TypeScript は PNG / WAV は対応、JPG / MP3 / MP4 / PDF / HTML は metadata trace のみ
-- `1_4` 高度なトレーシング: display name と attributes は対応。cost / Presidio PII redaction / sampling は TypeScript SDK-level API なし
+| 章 | ファイル | TypeScript 対応 | 内容 |
+| --- | --- | --- | --- |
+| `1_1` | `jp/1_1_basic_trace.ts` | 対応 | 基本的な `weave.op(...)`、OpenAI SDK integration、nested op |
+| `1_2` | `jp/1_2_agent_sdk.ts` | 対応 | OpenAI Agents SDK integration。Agent run / tool call / model call を trace |
+| `1_3` | `jp/1_3_multimodal_openai.ts` | 一部対応 | PNG / WAV は TypeScript helper で media preview。JPG / MP3 / MP4 / PDF / HTML は未対応説明のみ |
+| `1_4` | `jp/1_4_advanced_trace.ts` | 一部対応 | display name / attributes は対応。cost / Presidio PII redaction / sampling は SDK-level API 未対応 |
 
 ### 2. Asset Management
 
-- `2_1` Dataset、Prompt、function-based scorer は対応
-- `weave.Model` は現状 Python SDK のみ。TypeScript では Model asset として保存せず、traced function の実行を Traces に記録。`weave.Scorer` 継承、built-in scorers も Python 版の説明として整理
+| 章 | ファイル | TypeScript 対応 | 内容 |
+| --- | --- | --- | --- |
+| `2_1` | `jp/2_1_assets.ts` | 一部対応 | Dataset、Prompt、function-based scorer は対応。`weave.Model` は現状 Python SDK のみ |
+
+TypeScript SDK では `weave.Model` が public export されていないため、この教材では Model asset として保存せず、モデル実行を traced function として記録します。
 
 ### 3. Evaluation
 
-- `3_1` `weave.Evaluation`: 対応
-- `3_2` `EvaluationLogger`: 対応。`logPrediction()` / `logScore()` / `finish()` / `logSummary()` を使用
-- `3_3` Annotation Queue: UI 機能として説明
+| 章 | ファイル | TypeScript 対応 | 内容 |
+| --- | --- | --- | --- |
+| `3_1` | `jp/3_1_evaluation.ts` | 対応 | `weave.Evaluation`。同じ eval 名 / model 名で、弱い prompt と強い prompt を比較 |
+| `3_2` | `jp/3_2_evaluation_logger.ts` | 対応 | `EvaluationLogger` / `ScoreLogger` による逐次 logging |
+| `3_3` | `jp/3_3_annotation_queue.ts` | UI 機能 | Annotation Queue の使い方を説明 |
 
 ### 4. Monitoring
 
-- `4_1` Online Feedback: Python の高水準 feedback API 中心のため説明のみ
-- `4_2` Guardrails: TypeScript SDK-level API は未対応
-- `4_3` Custom Monitors: TypeScript で monitor 対象 op と trace を作成。Custom Monitor の作成、judge model、prompt、sampling rate は Weave UI で設定
+| 章 | ファイル | TypeScript 対応 | 内容 |
+| --- | --- | --- | --- |
+| `4_1` | `jp/4_1_online_feedback.ts` | 説明のみ | Python の高水準 feedback API 中心 |
+| `4_2` | `jp/4_2_guardrail_monitoring.ts` | 未対応 | Python の `Scorer` class / `call.apply_scorer()` guardrail API は TypeScript SDK-level API として未対応 |
+| `4_3` | `jp/4_3_monitors.ts` | 一部対応 | monitor 対象 op と trace は TypeScript で作成。Custom Monitor は Weave UI で設定 |
 
 ### 5. その他便利な機能
 
@@ -106,6 +166,7 @@ node --import=weave/instrument dist/jp/1_1_basic_trace.js
 
 - W&B Weave TypeScript SDK: https://docs.wandb.ai/weave/reference/typescript-sdk
 - TypeScript SDK integration guide: https://docs.wandb.ai/weave/guides/integrations/js
+- Attributes TypeScript guide: https://docs.wandb.ai/weave/guides/tools/attributes#typescript
+- EvaluationLogger TypeScript guide: https://docs.wandb.ai/weave/guides/evaluation/evaluation_logger#typescript
+- Custom Monitors: https://docs.wandb.ai/weave/guides/evaluation/custom-monitors
 - Built-in scorers: https://docs.wandb.ai/weave/guides/evaluation/builtin_scorers
-
-OpenAI Agents SDK integration は `1_2_agent_sdk.ts` で扱います。CrewAI、AutoGen、LlamaIndex、LangChain など Python 側で対応している他の Agent / orchestration integration について、TypeScript 対応の要望がある場合は W&B までご連絡ください。
