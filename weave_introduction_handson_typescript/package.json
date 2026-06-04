@@ -1,0 +1,31 @@
+{
+  "name": "weave-introduction-handson-typescript",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "TypeScript version of the W&B Weave introduction hands-on.",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "run:1_1": "npm run build && node --import=weave/instrument dist/jp/1_1_basic_trace.js",
+    "run:1_2": "npm run build && node --import=weave/instrument dist/jp/1_2_agent_sdk.js",
+    "run:1_3": "npm run build && node --import=weave/instrument dist/jp/1_3_multimodal_openai.js",
+    "run:1_4": "npm run build && node --import=weave/instrument dist/jp/1_4_advanced_trace.js",
+    "run:2_1": "npm run build && node --import=weave/instrument dist/jp/2_1_assets.js",
+    "run:3_1": "npm run build && node --import=weave/instrument dist/jp/3_1_evaluation.js",
+    "run:3_2": "npm run build && node --import=weave/instrument dist/jp/3_2_evaluation_logger.js",
+    "run:4_2": "npm run build && node --import=weave/instrument dist/jp/4_2_guardrail_monitoring.js",
+    "run:4_3": "npm run build && node --import=weave/instrument dist/jp/4_3_monitors.js"
+  },
+  "dependencies": {
+    "@openai/agents": "^0.11.6",
+    "dotenv": "^17.2.3",
+    "openai": "^6.42.0",
+    "weave": "^0.15.1",
+    "yaml": "^2.8.1",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "typescript": "^5.9.3"
+  }
+}
