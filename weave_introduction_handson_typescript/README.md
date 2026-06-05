@@ -9,7 +9,7 @@ W&B Weave を TypeScript / Node.js から使うためのハンズオンです。
 ## セットアップ
 
 ```bash
-cd /Users/keisuke/Project/wandb-handson/weave_introduction_handson_typescript
+cd wandb-handson/weave_introduction_handson_typescript
 npm install
 cp .env.example .env
 ```
