@@ -178,16 +178,16 @@ Before starting the hands-on, verify authentication, dependencies, and the core 
 python test.py
 ```
 
-`test.py` runs the Japanese reference implementations in this order:
+`test.py` creates the following minimal set of objects for a quick check:
 
-1. Experiment Tracking: log Runs, Config, and Metrics
-2. Tables and Rich Media: log Tables, images, and masks
-3. Artifacts: create Datasets, a Model, and Lineage
-4. Reports: create a draft Report summarizing the results
+1. Experiment Run: one Run with Config and three metric steps
+2. Table: one Table containing the same experiment results
+3. Artifact: one Artifact containing the results as JSON
+4. Report: one draft Report with a single experiment metrics chart
 
 This is not a dry run. It creates real Runs, Artifacts, and a draft Report in the currently selected W&B Entity and Project. Before the workflow starts, verify that the printed Entity, Project, and URL point to the intended destination.
 
-The core pre-course check is complete when `ALL CHECKS PASSED` appears. If a chapter fails, fix the displayed error and run the same command again.
+The core pre-course check is complete when `ALL CHECKS PASSED` appears. If it fails, fix the displayed error and run the same command again.
 
 Sweeps, Registry, and Extended Capabilities are not included in this check.
 

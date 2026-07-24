@@ -1,39 +1,30 @@
-"""Run the core W&B Models hands-on workflow as a pre-course check.
+"""W&B Models ハンズオンの主要機能を最小構成で事前確認する。
 
-This script executes the Japanese reference implementations in this order:
+実際に次のオブジェクトを作成します。
 
-1. Experiment Tracking
-2. Tables and Rich Media
-3. Artifacts
-4. Reports
-
-The check creates real W&B Runs, Artifacts, and a draft Report in the selected
-Entity and Project. It does not run Sweeps, Registry, or Extended Capabilities.
+- Experiment Run: 1つ
+- Table: 1つ
+- Artifact: 1つ
+- Draft Report: 1つ
 """
 
 from __future__ import annotations
 
 import importlib
+import json
 import os
-from pathlib import Path
-import runpy
 import sys
 import time
 
 
-ROOT = Path(__file__).resolve().parent
 DEFAULT_PROJECT = "wandb-models-handson"
-REQUIRED_PACKAGES = ("numpy", "wandb", "wandb_workspaces")
-STEPS = (
-    ("Experiment Tracking", ROOT / "jp" / "1_experiment.py"),
-    ("Tables and Rich Media", ROOT / "jp" / "2_table.py"),
-    ("Artifacts", ROOT / "jp" / "3_artifacts.py"),
-    ("Reports", ROOT / "jp" / "6_report.py"),
-)
+RUN_NAME = "pre-course-check"
+ARTIFACT_NAME = "pre-course-check-data"
+REQUIRED_PACKAGES = ("wandb", "wandb_workspaces")
 
 
 def check_dependencies() -> None:
-    """Fail early when a package required by the workflow is unavailable."""
+    """事前確認に必要なパッケージが入っていることを確認する。"""
     missing: list[str] = []
     for package in REQUIRED_PACKAGES:
         try:
@@ -42,86 +33,153 @@ def check_dependencies() -> None:
             missing.append(package)
 
     if missing:
-        names = ", ".join(missing)
         raise RuntimeError(
-            f"Missing required packages: {names}\n"
-            "Run `uv sync` in the models_handson directory and try again."
+            f"必要なパッケージが不足しています: {', '.join(missing)}\n"
+            "models_handson ディレクトリで `uv sync` を実行してください。"
         )
 
 
 def resolve_wandb_destination() -> tuple[str, str]:
-    """Verify W&B authentication and return the resolved Entity and Project."""
+    """W&B のログイン状態を確認し、保存先を返す。"""
     import wandb
 
     try:
-        entity = wandb.Api(timeout=30).default_entity
+        entity = os.getenv("WANDB_ENTITY") or wandb.Api(timeout=30).default_entity
     except Exception as error:
         raise RuntimeError(
-            "Could not authenticate with W&B. Run `wandb login`, then try again."
+            "W&B に接続できません。`wandb login` を実行してください。"
         ) from error
 
     if not entity:
         raise RuntimeError(
-            "W&B could not resolve a destination Entity. Set WANDB_ENTITY or "
-            "log in with `wandb login`."
+            "W&B Entity を特定できません。`wandb login` を実行するか、"
+            "WANDB_ENTITY を設定してください。"
         )
 
-    return entity, os.getenv("WANDB_PROJECT", DEFAULT_PROJECT)
+    project = os.getenv("WANDB_PROJECT", DEFAULT_PROJECT)
+    return entity, project
 
 
-def run_step(index: int, name: str, script: Path) -> float:
-    """Execute one chapter and return its elapsed time."""
-    print(f"\n{'=' * 72}")
-    print(f"[{index}/{len(STEPS)}] {name}")
-    print(f"Script: {script.relative_to(ROOT)}")
-    print("=" * 72)
+def create_run(project: str) -> str:
+    """1 Run にExperiment、1 Table、1 Artifactを記録する。"""
+    import wandb
 
-    started_at = time.monotonic()
-    try:
-        runpy.run_path(str(script), run_name="__main__")
-    except Exception as error:
-        elapsed = time.monotonic() - started_at
-        print(f"\nFAILED: {name} ({elapsed:.1f}s)", file=sys.stderr)
-        print(
-            "Fix the error shown above, then run `python test.py` again.",
-            file=sys.stderr,
+    rows = [
+        {"epoch": 0, "train/loss": 1.00, "val/accuracy": 0.55},
+        {"epoch": 1, "train/loss": 0.72, "val/accuracy": 0.68},
+        {"epoch": 2, "train/loss": 0.51, "val/accuracy": 0.79},
+    ]
+
+    with wandb.init(
+        project=project,
+        name=RUN_NAME,
+        job_type="pre-course-check",
+        config={"learning_rate": 0.01, "epochs": len(rows)},
+    ) as run:
+        # Experiment: 1つのRunへ短い学習曲線を記録する。
+        for row in rows:
+            run.log(
+                {
+                    "epoch": row["epoch"],
+                    "train/loss": row["train/loss"],
+                    "val/accuracy": row["val/accuracy"],
+                }
+            )
+
+        # Table: 上と同じ結果を1つのTableとして記録する。
+        table = wandb.Table(
+            columns=["epoch", "train/loss", "val/accuracy"],
+            data=[
+                [row["epoch"], row["train/loss"], row["val/accuracy"]]
+                for row in rows
+            ],
         )
-        raise
+        run.log({"evaluation/table": table})
 
-    elapsed = time.monotonic() - started_at
-    print(f"\nPASSED: {name} ({elapsed:.1f}s)")
-    return elapsed
+        # Artifact: 結果JSONを1つのArtifactとして記録する。
+        artifact = wandb.Artifact(
+            name=ARTIFACT_NAME,
+            type="dataset",
+            description="受講前確認用の最小データ",
+            metadata={"rows": len(rows)},
+        )
+        with artifact.new_file("metrics.json", mode="w", encoding="utf-8") as file:
+            json.dump(rows, file, ensure_ascii=False, indent=2)
+        run.log_artifact(artifact)
+
+        run.summary["best/val_accuracy"] = max(
+            row["val/accuracy"] for row in rows
+        )
+        run_url = run.url
+
+    return run_url
+
+
+def create_report(entity: str, project: str, run_url: str) -> str:
+    """事前確認Runのグラフを1枚だけ含む簡素なDraft Reportを作成する。"""
+    import wandb_workspaces.reports.v2 as wr
+
+    runs = wr.Runset(
+        entity=entity,
+        project=project,
+        name="Pre-course check run",
+        filters="Metric('jobType') == 'pre-course-check'",
+    )
+    report = wr.Report(
+        entity=entity,
+        project=project,
+        title="W&B Models Pre-course Check",
+        description="Experiment、Table、Artifactの作成確認",
+        width="readable",
+        blocks=[
+            wr.MarkdownBlock(
+                text=(
+                    "事前確認用の最小Runです。"
+                    f"[作成したRunを開く]({run_url})"
+                )
+            ),
+            wr.PanelGrid(
+                runsets=[runs],
+                panels=[
+                    wr.LinePlot(
+                        title="Experiment metrics",
+                        x="epoch",
+                        y=["train/loss", "val/accuracy"],
+                    )
+                ],
+            ),
+        ],
+    )
+    report.save(draft=True)
+    return report.url
 
 
 def main() -> None:
-    os.chdir(ROOT)
     check_dependencies()
     entity, project = resolve_wandb_destination()
 
-    print("W&B Models pre-course check")
+    print("W&B Models 事前確認を開始します。")
     print(f"Python:  {sys.executable}")
     print(f"Entity:  {entity}")
     print(f"Project: {project}")
-    print(f"URL:     https://wandb.ai/{entity}/{project}")
-    print()
-    print("This check creates real Runs, Artifacts, and a draft Report.")
+    print("1 Run、1 Table、1 Artifact、1 Draft Reportを作成します。")
 
-    total_started_at = time.monotonic()
-    timings = [
-        (name, run_step(index, name, script))
-        for index, (name, script) in enumerate(STEPS, start=1)
-    ]
-    total_elapsed = time.monotonic() - total_started_at
+    started_at = time.monotonic()
+    run_url = create_run(project)
+    report_url = create_report(entity, project, run_url)
+    elapsed = time.monotonic() - started_at
 
-    print(f"\n{'=' * 72}")
+    print("\n" + "=" * 72)
     print("ALL CHECKS PASSED")
     print("=" * 72)
-    for name, elapsed in timings:
-        print(f"- {name}: {elapsed:.1f}s")
-    print(f"Total: {total_elapsed:.1f}s")
-    print(f"Project: https://wandb.ai/{entity}/{project}")
-    print("Open the Project and confirm the Runs, Tables, Artifacts, and draft Report.")
+    print(f"Run:    {run_url}")
+    print(f"Report: {report_url}")
+    print(f"Total:  {elapsed:.1f}秒")
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as error:
+        print(f"\n[FAILED] {error}", file=sys.stderr)
+        raise SystemExit(1) from error

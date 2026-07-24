@@ -40,6 +40,10 @@ init_weave()
 # OpenAI client
 client = OpenAI()
 
+# test.py から画像の確認だけを実行するためのモード。
+# 未設定時は、従来どおりすべてのメディア例を実行します。
+IMAGE_ONLY = os.getenv("WEAVE_MULTIMODAL_IMAGE_ONLY") == "1"
+
 
 def download_bytes(url: str, timeout: int = 60) -> bytes:
     """URL からバイト列を取得する小さなヘルパー。"""
@@ -101,9 +105,10 @@ print(f"JPG image size: {len(jpg_bytes):,} bytes")
 # =============================================================================
 # 3. 音声 (MP3) - OpenAI TTS
 # =============================================================================
-print("\n" + "=" * 60)
-print("3. 音声 (MP3) - OpenAI TTS")
-print("=" * 60)
+if not IMAGE_ONLY:
+    print("\n" + "=" * 60)
+    print("3. 音声 (MP3) - OpenAI TTS")
+    print("=" * 60)
 
 
 @weave.op()
@@ -122,18 +127,20 @@ def text_to_speech(text: str, voice: str = "alloy") -> Annotated[bytes, Content[
     return b"".join(response.iter_bytes())
 
 
-audio_bytes = text_to_speech(
-    "Weights and Biases Weave helps you trace, evaluate, and monitor LLM applications."
-)
-print(f"MP3 audio size: {len(audio_bytes):,} bytes")
+if not IMAGE_ONLY:
+    audio_bytes = text_to_speech(
+        "Weights and Biases Weave helps you trace, evaluate, and monitor LLM applications."
+    )
+    print(f"MP3 audio size: {len(audio_bytes):,} bytes")
 
 
 # =============================================================================
 # 4. 動画 (MP4) - OpenAI Sora 2
 # =============================================================================
-print("\n" + "=" * 60)
-print("4. 動画 (MP4) - OpenAI Sora 2")
-print("=" * 60)
+if not IMAGE_ONLY:
+    print("\n" + "=" * 60)
+    print("4. 動画 (MP4) - OpenAI Sora 2")
+    print("=" * 60)
 
 
 @weave.op()
@@ -162,19 +169,20 @@ def generate_video(
             return f.read()
 
 
-if os.getenv("RUN_EXPENSIVE_MULTIMODAL") == "1":
+if not IMAGE_ONLY and os.getenv("RUN_EXPENSIVE_MULTIMODAL") == "1":
     video_bytes = generate_video()
     print(f"MP4 video size: {len(video_bytes):,} bytes")
-else:
+elif not IMAGE_ONLY:
     print("RUN_EXPENSIVE_MULTIMODAL=1 を設定すると、Sora 2 の動画生成例を実行します。")
 
 
 # =============================================================================
 # 5. PDF - arXiv 論文
 # =============================================================================
-print("\n" + "=" * 60)
-print("5. PDF - arXiv 論文")
-print("=" * 60)
+if not IMAGE_ONLY:
+    print("\n" + "=" * 60)
+    print("5. PDF - arXiv 論文")
+    print("=" * 60)
 
 
 @weave.op()
@@ -183,16 +191,18 @@ def fetch_arxiv_pdf(paper_id: str = "1706.03762") -> Annotated[bytes, Content[Li
     return download_bytes(f"https://arxiv.org/pdf/{paper_id}.pdf", timeout=60)
 
 
-pdf_bytes = fetch_arxiv_pdf()
-print(f"PDF size: {len(pdf_bytes):,} bytes")
+if not IMAGE_ONLY:
+    pdf_bytes = fetch_arxiv_pdf()
+    print(f"PDF size: {len(pdf_bytes):,} bytes")
 
 
 # =============================================================================
 # 6. HTML - Web ページ
 # =============================================================================
-print("\n" + "=" * 60)
-print("6. HTML - Web ページ")
-print("=" * 60)
+if not IMAGE_ONLY:
+    print("\n" + "=" * 60)
+    print("6. HTML - Web ページ")
+    print("=" * 60)
 
 
 @weave.op()
@@ -201,14 +211,29 @@ def fetch_html(url: str = "https://example.com") -> Annotated[bytes, Content[Lit
     return download_bytes(url, timeout=30)
 
 
-html_bytes = fetch_html()
-print(f"HTML size: {len(html_bytes):,} bytes")
+if not IMAGE_ONLY:
+    html_bytes = fetch_html()
+    print(f"HTML size: {len(html_bytes):,} bytes")
 
 
 print("\n" + "=" * 60)
-print("Multimodal Data Tracing Demo Complete!")
+if IMAGE_ONLY:
+    print("Multimodal Image Tracing Check Complete!")
+else:
+    print("Multimodal Data Tracing Demo Complete!")
 print("=" * 60)
-print("""
+if IMAGE_ONLY:
+    print("""
+まとめ:
+- Annotated[bytes, Content[Literal["png"]]]: PNG 画像
+- Annotated[bytes, Content[Literal["jpg"]]]: JPG 画像
+
+Weave UI で確認:
+- Traces タブで PNG/JPG 画像のプレビューを確認
+- Inputs/Outputs で Content 型として保存された payload を確認
+""")
+else:
+    print("""
 まとめ:
 - Annotated[bytes, Content[Literal["png"]]]: PNG 画像
 - Annotated[bytes, Content[Literal["jpg"]]]: JPG 画像

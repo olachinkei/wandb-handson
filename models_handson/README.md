@@ -178,16 +178,16 @@ source .venv/bin/activate  # Windows: .venv\Scripts\activate
 python test.py
 ```
 
-`test.py` は日本語版の実装を使い、次の順番で実行します。
+`test.py` は短時間で確認できる最小構成として、次のオブジェクトを作成します。
 
-1. Experiment Tracking: Run、Config、Metricsの記録
-2. Tables and Rich Media: Table、画像、マスクの記録
-3. Artifacts: Dataset、Model、Lineageの作成
-4. Reports: 結果をまとめたDraft Reportの作成
+1. Experiment Run: 3ステップのConfigとMetricsを記録するRunを1つ
+2. Table: 同じ実験結果をまとめたTableを1つ
+3. Artifact: 実験結果のJSONを含むArtifactを1つ
+4. Report: 実験メトリクスのグラフを1枚含むDraft Reportを1つ
 
 この確認はDry Runではありません。現在選択されているW&B EntityとProjectに、実際のRun、Artifact、Draft Reportを作成します。実行開始時に表示されるEntity、Project、URLが意図した保存先であることを確認してください。
 
-最後に `ALL CHECKS PASSED` と表示されれば、主要機能の事前確認は完了です。途中で失敗した場合は、表示された章とエラーを修正してから、同じコマンドを再実行してください。
+最後に `ALL CHECKS PASSED` と表示されれば、主要機能の事前確認は完了です。途中で失敗した場合は、表示されたエラーを修正してから、同じコマンドを再実行してください。
 
 Sweeps、Registry、Extended Capabilitiesはこの一括確認には含まれません。
 
