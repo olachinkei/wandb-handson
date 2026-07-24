@@ -1,5 +1,5 @@
 """
-1_4: Advanced Trace - Advanced tracing
+1_2: Advanced Trace - Advanced tracing
 
 What you'll learn in this script:
 ================================

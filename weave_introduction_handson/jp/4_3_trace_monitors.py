@@ -1,18 +1,23 @@
 """
-4_3: Monitors - built-in signals による継続評価
+4_3: Trace Monitors - built-in signals による継続評価
 
 ==========================================================
-Monitors とは
+Trace に対する online evaluation = Monitors
 ==========================================================
 
-Monitors は、本番環境で発生する Trace を継続的に評価し、
-品質やエラーの傾向を把握するための機能です。
+Weave では、本番環境で発生する Trace（@weave.op でトラッキングされた
+通常の関数呼び出しや LLM 呼び出し）に対する online evaluation の仕組みを
+Monitors と呼びます。
 
 個々の Trace を詳しく見ることはデバッグに有効ですが、本番環境では
 大量の Trace が発生します。すべてを人間が確認するのは現実的ではありません。
 
 Monitors を使うと、built-in signals や custom monitor によって、
 新しく入ってくる Trace を継続的にスコアリングできます。
+
+補足: Agent（会話・ターン）に対する online evaluation は、本スクリプトの
+Monitors とは別の Signals という機能で提供されます。詳しくは
+4_4_agent_signals.py を参照してください。
 
 ==========================================================
 built-in signals とは
@@ -72,12 +77,18 @@ built-in signals は、Weave が提供するプリセットのスコアラーで
 オフライン評価、アノテーション、本番監視をつなげることで、
 LLM アプリケーションを継続的に改善できます。
 
+1_4〜1_6 で扱った Agent（会話・ターン）の継続評価には、Monitors ではなく
+Signals を使います。4_4_agent_signals.py を参照してください。
+
 ==========================================================
 参考リンク
 ==========================================================
 
 Monitor using built-in signals:
 https://docs.wandb.ai/weave/guides/evaluation/monitors
+
+Agent Signals（Agent の継続評価）:
+https://docs.wandb.ai/weave/guides/tracking/view-agent-signals
 
 ==========================================================
 Note

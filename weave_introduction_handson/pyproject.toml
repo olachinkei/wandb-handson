@@ -20,5 +20,5 @@ dependencies = [
     "pyyaml>=6.0.0",
     "reportlab>=4.4.9",
     "wandb>=0.27.0",
-    "weave>=0.52.22",
+    "weave>=0.53.2",
 ]

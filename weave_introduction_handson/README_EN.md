@@ -35,15 +35,17 @@ In Enterprise environments, only Admins can create Teams. Ask your Admin for an 
 ### 1. Tracing
 
 - `1_1` Basic tracing (@weave.op, Library Integration, error tracking)
-- `1_2` Agent SDK (tool calls, Threads)
+- `1_2` Advanced tracing (Display Name, Attributes, PII Redaction, Sampling)
 - `1_3` Multimodal - OpenAI (image, audio, PDF)
-- `1_4` Advanced tracing (Display Name, Attributes, PII Redaction, Sampling)
+- `1_4` Agent Integration (integrating with frameworks such as the OpenAI Agents SDK)
+- `1_5` Agent SDK (manual instrumentation of conversations, turns, LLMs, and tools)
+- `1_6` Agent advanced (Attributes, Batch logging, Sub-agents)
 
 **Note: Agent Tracing**
 
 For agent applications, it is important to trace not only LLM calls, but also tool execution, subtasks, and multi-step decision making. Weave is developing new Agent Trace features, currently available as Public Preview.
 
-In this hands-on, `1_2` covers the basic integration between OpenAI Agents SDK and Weave. Public Preview Agent Trace features may change, so refer to the [official Agent Trace documentation](https://docs.wandb.ai/weave/guides/tracking/trace-agents) when using them.
+In this hands-on, `1_4`–`1_6` cover Agent Tracing: `1_4` integrates with frameworks such as the OpenAI Agents SDK, `1_5` shows manual instrumentation with the Weave Agent SDK, and `1_6` covers advanced topics (attributes, batch logging, sub-agents). Note that `1_5` and `1_6` require weave >= 0.53.x. Public Preview Agent Trace features may change, so refer to the [official Agent Trace documentation](https://docs.wandb.ai/weave/guides/tracking/trace-agents) when using them.
 
 ### 2. Asset Management
 

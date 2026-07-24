@@ -34,15 +34,17 @@ Enterprise 環境では、Team の作成は Admin のみが行えます。既存
 ### 1. Tracing (トレーシング)
 
 - `1_1` 基本的なトレーシング (@weave.op, Library Integration, エラートラッキング)
-- `1_2` Agent SDK (ツール呼び出し, Threads)
+- `1_2` 高度なトレーシング (Display Name, Attributes, PII Redaction, Sampling)
 - `1_3` マルチモーダル - OpenAI (画像, 音声, PDF)
-- `1_4` 高度なトレーシング (Display Name, Attributes, PII Redaction, Sampling)
+- `1_4` Agent Integration (OpenAI Agents SDK など各種フレームワークとの統合)
+- `1_5` Agent SDK (会話・ターン・LLM・ツールの手動計測)
+- `1_6` Agent 応用 (Attributes, Batch logging, Sub-agents)
 
 **補足: Agent 向け Trace について**
 
 Agent アプリケーションでは、LLM 呼び出しだけでなく、ツール実行、サブタスク、複数ステップの意思決定をまとめて追跡できることが重要です。Weave では Agent 向け Trace の新機能が開発されており、現時点では Public Preview として提供されています。
 
-このハンズオンの `1_2` では OpenAI Agents SDK と Weave の基本的な連携を扱います。Public Preview の Agent Trace 機能については、最新の仕様が変わる可能性があるため、利用する場合は [Agent 向け Trace の公式ドキュメント](https://docs.wandb.ai/weave/guides/tracking/trace-agents) を確認してください。
+このハンズオンの `1_4`〜`1_6` で Agent 向け Trace を扱います。`1_4` は OpenAI Agents SDK など各種フレームワークとの統合、`1_5` は Weave Agent SDK による手動計測、`1_6` は属性付与・バッチ記録・サブエージェントの応用です（`1_5`・`1_6` は weave >= 0.53.x が必要）。Public Preview の Agent Trace 機能は最新の仕様が変わる可能性があるため、利用する場合は [Agent 向け Trace の公式ドキュメント](https://docs.wandb.ai/weave/guides/tracking/trace-agents) を確認してください。
 
 ### 2. Asset Management (アセット管理)
 
@@ -57,7 +59,8 @@ Agent アプリケーションでは、LLM 呼び出しだけでなく、ツー�
 
 - `4_1` オンラインフィードバック (Reaction, Note, カスタムフィードバック)
 - `4_2` ガードレールとモニタリング (Scorer をガードレールとして使用)
-- `4_3` Monitors (本番環境の Trace を Scorer / built-in signals で継続評価: [ドキュメント](https://docs.wandb.ai/weave/guides/evaluation/monitors))
+- `4_3` Trace Monitors (本番環境の Trace を Scorer / built-in signals で継続評価: [ドキュメント](https://docs.wandb.ai/weave/guides/evaluation/monitors))
+- `4_4` Agent Signals (Agent の Trace を Tags / Ratings で継続評価: [ドキュメント](https://docs.wandb.ai/weave/guides/tracking/view-agent-signals))
 
 ### 5. その他便利な機能
 
