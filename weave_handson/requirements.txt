@@ -1,7 +1,8 @@
 wandb==0.27.0
-weave==0.52.22
+weave==0.53.2
 openai==2.40.0
 openai-agents==0.17.4
+requests==2.32.5
 griffe==1.15.0
 pillow==11.3.0
 nest_asyncio

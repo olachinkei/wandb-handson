@@ -11,6 +11,6 @@
 | ハンズオン | 場所 | 内容 |
 | --- | --- | --- |
 | W&B Models 101 | [models_handson/jp/W&B_models_intro_notebook.ipynb](models_handson/jp/W%26B_models_intro_notebook.ipynb) | Run、Table、Artifacts、Sweeps、Registry、Reportsをスクリプトとノートブックで学ぶハンズオンです。 |
-| Weave Introduction Hands-on | [weave_introduction_handson/](weave_introduction_handson/) | W&B Weave を使い、LLMアプリケーションのトレーシング、プロンプト・データセット・モデル・Scorerの管理、オフライン評価、オンラインフィードバック、ガードレール、モニタリングを学びます。日本語版と英語版のスクリプトがあります。 |
+| Weave Introduction Hands-on | [weave_handson/](weave_handson/) | W&B Weave を使い、LLMアプリケーションのトレーシング、プロンプト・データセット・モデル・Scorerの管理、オフライン評価、オンラインフィードバック、ガードレール、モニタリングを学びます。日本語版と英語版のスクリプトがあります。 |
 | eSIM Agent Demo | [esim-agent-demo/](esim-agent-demo/) | OpenAI Agents SDK と W&B Weave を使った、eSIMサービス向けマルチエージェントデモです。プラン検索、予約、RAG Q&A、ガードレール、Weaveによるトレース、評価シナリオとScorerを含みます。 |
 | ART-E: Email Search Agent | [ART-E/](ART-E/) | Enronメールデータセットを使い、メール検索エージェントをAgentic RLで学習するハンズオンです。ART、W&B Training / Serverless RL、W&B / Weaveによるログ記録、学習済みモデルの推論評価を扱います。 |

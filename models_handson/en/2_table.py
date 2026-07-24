@@ -1,11 +1,12 @@
 """
-2: Tables and Rich Media - Table とリッチメディア
+2: Tables and Rich Media
 
-環境構築（models_handson ディレクトリで実行）:
+Setup (run from the models_handson directory):
     uv sync
 
-このスクリプトでは、外部データをダウンロードせずに小さな画像とマスクを生成し、
-wandb.Image、セグメンテーションマスク、wandb.Table、時系列 Table を記録します。
+This script generates small images and masks without downloading external data,
+then logs wandb.Image objects, segmentation masks, wandb.Table objects, and
+Tables over time.
 """
 
 from __future__ import annotations
@@ -21,7 +22,7 @@ CLASS_LABELS = {0: "background", 1: "foreground"}
 
 
 def make_example(index: int, size: int = 64) -> tuple[np.ndarray, np.ndarray]:
-    """色付きの四角形と、その領域を示す整数マスクを生成する。"""
+    """Generate a colored square and an integer mask covering its area."""
     rng = np.random.default_rng(2_000 + index)
     image = rng.integers(15, 70, size=(size, size, 3), dtype=np.uint8)
     mask = np.zeros((size, size), dtype=np.uint8)
@@ -87,13 +88,13 @@ def main() -> None:
             }
         )
 
-        # 同じキーへ複数回 Table を記録すると、UI で step ごとに比較できる。
+        # Logging Tables repeatedly under one key enables step-by-step comparison.
         for step in range(3):
             run.log({"examples/progression": build_table(step=step)}, step=step + 1)
 
         print(f"Created: {run.url}")
 
-    print("W&B UI の Workspace で examples/table と examples/progression を確認してください。")
+    print("Open the W&B Workspace and inspect examples/table and examples/progression.")
 
 
 if __name__ == "__main__":

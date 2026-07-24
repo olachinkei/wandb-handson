@@ -1,31 +1,31 @@
 """
-6: Reports - 実験結果の可視化と共有
+6: Reports - Visualizing and Sharing Experiment Results
 
-環境構築（models_handson ディレクトリで実行）:
+Setup (run from the models_handson directory):
     uv sync
 
-Report and Workspace APIはPublic Previewです。最新仕様:
+The Report and Workspace API is in Public Preview. See the latest documentation:
 https://docs.wandb.ai/models/reports/create-a-report
 
-GUIでの基本手順:
-1. W&B ProjectのWorkspaceを開く。
-2. 右上のCreate reportを選び、開始時に含めるPanelを選択する。
-3. 本文、見出し、Panel Grid、Run set、グラフを追加・編集する。
-4. Publish to projectで公開し、Shareから共同利用者へ共有する。
+Basic UI workflow:
+1. Open the W&B Project Workspace.
+2. Select Create report and choose the initial Panels.
+3. Add or edit text, headings, Panel Grids, Run sets, and charts.
+4. Select Publish to project, then use Share to collaborate.
 
-利用できる主な要素:
-- 文章: Heading、Markdown、List、Code、Image、Media、Table of contents
-- Run整理: Runset、PanelGrid、Filter、Group、RunComparer、CodeComparer
-- 基本グラフ: LinePlot、BarPlot、ScatterPlot、ScalarChart、CustomChart
-- Sweep分析: ParallelCoordinatesPlot、ParameterImportancePlot
-- データ/Artifact: Summary Table、Artifact、Artifact File Panel
+Key available elements:
+- Content: Heading, Markdown, List, Code, Image, Media, Table of contents
+- Run organization: Runset, PanelGrid, Filter, Group, RunComparer, CodeComparer
+- Charts: LinePlot, BarPlot, ScatterPlot, ScalarChart, CustomChart
+- Sweep analysis: ParallelCoordinatesPlot, ParameterImportancePlot
+- Data/Artifacts: Summary Table, Artifact, Artifact File Panel
 
-この例では作り過ぎないよう、次の2種類だけを使用します:
-- LinePlot: 1・3・4章で記録した学習・検証メトリクス
-- ParameterImportancePlot: 4章のSweep設定とval/accuracyの関係
+To keep this example focused, it uses only:
+- LinePlot: training and validation metrics logged in chapters 1, 3, and 4
+- ParameterImportancePlot: chapter 4 Sweep settings versus val/accuracy
 
-参考Report:
-- Nejumi LLMリーダーボード4:
+Example Reports:
+- Nejumi LLM Leaderboard 4:
   https://wandb.ai/llm-leaderboard/nejumi-leaderboard4/reports/Nejumi-LLM-4--VmlldzoxMzc1OTk1MA
 - OpenPI and W&B for Physical AI (EN):
   https://wandb.ai/wandb-smle/openpi-aloha-wandb-integration/reports/OpenPI-and-W-B-for-Physical-AI-Experiment-tracking-guide--VmlldzoxNjQyMzc4Mg
@@ -49,7 +49,7 @@ def main() -> None:
         import wandb_workspaces.reports.v2 as wr
     except ImportError as error:
         raise RuntimeError(
-            "wandb-workspaces が必要です。models_handson で `uv sync` を実行してください。"
+            "wandb-workspaces is required. Run `uv sync` in models_handson."
         ) from error
 
     entity = wandb.Api().default_entity
@@ -78,15 +78,16 @@ def main() -> None:
         entity=entity,
         project=project,
         title="W&B Models Hands-on Results",
-        description="1〜5章で作成したRun、Table、Artifact、Sweep、Registryのまとめ",
+        description="Summary of Runs, Tables, Artifacts, Sweeps, and Registry from chapters 1-5",
         width="readable",
         blocks=[
             wr.TableOfContents(),
-            wr.H2(text="実験とモデル学習の推移"),
+            wr.H2(text="Experiment and model training progress"),
             wr.MarkdownBlock(
                 text=(
-                    "1章の模擬実験と3章のArtifact付きモデル学習を比較します。"
-                    "同じメトリクス名を使うことで、複数Runを一つのグラフへ重ねられます。"
+                    "Compare chapter 1 simulated experiments with chapter 3 "
+                    "Artifact-backed model training. Reusing metric names makes "
+                    "it possible to overlay multiple Runs in one chart."
                 )
             ),
             wr.PanelGrid(
@@ -101,7 +102,7 @@ def main() -> None:
                     )
                 ],
             ),
-            wr.H2(text="Sweepのパラメータ重要度"),
+            wr.H2(text="Sweep parameter importance"),
             wr.PanelGrid(
                 runsets=[sweep_runs],
                 panels=[
@@ -111,18 +112,18 @@ def main() -> None:
             wr.H2(text="Table・Artifacts・Registry"),
             wr.MarkdownBlock(
                 text=(
-                    f"- [Project Workspace]({project_url}) で2章の `examples/table` を確認\n"
-                    f"- [Project Artifacts]({project_url}/artifacts) で "
-                    "`models-handson-dataset`、`models-handson-processed-dataset`、"
-                    "`models-handson-model` のLineageを確認\n"
-                    f"- [Registry]({registry_url}) の `{registry_target_path}` で"
-                    "candidate Versionを確認"
+                    f"- Inspect chapter 2 `examples/table` in the [Project Workspace]({project_url})\n"
+                    f"- Inspect the Lineage of "
+                    "`models-handson-dataset`, `models-handson-processed-dataset`, and "
+                    f"`models-handson-model` in [Project Artifacts]({project_url}/artifacts)\n"
+                    f"- Inspect the candidate Version in `{registry_target_path}` "
+                    f"in [Registry]({registry_url})"
                 )
             ),
-            wr.H2(text="参考Report"),
+            wr.H2(text="Example Reports"),
             wr.MarkdownBlock(
                 text=(
-                    "- [Nejumi LLMリーダーボード4]"
+                    "- [Nejumi LLM Leaderboard 4]"
                     "(https://wandb.ai/llm-leaderboard/nejumi-leaderboard4/reports/"
                     "Nejumi-LLM-4--VmlldzoxMzc1OTk1MA)\n"
                     "- [OpenPI and W&B for Physical AI (EN)]"
@@ -138,7 +139,7 @@ def main() -> None:
 
     report.save(draft=True)
     print(f"Draft report saved: {report.url}")
-    print("内容を確認後、W&B UIからPublish to projectを実行してください。")
+    print("Review the draft, then select Publish to project in the W&B App.")
 
 
 if __name__ == "__main__":

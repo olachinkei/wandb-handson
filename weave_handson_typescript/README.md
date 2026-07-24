@@ -1,15 +1,15 @@
-# Weave Introduction Hands-on TypeScript
+# W&B Weave Hands-on TypeScript
 
 W&B Weave を TypeScript / Node.js から使うためのハンズオンです。
 
-元の Python 版 `weave_introduction_handson` をベースにしていますが、Python SDK と TypeScript SDK では対応している API が完全には同じではありません。この TypeScript 版では、実行できるもの、TypeScript では代替実装になるもの、現時点では未対応として説明だけにしているものを明確に分けています。
+元の Python 版 `weave_handson` をベースにしていますが、Python SDK と TypeScript SDK では対応している API が完全には同じではありません。この TypeScript 版では、実行できるもの、TypeScript では代替実装になるもの、現時点では未対応として説明だけにしているものを明確に分けています。
 
 詳しい対応表は [docs/typescript-support.md](docs/typescript-support.md) も確認してください。
 
 ## セットアップ
 
 ```bash
-cd wandb-handson/weave_introduction_handson_typescript
+cd wandb-handson/weave_handson_typescript
 npm install
 cp .env.example .env
 ```

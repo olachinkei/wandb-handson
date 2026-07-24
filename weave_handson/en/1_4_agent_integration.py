@@ -57,9 +57,7 @@ import asyncio
 import requests
 from dotenv import load_dotenv
 
-import weave
-from agents import Agent, Runner, function_tool, set_trace_processors
-from weave.integrations.openai_agents.openai_agents import WeaveTracingProcessor
+from agents import Agent, Runner, function_tool
 
 from config_loader import init_weave
 
@@ -67,12 +65,9 @@ from config_loader import init_weave
 load_dotenv()
 
 # Initialize Weave
+# init_weave() calls weave.init(...) internally. Weave automatically instruments
+# OpenAI Agents SDK runs, so no manual Tracing Processor registration is needed.
 init_weave()
-
-# Register WeaveTracingProcessor to automatically instrument the OpenAI Agents SDK.
-# Agent invocations, sub-agent handoffs, model calls, and tool calls are recorded
-# into the Weave Agents tab.
-set_trace_processors([WeaveTracingProcessor()])
 
 
 # =============================================================================
@@ -170,7 +165,7 @@ print("""
 Summary:
 - Define agent tools with @function_tool
 - Build the agent with Agent(), run it with Runner.run()
-- Enable automatic instrumentation with set_trace_processors([WeaveTracingProcessor()])
+- Automatically instrument OpenAI Agents SDK runs through weave.init(...)
 - Carry history forward to compose a multi-turn conversation
 
 Check in the Weave UI:

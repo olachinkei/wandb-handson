@@ -1,38 +1,39 @@
 """
-5: Registry - 組織で利用するArtifactのキュレーション
+5: Registry - Curating Artifacts for Organization-Wide Use
 
-環境構築（models_handson ディレクトリで実行）:
+Setup (run from the models_handson directory):
     uv sync
 
-Registry は、Projectで作成したArtifact Versionを組織全体で管理するための
-中央リポジトリです。「Link」は元Artifactへの参照を作る操作であり、ファイルを
-複製する操作ではありません。
+Registry is a central repository for managing Artifact Versions created in
+Projects across an organization. Linking creates a reference to the original
+Artifact; it does not duplicate its files.
 
-事前準備（必須）:
-1. https://wandb.ai/registry/ を開く。
-2. Registry `models_handson` を選ぶ。存在しない場合はUIから作成する。
-3. Create collectionを選び、Collection名を `handson`、Artifact typeを `model` にする。
-4. 作成後のTarget pathが `wandb-registry-models_handson/handson` であることを確認する。
+Required preparation:
+1. Open https://wandb.ai/registry/.
+2. Select the `models_handson` Registry. Create it in the UI if needed.
+3. Select Create collection, set its name to `handson`, and its Artifact type
+   to `model`.
+4. Confirm the Target path is `wandb-registry-models_handson/handson`.
 
-Collectionはこのスクリプトから作成しません。必ず事前にUIで手動作成してください:
+This script does not create Collections. Create the Collection manually first:
 https://docs.wandb.ai/models/registry/create_collection#python-sdk-beta
 
-実行後の確認:
-1. 必要に応じてAlias、Tags、Collection card、Registry accessを設定する。
-2. VersionのLineageタブとCollectionのAction Historyで系譜・監査履歴を確認する。
+After running:
+1. Configure Aliases, Tags, the Collection card, and Registry access as needed.
+2. Inspect the Version's Lineage and the Collection's Action History.
 
-このプログラム例:
-- 3_artifacts.py が作成した models-handson-model:latest を取得
-- 事前作成済みのCollectionが存在することを確認
-- Registry Collectionへcandidate Alias付きでリンク
-- CollectionへTagsと説明を付与
-- Registry経由でArtifactを再取得して一時ディレクトリへダウンロード
+This example:
+- Retrieves models-handson-model:latest created by 3_artifacts.py
+- Verifies that the pre-created Collection exists
+- Links the Artifact to the Collection with the candidate Alias
+- Adds Tags and a description to the Collection
+- Downloads the Artifact through Registry into a temporary directory
 
 Target path:
-- 既定値: wandb-registry-models_handson/handson
-- 変更する場合: WANDB_REGISTRY_TARGET_PATH 環境変数を設定
+- Default: wandb-registry-models_handson/handson
+- To change it: set the WANDB_REGISTRY_TARGET_PATH environment variable
 
-主な公式ドキュメント:
+Official documentation:
 - Overview: https://docs.wandb.ai/models/registry
 - Create registry: https://docs.wandb.ai/models/registry/create_registry
 - Create collection: https://docs.wandb.ai/models/registry/create_collection#python-sdk-beta
@@ -65,8 +66,8 @@ def get_target_path() -> str:
     target_path = os.getenv("WANDB_REGISTRY_TARGET_PATH", DEFAULT_TARGET_PATH)
     if not target_path.startswith("wandb-registry-") or target_path.count("/") != 1:
         raise ValueError(
-            "WANDB_REGISTRY_TARGET_PATH は "
-            "`wandb-registry-<registry>/<collection>` 形式で指定してください。"
+            "WANDB_REGISTRY_TARGET_PATH must use the format "
+            "`wandb-registry-<registry>/<collection>`."
         )
     return target_path
 
@@ -81,10 +82,10 @@ def main() -> None:
 
     if not api.artifact_collection_exists(name=target_path, type="model"):
         raise RuntimeError(
-            f"事前作成済みのModel Collection `{target_path}` が見つかりません。\n"
-            "W&B Registry画面でRegistryを開き、Artifact typeが `model` の"
-            "Collectionを手動作成してから再実行してください。\n"
-            f"手順: {CREATE_COLLECTION_DOCS}"
+            f"The pre-created Model Collection `{target_path}` was not found.\n"
+            "Open the Registry in the W&B App, manually create a Collection "
+            "with Artifact type `model`, and run this script again.\n"
+            f"Instructions: {CREATE_COLLECTION_DOCS}"
         )
     collection = api.artifact_collection(type_name="model", name=target_path)
 
@@ -112,8 +113,8 @@ def main() -> None:
         }
     )
     collection.description = (
-        "W&B Modelsハンズオンで作成した軽量モデル。"
-        "candidate Aliasは評価・昇格候補を示します。"
+        "Lightweight model created in the W&B Models hands-on. "
+        "The candidate Alias marks a version for evaluation or promotion."
     )
     collection.save()
 
@@ -125,7 +126,7 @@ def main() -> None:
         print(f"Downloaded from Registry: {registry_artifact_name}")
         print(f"Files: {files}")
 
-    print("Registry UIでAlias、Tags、Collection card、Lineageを確認してください。")
+    print("Open Registry and inspect the Alias, Tags, Collection card, and Lineage.")
 
 
 if __name__ == "__main__":

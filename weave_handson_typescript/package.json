@@ -1,9 +1,9 @@
 {
-  "name": "weave-introduction-handson-typescript",
+  "name": "weave-handson-typescript",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "TypeScript version of the W&B Weave introduction hands-on.",
+  "description": "TypeScript version of the W&B Weave hands-on.",
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "run:1_1": "npm run build && node --import=weave/instrument dist/jp/1_1_basic_trace.js",

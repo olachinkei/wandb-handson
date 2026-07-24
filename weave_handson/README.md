@@ -80,7 +80,7 @@ Agent アプリケーションでは、LLM 呼び出しだけでなく、ツー�
 **1. プロジェクトディレクトリに移動**
 
 ```bash
-cd weave_introduction_handson
+cd weave_handson
 ```
 
 **2. 環境変数を設定**
@@ -100,6 +100,16 @@ WANDB_PROJECT=weave-handson
 WANDB_BASE_URL=https://your-instance.wandb.io
 ```
 
+`.env` の内容を、Python プロセスから参照できる環境変数として読み込みます。
+
+```bash
+set -a
+source .env
+set +a
+```
+
+`source .env` だけでは、`.env` の値が子プロセスへ export されない場合があります。上記の `set -a` を使用し、同じターミナルでスクリプトを実行してください。
+
 **注意:** Dedicated Cloud やオンプレミス環境を利用している場合は、`WANDB_BASE_URL` に自社インスタンスの URL を設定してください。
 
 **その他の便利な環境変数:**
@@ -116,10 +126,22 @@ WANDB_BASE_URL=https://your-instance.wandb.io
 
 **uv を使う場合（推奨）:**
 
+別の仮想環境が有効な場合は、先に `deactivate` を実行してください。特に、プロンプトに旧名の `(weave-introduction-handson)` が表示されている場合は解除が必要です。
+
 ```bash
 uv sync
 source .venv/bin/activate  # Windows: .venv\Scripts\activate
 ```
+
+`uv sync` により、`weave`、`openai-agents`、`requests` を含む必要な依存関係が `.venv` にインストールされます。`openai-agents` のPython import名は `agents` です。
+
+インストールを確認するには、仮想環境を有効化した状態で次を実行します。
+
+```bash
+python -c "import agents, requests, weave; print('Dependencies: OK')"
+```
+
+`ModuleNotFoundError: No module named 'agents'` が表示された場合は、現在のPythonが `weave_handson/.venv` を使っているか `which python` で確認してください。別の環境を指している場合は `deactivate` を実行してから、もう一度 `uv sync` と `source .venv/bin/activate` を実行してください。個別に `pip install` する必要はありません。
 
 **pip を使う場合:**
 

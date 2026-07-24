@@ -1,16 +1,16 @@
 """
-3: Artifacts - データとモデルのバージョン管理
+3: Artifacts - Data and Model Versioning
 
-環境構築（models_handson ディレクトリで実行）:
+Setup (run from the models_handson directory):
     uv sync
 
-このスクリプトで作成する Artifact:
+Artifacts created by this script:
 - models-handson-dataset
 - models-handson-processed-dataset
 - models-handson-model
 
-データ生成、前処理、模擬学習を別 Run にし、use_artifact() で入力を宣言することで
-W&B にデータからモデルまでの Lineage を記録します。
+Data generation, preprocessing, and simulated training use separate Runs.
+Declaring inputs with use_artifact() records end-to-end Lineage in W&B.
 """
 
 from __future__ import annotations
@@ -73,12 +73,13 @@ def artifact_input_path(
     fallback: Path,
     download_root: Path,
 ) -> Path:
-    """Online では Artifact を取得し、Offline smoke test ではローカル入力を使う。"""
+    """Download an Artifact online or use a local input for offline smoke tests."""
     if is_offline_mode():
         try:
             run.use_artifact(artifact_or_name)
         except (TypeError, ValueError, wandb.Error):
-            # Offline backend はサーバー上の alias を解決できないため、入力宣言だけ省略する。
+            # The offline backend cannot resolve server aliases, so skip only
+            # the input declaration when necessary.
             pass
         return fallback
 
@@ -152,7 +153,7 @@ def main() -> None:
             dataset = wandb.Artifact(
                 name=DATASET_NAME,
                 type="dataset",
-                description="W&B Models ハンズオン用の合成分類データ",
+                description="Synthetic classification data for the W&B Models hands-on",
                 metadata={"rows": 120, "source": "generated"},
             )
             dataset.add_file(str(raw_csv), name=raw_csv.name)
@@ -175,7 +176,7 @@ def main() -> None:
             processed_dataset = wandb.Artifact(
                 name=PROCESSED_DATASET_NAME,
                 type="dataset",
-                description="標準化済みの合成分類データ",
+                description="Standardized synthetic classification data",
                 metadata={"transform": "standardization"},
             )
             processed_dataset.add_file(str(processed_csv), name=processed_csv.name)
@@ -206,7 +207,7 @@ def main() -> None:
             model_artifact = wandb.Artifact(
                 name=MODEL_NAME,
                 type="model",
-                description="NumPyで学習した軽量なロジスティック回帰モデル",
+                description="Lightweight logistic regression model trained with NumPy",
                 metadata={"best_val_accuracy": best_accuracy},
             )
             model_artifact.add_file(str(model_file), name=model_file.name)
@@ -214,7 +215,7 @@ def main() -> None:
             training_run.summary["best/val_accuracy"] = best_accuracy
             print(f"Created model artifact from: {training_run.url}")
 
-    print("Artifacts の Lineage で dataset -> processed dataset -> model を確認してください。")
+    print("Inspect dataset -> processed dataset -> model in Artifact Lineage.")
 
 
 if __name__ == "__main__":

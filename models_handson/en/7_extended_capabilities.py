@@ -1,24 +1,24 @@
 """
-7: Extended Capabilities - W&B SDKの拡張機能
+7: Extended W&B SDK Capabilities
 
-環境構築（models_handson ディレクトリで実行）:
+Setup (run from the models_handson directory):
     uv sync
 
-実行例:
+Examples:
     python 7_extended_capabilities.py
     python 7_extended_capabilities.py --demo query --run-id <RUN_ID>
     python 7_extended_capabilities.py --demo charts
     python 7_extended_capabilities.py --demo offline
     python 7_extended_capabilities.py --demo alert --enable-alert
 
---demo の選択肢:
-- resume: 中断したRunへ同じRun IDで追記（既定）
-- query: Public APIで指定Runの必要な履歴だけを取得
-- charts: PR CurveとAudioを記録
-- offline: Offline Runを作成し、syncコマンドを表示
-- alert: 明示的な--enable-alert指定時だけ通知を送信
-- settings: よく使う環境変数とSettingsを表示
-- all: alert以外のデモを順番に実行
+--demo choices:
+- resume: append to an interrupted Run using the same Run ID (default)
+- query: retrieve only selected history fields through the Public API
+- charts: log a PR Curve and Audio
+- offline: create an Offline Run and print its sync command
+- alert: send a notification only when --enable-alert is explicitly supplied
+- settings: display commonly used environment variables and Settings
+- all: run every demo except alert
 """
 
 from __future__ import annotations
@@ -35,7 +35,7 @@ DEFAULT_PROJECT = "wandb-models-handson"
 
 
 def demo_resume(project: str) -> str:
-    """5 step記録したRunを終了し、同じRun IDへさらに5 step追記する。"""
+    """Finish a five-step Run, then append five steps using the same Run ID."""
     run_id = wandb.util.generate_id()
     with wandb.init(
         project=project,
@@ -61,7 +61,7 @@ def demo_resume(project: str) -> str:
 
 
 def demo_query(project: str, run_id: str) -> None:
-    """明示した2メトリクスだけを取得し、巨大な履歴の全列取得を避ける。"""
+    """Fetch only two metrics instead of downloading every history column."""
     api = wandb.Api(timeout=60)
     run = api.run(f"{api.default_entity}/{project}/{run_id}")
     rows = list(
@@ -129,13 +129,14 @@ def demo_offline(project: str) -> None:
         run_directory = Path(run.dir).parent
 
     print(f"Offline run saved: {run_directory}")
-    print(f"Onlineへ送信するには実行: wandb sync {run_directory}")
+    print(f"To upload this Run, execute: wandb sync {run_directory}")
 
 
 def demo_alert(project: str, enabled: bool) -> None:
     if not enabled:
         raise RuntimeError(
-            "Alertは外部通知を送ります。実行する場合だけ--enable-alertを追加してください。"
+            "Alerts send external notifications. Add --enable-alert only when "
+            "you intend to send one."
         )
     with wandb.init(
         project=project,
@@ -145,7 +146,7 @@ def demo_alert(project: str, enabled: bool) -> None:
     ) as run:
         run.alert(
             title="W&B Models hands-on alert",
-            text="7_extended_capabilities.py から送信したテスト通知です。",
+            text="Test notification sent from 7_extended_capabilities.py.",
         )
         print(f"Alert sent from: {run.url}")
 
@@ -168,11 +169,11 @@ def parse_args() -> argparse.Namespace:
         choices=["resume", "query", "charts", "offline", "alert", "settings", "all"],
         default="resume",
     )
-    parser.add_argument("--run-id", help="queryで取得するRun ID")
+    parser.add_argument("--run-id", help="Run ID to retrieve with the query demo")
     parser.add_argument(
         "--enable-alert",
         action="store_true",
-        help="alertデモの外部通知を明示的に許可する",
+        help="explicitly allow the alert demo to send an external notification",
     )
     return parser.parse_args()
 
@@ -185,7 +186,7 @@ def main() -> None:
         demo_resume(project)
     elif args.demo == "query":
         if not args.run_id:
-            raise RuntimeError("--demo query には--run-idが必要です。")
+            raise RuntimeError("--demo query requires --run-id.")
         demo_query(project, args.run_id)
     elif args.demo == "charts":
         demo_charts_and_audio(project)

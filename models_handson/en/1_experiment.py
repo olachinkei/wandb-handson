@@ -1,17 +1,17 @@
 """
-1: Experiment Tracking - 実験管理の基本
+1: Experiment Tracking Fundamentals
 
-環境構築（models_handson ディレクトリで実行）:
+Setup (run from the models_handson directory):
     uv sync
 
-このスクリプトで学べること:
-- Config、Tags、Group、Job Type による Run の整理
-- train/ と val/ を使ったメトリクスの階層化
-- define_metric() によるカスタム X 軸
-- with wandb.init(...) による Run の確実な終了
+What you will learn:
+- Organize Runs with Config, Tags, Group, and Job Type
+- Group metrics into train/ and val/ namespaces
+- Define a custom X-axis with define_metric()
+- Reliably finish Runs with with wandb.init(...)
 
-保存先の Entity は W&B SDK のログイン設定または WANDB_ENTITY から自動解決されます。
-WANDB_PROJECT を省略した場合は "wandb-models-handson" を使用します。
+The destination Entity is resolved from the W&B SDK login or WANDB_ENTITY.
+If WANDB_PROJECT is omitted, the script uses "wandb-models-handson".
 """
 
 from __future__ import annotations
@@ -28,7 +28,7 @@ LEARNING_RATES = [0.0005, 0.001, 0.003, 0.01, 0.03]
 
 
 def simulate_metrics(run_index: int, epoch: int) -> dict[str, float]:
-    """Run と epoch が同じなら同じ値になる軽量な模擬メトリクスを返す。"""
+    """Return lightweight deterministic metrics for a Run and epoch."""
     rng = random.Random(10_000 + run_index * 100 + epoch)
     difficulty = run_index * 0.025
     train_loss = max(
@@ -70,7 +70,7 @@ def main() -> None:
             config=config,
             tags=["experiment", "baseline"],
         ) as run:
-            # custom/epoch_squared を X 軸として custom/inverse_epoch を表示する。
+            # Plot custom/inverse_epoch against custom/epoch_squared.
             run.define_metric("custom/epoch_squared")
             run.define_metric(
                 "custom/inverse_epoch",
@@ -92,7 +92,7 @@ def main() -> None:
             run.summary["best/val_accuracy"] = best_accuracy
             print(f"Created: {run.name} -> {run.url}")
 
-    print("\nW&B UI の Workspace で Run の比較、Group、Tags、各曲線を確認してください。")
+    print("\nOpen the W&B Workspace to compare Runs, Groups, Tags, and charts.")
 
 
 if __name__ == "__main__":

@@ -1,8 +1,8 @@
 """
-3_4: Monitors - continuous evaluation with built-in signals
+4_3: Trace Monitors - continuous evaluation with built-in signals
 
 ==========================================================
-What are Monitors?
+Online evaluation for Traces = Monitors
 ==========================================================
 
 Monitors help continuously evaluate production traces so you can understand
@@ -14,6 +14,9 @@ review every trace manually.
 
 With Monitors, built-in signals or custom monitors can score incoming traces
 continuously.
+
+Note: Agent conversations and turns use Signals instead of these Trace
+Monitors. See 4_4_agent_signals.py for an executable User Frustration demo.
 
 ==========================================================
 What are built-in signals?
@@ -69,9 +72,13 @@ How this relates to this hands-on
 3_1 and 3_2 cover evaluation against local datasets.
 3_3 covers feedback collection through human review.
 
-3_4 Monitors are for continuous evaluation in production. Together,
+4_3 Monitors are for continuous evaluation in production. Together,
 offline evaluation, annotation, and production monitoring create a feedback
 loop for improving LLM applications.
+
+Use Signals, rather than Monitors, for continuous evaluation of the Agent
+conversations and turns covered in chapters 1_4 through 1_6. See
+4_4_agent_signals.py.
 
 ==========================================================
 Reference
@@ -79,6 +86,9 @@ Reference
 
 Monitor using built-in signals:
 https://docs.wandb.ai/weave/guides/evaluation/monitors
+
+Agent Signals:
+https://docs.wandb.ai/weave/guides/tracking/view-agent-signals
 
 ==========================================================
 Note

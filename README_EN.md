@@ -11,6 +11,6 @@ Each hands-on is organized as an independent directory or notebook. See the READ
 | Hands-on | Location | What it covers |
 | --- | --- | --- |
 | W&B Models 101 | [models_handson/jp/W&B_models_intro_notebook.ipynb](models_handson/jp/W%26B_models_intro_notebook.ipynb) | A scripts-and-notebook hands-on covering Runs, Tables, Artifacts, Sweeps, Registry, and Reports. |
-| Weave Introduction Hands-on | [weave_introduction_handson/](weave_introduction_handson/) | A W&B Weave hands-on for LLM application tracing, prompt/dataset/model/Scorer management, offline evaluation, online feedback, guardrails, and monitoring. It includes both Japanese and English scripts. |
+| Weave Introduction Hands-on | [weave_handson/](weave_handson/) | A W&B Weave hands-on for LLM application tracing, prompt/dataset/model/Scorer management, offline evaluation, online feedback, guardrails, and monitoring. It includes both Japanese and English scripts. |
 | eSIM Agent Demo | [esim-agent-demo/](esim-agent-demo/) | A multi-agent demo for an eSIM service using the OpenAI Agents SDK and W&B Weave. It includes plan search, booking, RAG Q&A, guardrails, Weave tracing, evaluation scenarios, and Scorers. |
 | ART-E: Email Search Agent | [ART-E/](ART-E/) | A hands-on project for training an email search agent with Agentic RL on the Enron email dataset. It covers ART, W&B Training / Serverless RL, W&B / Weave logging, and inference evaluation for the trained model. |

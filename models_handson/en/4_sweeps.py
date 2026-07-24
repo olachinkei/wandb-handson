@@ -1,11 +1,11 @@
 """
-4: Sweeps - ハイパーパラメータ探索
+4: Sweeps - Hyperparameter Optimization
 
-環境構築（models_handson ディレクトリで実行）:
+Setup (run from the models_handson directory):
     uv sync
 
-Random Sweep で learning_rate と epochs を探索します。ローカル Agent の試行数は
-count=6 に固定しているため、明示的に増やさない限り無制限には実行されません。
+This Random Sweep explores learning_rate, epochs, and batch_size. The local
+Agent is limited to count=6, so it cannot run indefinitely unless increased.
 """
 
 from __future__ import annotations
@@ -36,7 +36,7 @@ def simulated_fold_accuracy(
     batch_size: int,
     fold: int,
 ) -> float:
-    """最適値付近で高精度になる、再現可能な模擬評価値を返す。"""
+    """Return a reproducible simulated score that peaks near ideal values."""
     seed = int(learning_rate * 1_000_000) + epochs * 100 + batch_size + fold
     rng = random.Random(seed)
     lr_score = max(0.0, 1.0 - abs(np.log10(learning_rate) + 2.0) * 0.16)

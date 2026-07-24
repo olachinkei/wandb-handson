@@ -1,28 +1,29 @@
-"""4_4: Agent Signals - User Frustration の検出デモ。
+"""4_4: Agent Signals - User Frustration detection demo.
 
-このスクリプトは、W&B公式のOpenAI Agents SDK連携例をもとに、
-User Frustration Signalが検出しやすいマルチターン会話を記録します。
+This script is based on W&B's official OpenAI Agents SDK integration example.
+It records a multi-turn conversation designed to trigger the User Frustration
+Signal.
 
-公式例:
+Official example:
 https://docs.wandb.ai/weave/guides/integrations/agents/openai-agents-sdk
 
 Agent Signals:
 https://docs.wandb.ai/weave/guides/tracking/view-agent-signals
 
-事前準備:
-1. W&B ProjectのAgents viewを開く。
-2. Signalsタブで「+ New signal」を選択する。
-3. Tagsプリセットの「User Frustration」を選択して作成する。
-4. このスクリプトを実行する。
+Prerequisites:
+1. Open the Agents view in your W&B Project.
+2. Select "+ New signal" in the Signals tab.
+3. Create the "User Frustration" preset under Tags.
+4. Run this script.
 
-実行後:
-1. Agents > Signalsを開く。
-2. Scorerを「User Frustration」で絞り込む。
-3. 2・3ターン目、特に明示的な不満を含む3ターン目を確認する。
+After running:
+1. Open Agents > Signals.
+2. Filter the Scorer column to "User Frustration".
+3. Inspect turns 2 and 3, especially turn 3 with explicit dissatisfaction.
 
-User Frustrationプリセットは、ユーザーの frustration、anger、confusion、
-dissatisfaction の兆候を検出します。Tag Signalは条件に一致したターンだけを
-Signalsテーブルに表示するため、正常な1ターン目が表示されないのは想定どおりです。
+The User Frustration preset detects signs of frustration, anger, confusion,
+or dissatisfaction. Tag Signals display only matching turns in the Signals
+table, so the normal first turn is not expected to appear.
 """
 
 from __future__ import annotations
@@ -39,13 +40,14 @@ from config_loader import get_weave_project_name
 
 load_dotenv()
 
-# 公式例と同じく、weave.init(...)だけでOpenAI Agents SDKを自動計測します。
+# As in the official example, weave.init(...) automatically instruments the
+# OpenAI Agents SDK. No manual Tracing Processor registration is needed.
 weave.init(get_weave_project_name())
 
 
 @function_tool
 def wikipedia_search(query: str) -> str:
-    """トピックをWikipediaで検索し、記事タイトルと導入段落を返す。"""
+    """Search Wikipedia for a topic and return its title and introduction."""
     response = requests.get(
         "https://en.wikipedia.org/w/api.php",
         params={
@@ -82,9 +84,9 @@ agent = Agent(
 )
 
 
-# 1ターン目は通常の質問です。
-# 2ターン目は回答への不満、3ターン目は強い苛立ちと反復要求を明示します。
-# これにより、User Frustration Signalの非一致・一致を比較しやすくなります。
+# Turn 1 is a normal request. Turn 2 expresses dissatisfaction with the answer,
+# and turn 3 explicitly expresses strong frustration and a repeated request.
+# This makes non-matching and matching User Frustration turns easy to compare.
 QUESTIONS = [
     "Who founded Anthropic? Use Wikipedia and cite the article title.",
     (
@@ -100,7 +102,7 @@ QUESTIONS = [
 
 
 async def main() -> None:
-    """3つのユーザーターンを1つの会話として実行する。"""
+    """Run three user turns as one conversation."""
     history: list = []
 
     print("\nStarting the User Frustration conversation demo...")
@@ -113,15 +115,15 @@ async def main() -> None:
         result = await Runner.run(agent, input=history)
         print(f"AGENT: {result.final_output}")
 
-        # 公式例と同様に、前ターンまでの履歴を次のRunner.runへ渡します。
+        # As in the official example, pass prior history into the next Runner.run.
         history = result.to_input_list()
 
     print("\n" + "=" * 72)
     print("User Frustration demo complete")
     print("=" * 72)
     print(
-        "Weave UIの Agents > Signals を開き、User Frustration Signalの結果を"
-        "確認してください。Signalの評価完了まで少し時間がかかる場合があります。"
+        "Open Agents > Signals in the Weave UI and inspect the User Frustration "
+        "Signal. Signal evaluation may take a short time to complete."
     )
 
 

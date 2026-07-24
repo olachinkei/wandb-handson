@@ -56,12 +56,13 @@ In this hands-on, `1_4`–`1_6` cover Agent Tracing: `1_4` integrates with frame
 - `3_1` Offline evaluation (`weave.Evaluation`, multiple Scorers)
 - `3_2` EvaluationLogger (flexible batch evaluation)
 - `3_3` Annotation Queue / Review ([documentation](https://docs.wandb.ai/weave/guides/tracking/annotation-review#annotation-workflow))
-- `3_4` Monitors (continuous evaluation of production Traces with Scorers / built-in signals: [documentation](https://docs.wandb.ai/weave/guides/evaluation/monitors))
 
 ### 4. Monitoring
 
 - `4_1` Online feedback (Reaction, Note, custom feedback)
 - `4_2` Guardrails and monitoring (using Scorers as guardrails)
+- `4_3` Trace Monitors (continuously evaluate production Traces with Scorers / built-in signals: [documentation](https://docs.wandb.ai/weave/guides/evaluation/monitors))
+- `4_4` Agent Signals (continuously evaluate Agent turns with Tags / Ratings: [documentation](https://docs.wandb.ai/weave/guides/tracking/view-agent-signals))
 
 ### 5. Other Useful Features
 
@@ -81,7 +82,7 @@ Before starting the hands-on, confirm that your environment is correctly configu
 **1. Move to the project directory**
 
 ```bash
-cd weave_introduction_handson
+cd weave_handson
 ```
 
 **2. Set environment variables**
@@ -101,6 +102,16 @@ WANDB_PROJECT=weave-handson
 WANDB_BASE_URL=https://your-instance.wandb.io
 ```
 
+Load the `.env` entries as exported environment variables so Python processes can access them:
+
+```bash
+set -a
+source .env
+set +a
+```
+
+Running only `source .env` may not export its values to child processes. Use `set -a` as shown above, then run the scripts in the same terminal.
+
 **Note:** If you use Dedicated Cloud or an on-premises environment, set `WANDB_BASE_URL` to your instance URL.
 
 **Useful environment variables:**
@@ -117,10 +128,22 @@ Details: [official documentation](https://docs.wandb.ai/weave/guides/core-types/
 
 **Using uv (recommended):**
 
+If another virtual environment is active, run `deactivate` first. This is especially important when the prompt still shows the old name `(weave-introduction-handson)`.
+
 ```bash
 uv sync
 source .venv/bin/activate  # Windows: .venv\Scripts\activate
 ```
+
+`uv sync` installs all required dependencies into `.venv`, including `weave`, `openai-agents`, and `requests`. The Python import name provided by `openai-agents` is `agents`.
+
+To verify the installation, run the following with the virtual environment activated:
+
+```bash
+python -c "import agents, requests, weave; print('Dependencies: OK')"
+```
+
+If you see `ModuleNotFoundError: No module named 'agents'`, use `which python` to confirm that the active interpreter is from `weave_handson/.venv`. If it points elsewhere, run `deactivate`, then run `uv sync` and `source .venv/bin/activate` again. You do not need to install the packages individually with `pip`.
 
 **Using pip:**
 

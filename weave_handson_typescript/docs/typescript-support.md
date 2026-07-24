@@ -1,6 +1,6 @@
 # TypeScript 対応状況
 
-このディレクトリは `weave_introduction_handson` の TypeScript 版です。Python SDK と TypeScript SDK では API の粒度が違うため、章ごとに「そのまま移植」「TypeScript で代替」「Python 専用または UI 操作のみ」に分けています。
+このディレクトリは `weave_handson` の TypeScript 版です。Python SDK と TypeScript SDK では API の粒度が違うため、章ごとに「そのまま移植」「TypeScript で代替」「Python 専用または UI 操作のみ」に分けています。
 
 この対応表は、このディレクトリで実際にインストールして型チェックした `weave@0.15.1` を基準にしています。公式 TypeScript reference に掲載されていても、現行 npm package ではまだ Python SDK と同等ではない API があります。
 

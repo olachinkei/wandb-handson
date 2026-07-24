@@ -90,25 +90,39 @@ class TestProjectStructure:
         assert (PROJECT_ROOT / "config.yaml").exists()
         assert (PROJECT_ROOT / "assets.json").exists()
 
-    def test_jp_scripts_exist(self):
-        """Test all Japanese scripts exist."""
-        jp_dir = PROJECT_ROOT / "jp"
-        
+    @pytest.mark.parametrize("language", ["jp", "en"])
+    def test_scripts_exist(self, language):
+        """Test all hands-on scripts exist in both languages."""
+        language_dir = PROJECT_ROOT / language
+
         scripts = [
             "config_loader.py",
             "1_1_basic_trace.py",
-            "1_2_agent_sdk.py",
+            "1_2_advanced_trace.py",
             "1_3_multimodal_openai.py",
-            "1_4_advanced_trace.py",
+            "1_4_agent_integration.py",
+            "1_5_agent.py",
+            "1_6_agent_advanced.py",
             "2_1_assets.py",
             "3_1_evaluation.py",
             "3_2_evaluation_logger.py",
+            "3_3_annotation_queue.py",
             "4_1_online_feedback.py",
             "4_2_guardrail_monitoring.py",
+            "4_3_trace_monitors.py",
+            "4_4_agent_signals.py",
+            "5_1_skills_mcp.py",
+            "5_2_automations.py",
+            "5_3_dynamic_leaderboards.py",
+            "5_4_trace_plots.py",
+            "5_5_saved_views.py",
+            "5_6_playground.py",
         ]
-        
+
         for script in scripts:
-            assert (jp_dir / script).exists(), f"{script} should exist"
+            assert (language_dir / script).exists(), (
+                f"{language}/{script} should exist"
+            )
 
     def test_jp_scripts_valid_syntax(self):
         """Test all JP scripts have valid Python syntax."""

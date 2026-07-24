@@ -59,9 +59,7 @@ import asyncio
 import requests
 from dotenv import load_dotenv
 
-import weave
-from agents import Agent, Runner, function_tool, set_trace_processors
-from weave.integrations.openai_agents.openai_agents import WeaveTracingProcessor
+from agents import Agent, Runner, function_tool
 
 from config_loader import init_weave
 
@@ -69,12 +67,10 @@ from config_loader import init_weave
 load_dotenv()
 
 # Initialize Weave
+# init_weave() は内部で weave.init(...) を呼び出します。
+# OpenAI Agents SDK の実行は Weave により自動計測されるため、
+# Tracing Processor を手動登録する必要はありません。
 init_weave()
-
-# WeaveTracingProcessor を設定して OpenAI Agents SDK の実行を自動計測
-# これにより、エージェント呼び出し・サブエージェントへの handoff・モデル呼び出し・
-# ツール呼び出しが Weave の Agents タブへ記録されます。
-set_trace_processors([WeaveTracingProcessor()])
 
 
 # =============================================================================
@@ -172,7 +168,7 @@ print("""
 まとめ:
 - @function_tool でエージェントのツールを定義
 - Agent() でエージェント、Runner.run() で実行
-- set_trace_processors([WeaveTracingProcessor()]) で自動計測を有効化
+- weave.init(...) により OpenAI Agents SDK の実行を自動計測
 - history を引き回すことでマルチターン会話を構成
 
 Weave UI で確認:
