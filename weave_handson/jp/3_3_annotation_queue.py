@@ -45,7 +45,7 @@ Annotation Queue を使うと、レビュー対象をキューとして用意し
 1. レビュー対象の Trace や出力を選ぶ
 2. Annotation Queue を作成する
 3. レビュー項目や評価フォームを設定する
-4. レビュアーがキューを開き、1 件ずつ確認する
+4. レビュアーがキューを開き、1 件ずつ確認して評価を送信する
 5. structured feedback として結果を保存する
 6. 保存された feedback を Evaluation や改善作業に利用する
 
@@ -72,9 +72,68 @@ https://docs.wandb.ai/ja/weave/guides/tracking/annotation-review#annotation-work
 Note
 ==========================================================
 
-- Annotation Queue は UI 上で使う機能なので、このスクリプトでは説明のみを表示します
+- Annotation Queue の作成とレビュー操作は Weave UI で行います
+- 下のサンプルコードでは、レビュー対象 Trace、AnnotationSpec、
+  structured feedback の作成と読み戻しを SDK で確認します
 - 実際のレビュー作業では、Weave UI でキューを作成・共有します
 - 人手評価は、LLM アプリケーション改善の重要なフィードバック源になります
 """
 
+from dotenv import load_dotenv
+import weave
+
+from config_loader import init_weave
+
+load_dotenv()
+init_weave()
+
 print(__doc__)
+
+
+@weave.op()
+def answer_for_review(question: str) -> dict:
+    """アノテーション対象になる再現可能な回答を記録する。"""
+    return {
+        "answer": "Weave はLLMアプリのトレース、評価、監視を支援します。",
+        "sources": ["https://docs.wandb.ai/weave"],
+    }
+
+
+print("\n1. レビュー対象のTraceを作成")
+output, call = answer_for_review.call("W&B Weaveで何ができますか？")
+print(f"call_id={call.id}")
+print(f"output={output}")
+
+print("\n2. AnnotationSpecを公開")
+quality_spec = weave.AnnotationSpec(
+    name="answer_quality",
+    description="回答の品質を人手でレビューするためのフォーム",
+    field_schema={
+        "type": "object",
+        "properties": {
+            "score": {"type": "integer", "minimum": 1, "maximum": 5},
+            "approved": {"type": "boolean"},
+            "comment": {"type": "string"},
+        },
+        "required": ["score", "approved"],
+    },
+)
+spec_ref = weave.publish(quality_spec)
+print(f"annotation_spec={spec_ref.uri()}")
+
+print("\n3. structured feedbackを送信して読み戻す")
+feedback_id = call.feedback.add(
+    "wandb.annotation.answer_quality",
+    payload={
+        "value": {"score": 5, "approved": True, "comment": "簡潔で根拠もある"}
+    },
+    annotation_ref=spec_ref.uri(),
+)
+# Feedbackはバックグラウンド送信されるため、読み戻す前にキューをflushする。
+weave.finish()
+init_weave()
+feedbacks = list(call.feedback)
+assert any(item.id == feedback_id for item in feedbacks)
+print(f"feedback_id={feedback_id}")
+print(f"feedback_count={len(feedbacks)}")
+print("\nAnnotation workflow demo: OK")

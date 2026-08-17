@@ -2961,7 +2961,7 @@ wheels = [
 
 [[package]]
 name = "weave"
-version = "0.53.2"
+version = "0.53.6"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cachetools" },
@@ -2975,13 +2975,14 @@ dependencies = [
     { name = "packaging" },
     { name = "polyfile-weave" },
     { name = "pydantic" },
+    { name = "pyyaml" },
     { name = "sentry-sdk" },
     { name = "tenacity" },
     { name = "tzdata", marker = "sys_platform == 'win32'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/74/b1/566cd40fa3455f2601306a4ebc1ea6c3f26161a01cbdeda668da1479f4df/weave-0.53.2.tar.gz", hash = "sha256:2e14e3279ebc62eb529aabf498aa02d526a01f18a189dfcfec19d2f38e75832a", size = 1148019 }
+sdist = { url = "https://files.pythonhosted.org/packages/a4/4a/5a016b2bf6bd177ffa92f24a915eaf7f642d7e5e32e17021e57f2b138ddc/weave-0.53.6.tar.gz", hash = "sha256:f91b54a3bd5abbb455d4f047f53ba93deb9940819d7278107559ca9f71235742", size = 1193939 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/57/e9/a22ed23dae0f1231b66afb84bd9460fa9b7c82a81841b7eb0c83593de06f/weave-0.53.2-py3-none-any.whl", hash = "sha256:0e44fcd002ed6e77f759f69a6b257edea8b645612c4b2cb41a8291f697299a3f", size = 1390710 },
+    { url = "https://files.pythonhosted.org/packages/2a/4f/9aecfc3b456294ed371bc6484b404aece22d2a3f096a60c0ae956b23f5f6/weave-0.53.6-py3-none-any.whl", hash = "sha256:284de065a738f5620bf0d4f060b2bef4257f1afa8008685fd3b4f006012e9806", size = 1447894 },
 ]
 
 [[package]]
@@ -3026,7 +3027,7 @@ requires-dist = [
     { name = "reportlab", specifier = ">=4.4.9" },
     { name = "requests", specifier = ">=2.32.5" },
     { name = "wandb", specifier = ">=0.27.0" },
-    { name = "weave", specifier = ">=0.53.2" },
+    { name = "weave", specifier = "==0.53.6" },
 ]
 
 [[package]]
