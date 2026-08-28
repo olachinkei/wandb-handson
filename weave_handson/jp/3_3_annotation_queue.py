@@ -82,10 +82,10 @@ Note
 from dotenv import load_dotenv
 import weave
 
-from config_loader import init_weave
+from config_loader import get_weave_project_name
 
 load_dotenv()
-init_weave()
+weave.init(get_weave_project_name())
 
 print(__doc__)
 
@@ -131,7 +131,7 @@ feedback_id = call.feedback.add(
 )
 # Feedbackはバックグラウンド送信されるため、読み戻す前にキューをflushする。
 weave.finish()
-init_weave()
+weave.init(get_weave_project_name())
 feedbacks = list(call.feedback)
 assert any(item.id == feedback_id for item in feedbacks)
 print(f"feedback_id={feedback_id}")

@@ -19,13 +19,13 @@ import time
 from dotenv import load_dotenv
 import weave
 
-from config_loader import chat_completion, init_weave
+from config_loader import chat_completion, get_weave_project_name
 
 # Load environment variables
 load_dotenv()
 
 # Initialize Weave
-init_weave()
+weave.init(get_weave_project_name())
 
 
 # =============================================================================

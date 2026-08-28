@@ -36,13 +36,6 @@ def get_weave_project_name() -> str:
     return f"{entity}/{project}" if entity else project
 
 
-def init_weave():
-    """Initialize Weave consistently across hands-on scripts."""
-    import weave
-
-    return weave.init(get_weave_project_name())
-
-
 def get_model_name() -> str:
     """Get the OpenAI model name from config."""
     config = load_config()

@@ -58,19 +58,19 @@ import asyncio
 
 import requests
 from dotenv import load_dotenv
+import weave
 
 from agents import Agent, Runner, function_tool
 
-from config_loader import init_weave
+from config_loader import get_weave_project_name
 
 # Load environment variables
 load_dotenv()
 
 # Initialize Weave
-# init_weave() は内部で weave.init(...) を呼び出します。
 # OpenAI Agents SDK の実行は Weave により自動計測されるため、
 # Tracing Processor を手動登録する必要はありません。
-init_weave()
+weave.init(get_weave_project_name())
 
 
 # =============================================================================
