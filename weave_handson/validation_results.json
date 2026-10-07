@@ -1,0 +1,316 @@
+{
+  "date": "2026-10-07",
+  "python": "3.11.15",
+  "weave": "0.53.11",
+  "latest_version_source": "https://pypi.org/pypi/weave/json",
+  "scope": "README agenda: jp/en numbered Python samples; real APIs, default configuration",
+  "summary": {
+    "scripts": 40,
+    "api_scripts": 25,
+    "explanation_scripts": 15,
+    "final_pass": 40,
+    "initial_failures": 1,
+    "preflight_test_py": "PASS"
+  },
+  "dependency_checks": {
+    "uv_sync_locked": "PASS",
+    "uv_pip_check": "PASS",
+    "fresh_requirements_install_and_sdk_imports": "PASS"
+  },
+  "fix": "jp/3_3_annotation_queue.py: SDK batch feedback ID differs from persisted server ID. Verify feedback type, payload and AnnotationSpec on the new call, refresh with bounded retries. Two final runs passed.",
+  "limitations": [
+    "Sora video generation skipped by default (RUN_EXPENSIVE_MULTIMODAL was not set).",
+    "Explanation scripts only display guidance; UI workflows were not exercised.",
+    "jp/W&B_models_intro_notebook.ipynb is a W&B Models notebook outside the Weave README agenda and was not executed.",
+    "Fresh requirements environment emits RequestsDependencyWarning for transitive urllib3/chardet versions; imports succeed. Full sample execution used the recommended uv environment.",
+    "3_1 evaluation exact-match score was 0.8 in both languages; successful execution does not imply every LLM answer exactly matches its expected text."
+  ],
+  "results": [
+    {
+      "script": "jp/1_1_basic_trace.py",
+      "kind": "API",
+      "status": "PASS",
+      "seconds": 17.2,
+      "log": "outputs/validation-2026-10-07/jp-1_1_basic_trace.log"
+    },
+    {
+      "script": "jp/1_2_advanced_trace.py",
+      "kind": "API",
+      "status": "PASS",
+      "seconds": 14.5,
+      "log": "outputs/validation-2026-10-07/jp-1_2_advanced_trace.log"
+    },
+    {
+      "script": "jp/1_3_multimodal_openai.py",
+      "kind": "API",
+      "status": "PASS",
+      "seconds": 59.8,
+      "log": "outputs/validation-2026-10-07/jp-1_3_multimodal_openai.log"
+    },
+    {
+      "script": "jp/1_4_agent_integration.py",
+      "kind": "API",
+      "status": "PASS",
+      "seconds": 17.4,
+      "log": "outputs/validation-2026-10-07/jp-1_4_agent_integration.log"
+    },
+    {
+      "script": "jp/1_5_agent.py",
+      "kind": "API",
+      "status": "PASS",
+      "seconds": 9.7,
+      "log": "outputs/validation-2026-10-07/jp-1_5_agent.log"
+    },
+    {
+      "script": "jp/1_6_agent_advanced.py",
+      "kind": "API",
+      "status": "PASS",
+      "seconds": 4.6,
+      "log": "outputs/validation-2026-10-07/jp-1_6_agent_advanced.log"
+    },
+    {
+      "script": "jp/2_1_assets.py",
+      "kind": "API",
+      "status": "PASS",
+      "seconds": 22.7,
+      "log": "outputs/validation-2026-10-07/jp-2_1_assets.log"
+    },
+    {
+      "script": "jp/3_1_evaluation.py",
+      "kind": "API",
+      "status": "PASS",
+      "seconds": 9.8,
+      "log": "outputs/validation-2026-10-07/jp-3_1_evaluation.log"
+    },
+    {
+      "script": "jp/3_2_evaluation_logger.py",
+      "kind": "API",
+      "status": "PASS",
+      "seconds": 8.1,
+      "log": "outputs/validation-2026-10-07/jp-3_2_evaluation_logger.log"
+    },
+    {
+      "script": "jp/3_3_annotation_queue.py",
+      "kind": "API",
+      "status": "PASS_AFTER_FIX",
+      "seconds": 9.1,
+      "log": "outputs/validation-2026-10-07/jp-3_3_annotation_queue.log",
+      "initial_status": "FAIL",
+      "retest_logs": [
+        "outputs/validation-2026-10-07/jp-3_3_annotation_queue-retest2.log",
+        "outputs/validation-2026-10-07/jp-3_3_annotation_queue-final.log"
+      ]
+    },
+    {
+      "script": "jp/4_1_online_feedback.py",
+      "kind": "API",
+      "status": "PASS",
+      "seconds": 5.3,
+      "log": "outputs/validation-2026-10-07/jp-4_1_online_feedback.log"
+    },
+    {
+      "script": "jp/4_2_guardrail_monitoring.py",
+      "kind": "API",
+      "status": "PASS",
+      "seconds": 11.9,
+      "log": "outputs/validation-2026-10-07/jp-4_2_guardrail_monitoring.log"
+    },
+    {
+      "script": "jp/4_3_trace_monitors.py",
+      "kind": "explanation",
+      "status": "PASS",
+      "seconds": 0.0,
+      "log": "outputs/validation-2026-10-07/jp-4_3_trace_monitors.log"
+    },
+    {
+      "script": "jp/4_4_agent_signals.py",
+      "kind": "API",
+      "status": "PASS",
+      "seconds": 14.7,
+      "log": "outputs/validation-2026-10-07/jp-4_4_agent_signals.log"
+    },
+    {
+      "script": "jp/5_1_skills_mcp.py",
+      "kind": "explanation",
+      "status": "PASS",
+      "seconds": 0.0,
+      "log": "outputs/validation-2026-10-07/jp-5_1_skills_mcp.log"
+    },
+    {
+      "script": "jp/5_2_automations.py",
+      "kind": "explanation",
+      "status": "PASS",
+      "seconds": 0.0,
+      "log": "outputs/validation-2026-10-07/jp-5_2_automations.log"
+    },
+    {
+      "script": "jp/5_3_dynamic_leaderboards.py",
+      "kind": "explanation",
+      "status": "PASS",
+      "seconds": 0.0,
+      "log": "outputs/validation-2026-10-07/jp-5_3_dynamic_leaderboards.log"
+    },
+    {
+      "script": "jp/5_4_trace_plots.py",
+      "kind": "explanation",
+      "status": "PASS",
+      "seconds": 0.0,
+      "log": "outputs/validation-2026-10-07/jp-5_4_trace_plots.log"
+    },
+    {
+      "script": "jp/5_5_saved_views.py",
+      "kind": "explanation",
+      "status": "PASS",
+      "seconds": 0.0,
+      "log": "outputs/validation-2026-10-07/jp-5_5_saved_views.log"
+    },
+    {
+      "script": "jp/5_6_playground.py",
+      "kind": "explanation",
+      "status": "PASS",
+      "seconds": 0.0,
+      "log": "outputs/validation-2026-10-07/jp-5_6_playground.log"
+    },
+    {
+      "script": "en/1_1_basic_trace.py",
+      "kind": "API",
+      "status": "PASS",
+      "seconds": 17.3,
+      "log": "outputs/validation-2026-10-07/en-1_1_basic_trace.log"
+    },
+    {
+      "script": "en/1_2_advanced_trace.py",
+      "kind": "API",
+      "status": "PASS",
+      "seconds": 13.2,
+      "log": "outputs/validation-2026-10-07/en-1_2_advanced_trace.log"
+    },
+    {
+      "script": "en/1_3_multimodal_openai.py",
+      "kind": "API",
+      "status": "PASS",
+      "seconds": 51.6,
+      "log": "outputs/validation-2026-10-07/en-1_3_multimodal_openai.log"
+    },
+    {
+      "script": "en/1_4_agent_integration.py",
+      "kind": "API",
+      "status": "PASS",
+      "seconds": 22.7,
+      "log": "outputs/validation-2026-10-07/en-1_4_agent_integration.log"
+    },
+    {
+      "script": "en/1_5_agent.py",
+      "kind": "API",
+      "status": "PASS",
+      "seconds": 10.8,
+      "log": "outputs/validation-2026-10-07/en-1_5_agent.log"
+    },
+    {
+      "script": "en/1_6_agent_advanced.py",
+      "kind": "API",
+      "status": "PASS",
+      "seconds": 4.7,
+      "log": "outputs/validation-2026-10-07/en-1_6_agent_advanced.log"
+    },
+    {
+      "script": "en/2_1_assets.py",
+      "kind": "API",
+      "status": "PASS",
+      "seconds": 25.9,
+      "log": "outputs/validation-2026-10-07/en-2_1_assets.log"
+    },
+    {
+      "script": "en/3_1_evaluation.py",
+      "kind": "API",
+      "status": "PASS",
+      "seconds": 9.6,
+      "log": "outputs/validation-2026-10-07/en-3_1_evaluation.log"
+    },
+    {
+      "script": "en/3_2_evaluation_logger.py",
+      "kind": "API",
+      "status": "PASS",
+      "seconds": 8.0,
+      "log": "outputs/validation-2026-10-07/en-3_2_evaluation_logger.log"
+    },
+    {
+      "script": "en/3_3_annotation_queue.py",
+      "kind": "explanation",
+      "status": "PASS",
+      "seconds": 0.0,
+      "log": "outputs/validation-2026-10-07/en-3_3_annotation_queue.log"
+    },
+    {
+      "script": "en/4_1_online_feedback.py",
+      "kind": "API",
+      "status": "PASS",
+      "seconds": 6.1,
+      "log": "outputs/validation-2026-10-07/en-4_1_online_feedback.log"
+    },
+    {
+      "script": "en/4_2_guardrail_monitoring.py",
+      "kind": "API",
+      "status": "PASS",
+      "seconds": 10.6,
+      "log": "outputs/validation-2026-10-07/en-4_2_guardrail_monitoring.log"
+    },
+    {
+      "script": "en/4_3_trace_monitors.py",
+      "kind": "explanation",
+      "status": "PASS",
+      "seconds": 0.0,
+      "log": "outputs/validation-2026-10-07/en-4_3_trace_monitors.log"
+    },
+    {
+      "script": "en/4_4_agent_signals.py",
+      "kind": "API",
+      "status": "PASS",
+      "seconds": 20.1,
+      "log": "outputs/validation-2026-10-07/en-4_4_agent_signals.log"
+    },
+    {
+      "script": "en/5_1_skills_mcp.py",
+      "kind": "explanation",
+      "status": "PASS",
+      "seconds": 0.0,
+      "log": "outputs/validation-2026-10-07/en-5_1_skills_mcp.log"
+    },
+    {
+      "script": "en/5_2_automations.py",
+      "kind": "explanation",
+      "status": "PASS",
+      "seconds": 0.0,
+      "log": "outputs/validation-2026-10-07/en-5_2_automations.log"
+    },
+    {
+      "script": "en/5_3_dynamic_leaderboards.py",
+      "kind": "explanation",
+      "status": "PASS",
+      "seconds": 0.0,
+      "log": "outputs/validation-2026-10-07/en-5_3_dynamic_leaderboards.log"
+    },
+    {
+      "script": "en/5_4_trace_plots.py",
+      "kind": "explanation",
+      "status": "PASS",
+      "seconds": 0.0,
+      "log": "outputs/validation-2026-10-07/en-5_4_trace_plots.log"
+    },
+    {
+      "script": "en/5_5_saved_views.py",
+      "kind": "explanation",
+      "status": "PASS",
+      "seconds": 0.0,
+      "log": "outputs/validation-2026-10-07/en-5_5_saved_views.log"
+    },
+    {
+      "script": "en/5_6_playground.py",
+      "kind": "explanation",
+      "status": "PASS",
+      "seconds": 0.0,
+      "log": "outputs/validation-2026-10-07/en-5_6_playground.log"
+    }
+  ],
+  "preflight_log": "outputs/validation-2026-10-07/preflight.log"
+}

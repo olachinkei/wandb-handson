@@ -1,5 +1,5 @@
 wandb==0.27.0
-weave==0.53.6
+weave==0.53.11
 openai==2.40.0
 openai-agents==0.17.4
 requests==2.32.5

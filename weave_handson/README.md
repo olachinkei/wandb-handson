@@ -130,7 +130,8 @@ set +a
 
 ```bash
 uv sync
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
+source .venv/bin/activate  
+# Windows: .venv\Scripts\activate
 ```
 
 `uv sync` により、`weave`、`openai-agents`、`requests` を含む必要な依存関係が `.venv` にインストールされます。`openai-agents` のPython import名は `agents` です。
@@ -147,7 +148,8 @@ python -c "import agents, requests, weave; print('Dependencies: OK')"
 
 ```bash
 python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
+source .venv/bin/activate  
+# Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 

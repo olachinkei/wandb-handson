@@ -79,13 +79,15 @@ Note
 - 人手評価は、LLM アプリケーション改善の重要なフィードバック源になります
 """
 
+import time
+
 from dotenv import load_dotenv
 import weave
 
-from config_loader import init_weave
+from config_loader import get_weave_project_name
 
 load_dotenv()
-init_weave()
+weave.init(get_weave_project_name())
 
 print(__doc__)
 
@@ -122,18 +124,39 @@ spec_ref = weave.publish(quality_spec)
 print(f"annotation_spec={spec_ref.uri()}")
 
 print("\n3. structured feedbackを送信して読み戻す")
+feedback_type = "wandb.annotation.answer_quality"
+feedback_payload = {
+    "value": {"score": 5, "approved": True, "comment": "簡潔で根拠もある"}
+}
 feedback_id = call.feedback.add(
-    "wandb.annotation.answer_quality",
-    payload={
-        "value": {"score": 5, "approved": True, "comment": "簡潔で根拠もある"}
-    },
+    feedback_type,
+    payload=feedback_payload,
     annotation_ref=spec_ref.uri(),
 )
 # Feedbackはバックグラウンド送信されるため、読み戻す前にキューをflushする。
 weave.finish()
-init_weave()
-feedbacks = list(call.feedback)
-assert any(item.id == feedback_id for item in feedbacks)
+client = weave.init(get_weave_project_name())
+# バッチ送信時の返却IDとサーバー保存IDが異なる環境があるため、
+# このcallに保存されたtype、payload、annotation_refを照合する。
+# 送信完了後も検索への反映には時間がかかる場合がある。
+# 新しいクライアントで取得し、キャッシュを更新しながら有限回だけ再試行する。
+feedback_query = client.get_call(call.id).feedback
+for attempt in range(10):
+    feedbacks = list(feedback_query.refresh())
+    saved_feedback = next(
+        (item for item in feedbacks
+         if item.feedback_type == feedback_type
+         and item.payload == feedback_payload
+         and item.annotation_ref == spec_ref.uri()),
+        None,
+    )
+    if saved_feedback is not None:
+        break
+    if attempt < 9:
+        time.sleep(1)
+else:
+    raise RuntimeError(f"送信したフィードバックを読み戻せません: {feedback_id}")
 print(f"feedback_id={feedback_id}")
+print(f"saved_feedback_id={saved_feedback.id}")
 print(f"feedback_count={len(feedbacks)}")
 print("\nAnnotation workflow demo: OK")

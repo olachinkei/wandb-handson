@@ -46,13 +46,13 @@ from dotenv import load_dotenv
 import weave
 from weave import Message, Usage
 
-from config_loader import get_llm_client, get_model_name, init_weave
+from config_loader import get_llm_client, get_model_name, get_weave_project_name
 
 # Load environment variables
 load_dotenv()
 
 # Initialize Weave
-init_weave()
+weave.init(get_weave_project_name())
 
 client = get_llm_client()
 MODEL = get_model_name()

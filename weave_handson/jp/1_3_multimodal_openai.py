@@ -29,13 +29,13 @@ from PIL import Image, ImageDraw
 import weave
 from weave import Content
 
-from config_loader import init_weave
+from config_loader import get_weave_project_name
 
 # Load environment variables
 load_dotenv()
 
 # Initialize Weave
-init_weave()
+weave.init(get_weave_project_name())
 
 # OpenAI client
 client = OpenAI()
