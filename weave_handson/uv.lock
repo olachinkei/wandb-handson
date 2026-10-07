@@ -1,14 +1,14 @@
 version = 1
-revision = 1
+revision = 3
 requires-python = ">=3.11"
 resolution-markers = [
     "python_full_version >= '3.14' and sys_platform == 'linux'",
-    "python_full_version == '3.13.*' and sys_platform == 'linux'",
-    "python_full_version == '3.12.*' and sys_platform == 'linux'",
-    "python_full_version < '3.12' and sys_platform == 'linux'",
     "python_full_version >= '3.14' and sys_platform != 'linux'",
+    "python_full_version == '3.13.*' and sys_platform == 'linux'",
     "python_full_version == '3.13.*' and sys_platform != 'linux'",
+    "python_full_version == '3.12.*' and sys_platform == 'linux'",
     "python_full_version == '3.12.*' and sys_platform != 'linux'",
+    "python_full_version < '3.12' and sys_platform == 'linux'",
     "python_full_version < '3.12' and sys_platform != 'linux'",
 ]
 
@@ -2961,12 +2961,13 @@ wheels = [
 
 [[package]]
 name = "weave"
-version = "0.53.6"
+version = "0.53.11"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cachetools" },
     { name = "click" },
     { name = "diskcache-weave" },
+    { name = "distro" },
     { name = "gql", extra = ["httpx"] },
     { name = "jsonschema" },
     { name = "opentelemetry-api" },
@@ -2975,14 +2976,14 @@ dependencies = [
     { name = "packaging" },
     { name = "polyfile-weave" },
     { name = "pydantic" },
-    { name = "pyyaml" },
     { name = "sentry-sdk" },
+    { name = "sniffio" },
     { name = "tenacity" },
     { name = "tzdata", marker = "sys_platform == 'win32'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a4/4a/5a016b2bf6bd177ffa92f24a915eaf7f642d7e5e32e17021e57f2b138ddc/weave-0.53.6.tar.gz", hash = "sha256:f91b54a3bd5abbb455d4f047f53ba93deb9940819d7278107559ca9f71235742", size = 1193939 }
+sdist = { url = "https://files.pythonhosted.org/packages/d7/77/68fa082fd6aed4de788e613a03988be05da98f9a01e511bf60c67f985514/weave-0.53.11.tar.gz", hash = "sha256:75c8441c952bbfa41f7ef9ab37fc7759c095ee387167a20e8b824759646367ab", size = 1368106 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/2a/4f/9aecfc3b456294ed371bc6484b404aece22d2a3f096a60c0ae956b23f5f6/weave-0.53.6-py3-none-any.whl", hash = "sha256:284de065a738f5620bf0d4f060b2bef4257f1afa8008685fd3b4f006012e9806", size = 1447894 },
+    { url = "https://files.pythonhosted.org/packages/5e/13/eb49f84310b6640848f6a1ce97f3ca1961a9af7bc92d64b8663eb8324052/weave-0.53.11-py3-none-any.whl", hash = "sha256:d87e361ba057dd25d700984fb4664bb4b795a17e6f2a51e0030755da0def1327", size = 1816882 },
 ]
 
 [[package]]
@@ -3027,7 +3028,7 @@ requires-dist = [
     { name = "reportlab", specifier = ">=4.4.9" },
     { name = "requests", specifier = ">=2.32.5" },
     { name = "wandb", specifier = ">=0.27.0" },
-    { name = "weave", specifier = "==0.53.6" },
+    { name = "weave", specifier = "==0.53.11" },
 ]
 
 [[package]]
