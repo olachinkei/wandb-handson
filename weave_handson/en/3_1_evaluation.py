@@ -22,13 +22,13 @@ from openai import OpenAI
 import weave
 from weave import Dataset, Evaluation
 
-from config_loader import get_model_name, get_weave_project_name
+from config_loader import get_model_name
 
 # Load environment variables
 load_dotenv()
 
 # Initialize Weave
-weave.init(get_weave_project_name())
+weave.init()
 
 
 # =============================================================================

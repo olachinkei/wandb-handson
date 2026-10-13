@@ -84,10 +84,9 @@ import time
 from dotenv import load_dotenv
 import weave
 
-from config_loader import get_weave_project_name
 
 load_dotenv()
-weave.init(get_weave_project_name())
+weave.init()
 
 print(__doc__)
 
@@ -135,7 +134,7 @@ feedback_id = call.feedback.add(
 )
 # Feedbackはバックグラウンド送信されるため、読み戻す前にキューをflushする。
 weave.finish()
-client = weave.init(get_weave_project_name())
+client = weave.init()
 # バッチ送信時の返却IDとサーバー保存IDが異なる環境があるため、
 # このcallに保存されたtype、payload、annotation_refを照合する。
 # 送信完了後も検索への反映には時間がかかる場合がある。

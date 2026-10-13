@@ -29,13 +29,6 @@ def get_llm_client():
     return openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 
-def get_weave_project_name() -> str:
-    """Get the Weave project path used by all hands-on scripts."""
-    entity = os.getenv("WANDB_ENTITY")
-    project = os.getenv("WANDB_PROJECT", "weave-handson")
-    return f"{entity}/{project}" if entity else project
-
-
 def get_model_name() -> str:
     """Get the OpenAI model name from config."""
     config = load_config()

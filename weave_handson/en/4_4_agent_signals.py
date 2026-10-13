@@ -35,14 +35,13 @@ import weave
 from agents import Agent, Runner, function_tool
 from dotenv import load_dotenv
 
-from config_loader import get_weave_project_name
 
 
 load_dotenv()
 
 # As in the official example, weave.init(...) automatically instruments the
 # OpenAI Agents SDK. No manual Tracing Processor registration is needed.
-weave.init(get_weave_project_name())
+weave.init()
 
 
 @function_tool

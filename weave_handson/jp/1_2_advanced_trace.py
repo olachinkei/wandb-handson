@@ -24,13 +24,13 @@ from dotenv import load_dotenv
 import weave
 from weave.utils import sanitize
 
-from config_loader import chat_completion, get_weave_project_name
+from config_loader import chat_completion
 
 # Load environment variables
 load_dotenv()
 
 # Initialize Weave
-client = weave.init(get_weave_project_name())
+client = weave.init()
 
 
 # =============================================================================

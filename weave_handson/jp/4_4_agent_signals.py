@@ -34,13 +34,12 @@ import weave
 from agents import Agent, Runner, function_tool
 from dotenv import load_dotenv
 
-from config_loader import get_weave_project_name
 
 
 load_dotenv()
 
 # 公式例と同じく、weave.init(...)だけでOpenAI Agents SDKを自動計測します。
-weave.init(get_weave_project_name())
+weave.init()
 
 
 @function_tool

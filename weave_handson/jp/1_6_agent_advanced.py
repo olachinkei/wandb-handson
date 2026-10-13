@@ -31,13 +31,12 @@ from dotenv import load_dotenv
 import weave
 from weave import LLM, Message, Tool, Turn, Usage
 
-from config_loader import get_weave_project_name
 
 # Load environment variables
 load_dotenv()
 
 # Initialize Weave
-weave.init(get_weave_project_name())
+weave.init()
 
 
 # =============================================================================
